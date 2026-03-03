@@ -4,6 +4,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/trpc(.*)", // tRPC handles its own auth via protectedProcedure
+  "/clerk(.*)",    // Clerk proxy — must be publicly accessible
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
