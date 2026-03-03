@@ -30,13 +30,22 @@ async function proxy(req: NextRequest, params: { path: string[] }) {
   }
   forwardHeaders.set("host", CLERK_HOST);
 
-  const upstream = await fetch(upstreamUrl, {
-    method: req.method,
-    headers: forwardHeaders,
-    body: req.method !== "GET" && req.method !== "HEAD" ? req.body : undefined,
-    duplex: "half",
-    redirect: "manual",
-  } as RequestInit);
+  let upstream: Response;
+  try {
+    upstream = await fetch(upstreamUrl, {
+      method: req.method,
+      headers: forwardHeaders,
+      body: req.method !== "GET" && req.method !== "HEAD" ? req.body : undefined,
+      duplex: "half",
+      redirect: "manual",
+    } as RequestInit);
+  } catch (err) {
+    console.error("[Clerk proxy] upstream fetch failed:", upstreamUrl, err);
+    return new NextResponse(
+      JSON.stringify({ error: "clerk_proxy_upstream_error", url: upstreamUrl }),
+      { status: 502, headers: { "content-type": "application/json" } },
+    );
+  }
 
   const responseHeaders = new Headers();
   for (const [key, value] of upstream.headers.entries()) {
