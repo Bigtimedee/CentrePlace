@@ -1,0 +1,194 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Monte Carlo Engine — Probabilistic FI Forecasting
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Runs N simplified annual simulations with log-normal investment returns.
+// Uses the deterministic quarterly result for non-investment cash flows
+// (carry, W-2, rental, spending) and RE / insurance buckets.
+// ─────────────────────────────────────────────────────────────────────────────
+
+import type { SimulationInput, SimulationResult } from "./types";
+import type {
+  MonteCarloOptions,
+  MonteCarloResult,
+  MonteCarloYearBand,
+} from "./monte-carlo-types";
+
+const YEARS = 40;
+const CARRY_TAX = 0.238; // simplified LTCG + NIIT rate
+const W2_TAX = 0.50;     // simplified effective rate for high-W2 earners
+
+// ── Box-Muller normal RNG ─────────────────────────────────────────────────────
+
+function randNormal(): number {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+// ── Percentile helper (requires sorted array) ─────────────────────────────────
+
+function percentile(sorted: number[], p: number): number {
+  const idx = p * (sorted.length - 1);
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  return sorted[lo] + (idx - lo) * (sorted[hi] - sorted[lo]);
+}
+
+// ── Main engine ───────────────────────────────────────────────────────────────
+
+export function runMonteCarlo(
+  simInput: SimulationInput,
+  deterministicResult: SimulationResult,
+  options: MonteCarloOptions,
+): MonteCarloResult {
+  const { simulations, returnVolatility: σ, varyCarryHaircut } = options;
+  const { startYear, currentAge } = deterministicResult;
+  const μ = simInput.profile.assumedReturnRate;
+
+  // ── Q4 snapshots for each of 40 years ──────────────────────────────────────
+  const q4Rows = Array.from({ length: YEARS }, (_, t) => {
+    const year = startYear + t;
+    return deterministicResult.quarters.find(
+      q => q.year === year && q.quarterLabel === "Q4",
+    ) ?? null;
+  });
+
+  // ── Annual carry and LP sums across all 4 quarters ─────────────────────────
+  const annualCarry = Array.from({ length: YEARS }, (_, t) => {
+    const year = startYear + t;
+    return deterministicResult.quarters
+      .filter(q => q.year === year)
+      .reduce((s, q) => s + q.carryIncome, 0);
+  });
+
+  const annualLP = Array.from({ length: YEARS }, (_, t) => {
+    const year = startYear + t;
+    return deterministicResult.quarters
+      .filter(q => q.year === year)
+      .reduce((s, q) => s + q.lpIncome, 0);
+  });
+
+  // ── Carry positions by realization year (for varyCarryHaircut) ─────────────
+  const carryByYear = new Map<number, typeof simInput.carry>();
+  for (const c of simInput.carry) {
+    const yr = c.expectedRealizationYear;
+    if (!carryByYear.has(yr)) carryByYear.set(yr, []);
+    carryByYear.get(yr)!.push(c);
+  }
+
+  // ── Seed investment capital from current account balances ──────────────────
+  const initialInvestmentCapital = simInput.investmentAccounts.reduce(
+    (s, a) => s + a.currentBalance,
+    0,
+  );
+
+  // ── Run N simulations ──────────────────────────────────────────────────────
+  // yearEndCapitals[t][sim] = total capital at end of year t for simulation sim
+  const yearEndCapitals: number[][] = Array.from({ length: YEARS }, () =>
+    new Array(simulations).fill(0),
+  );
+  const fiYears: (number | null)[] = new Array(simulations).fill(null);
+
+  for (let sim = 0; sim < simulations; sim++) {
+    let investmentCapital = initialInvestmentCapital;
+
+    for (let t = 0; t < YEARS; t++) {
+      const q4 = q4Rows[t];
+      if (!q4) continue;
+      const year = startYear + t;
+
+      // 1. Random log-normal investment return: E[r_t] = e^μ
+      const Z = randNormal();
+      investmentCapital *= Math.exp(Z * σ + (μ - (σ * σ) / 2));
+
+      // 2. Carry + LP net proceeds (post simplified tax)
+      let carryLP: number;
+      if (varyCarryHaircut) {
+        const carries = carryByYear.get(year) ?? [];
+        carryLP =
+          carries.reduce((s, c) => {
+            const randomHaircut = Math.random() * 2 * c.haircutPct;
+            return s + c.expectedGrossCarry * (1 - randomHaircut);
+          }, 0) + annualLP[t];
+      } else {
+        carryLP = annualCarry[t] + annualLP[t];
+      }
+      investmentCapital += carryLP * (1 - CARRY_TAX);
+
+      // 3. W-2 net income (quarterly × 4 for annual, simplified tax)
+      investmentCapital += q4.w2Income * 4 * (1 - W2_TAX);
+
+      // 4. Rental net income (quarterly × 4 for annual)
+      investmentCapital += q4.rentalNetIncome * 4;
+
+      // 5. Annual spending (reverse of 25× rule from requiredCapital)
+      investmentCapital -= q4.requiredCapital * 0.04;
+
+      // 6. Total capital: investment + deterministic RE equity + insurance CV
+      const totalCapital =
+        investmentCapital + q4.realEstateEquity + q4.insuranceCashValue;
+      yearEndCapitals[t][sim] = totalCapital;
+
+      // 7. FI detection
+      if (fiYears[sim] === null && totalCapital >= q4.requiredCapital) {
+        fiYears[sim] = year;
+      }
+    }
+  }
+
+  // ── Build annual bands ─────────────────────────────────────────────────────
+  const bands: MonteCarloYearBand[] = [];
+
+  for (let t = 0; t < YEARS; t++) {
+    const year = startYear + t;
+    const q4 = q4Rows[t];
+    if (!q4) continue;
+
+    const sorted = [...yearEndCapitals[t]].sort((a, b) => a - b);
+    const pctFI =
+      fiYears.filter(fy => fy !== null && fy <= year).length / simulations;
+
+    bands.push({
+      year,
+      age: currentAge + t,
+      p10: percentile(sorted, 0.1),
+      p25: percentile(sorted, 0.25),
+      p50: percentile(sorted, 0.5),
+      p75: percentile(sorted, 0.75),
+      p90: percentile(sorted, 0.9),
+      pctFI,
+      base: q4.totalCapital,
+      requiredCapital: q4.requiredCapital,
+    });
+  }
+
+  // ── Summary statistics ─────────────────────────────────────────────────────
+  const deterministicFiYear = deterministicResult.fiDate?.year ?? null;
+  const medianFiYear = bands.find(b => b.pctFI >= 0.5)?.year ?? null;
+  const medianFiAge =
+    medianFiYear !== null ? currentAge + (medianFiYear - startYear) : null;
+  const p25FiYear = bands.find(b => b.pctFI >= 0.25)?.year ?? null;
+  const p75FiYear = bands.find(b => b.pctFI >= 0.75)?.year ?? null;
+
+  let pFIByBaseYear = 0;
+  if (deterministicFiYear !== null) {
+    const band = bands.find(b => b.year === deterministicFiYear);
+    pFIByBaseYear = band?.pctFI ?? 0;
+  }
+
+  return {
+    bands,
+    medianFiYear,
+    medianFiAge,
+    p25FiYear,
+    p75FiYear,
+    pFIByBaseYear,
+    deterministicFiYear,
+    simulations,
+    startYear,
+    options,
+  };
+}
