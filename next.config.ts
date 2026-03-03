@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: "/clerk/:path*",
+        destination: "https://frontend-api.clerk.services/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
