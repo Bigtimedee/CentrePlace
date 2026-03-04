@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider dynamic proxyUrl="https://gpretire.com/clerk">
+    <ClerkProvider dynamic>
       <html lang="en">
         <body className={`${inter.className} bg-slate-950 text-slate-50 antialiased`}>
           <TRPCProvider>
