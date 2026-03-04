@@ -4,6 +4,7 @@ import { assembleSimInput } from "../../simulation/assembler";
 import { runSimulation } from "../../simulation/engine/quarterly-engine";
 import { applyScenarioOverrides } from "../../simulation/engine/scenario-types";
 import type { ScenarioRun } from "../../simulation/engine/scenario-types";
+import type { SimulationInput } from "../../simulation/engine/types";
 
 // ── Zod schema for overrides ───────────────────────────────────────────────────
 
@@ -29,18 +30,9 @@ const ScenarioDefSchema = z.object({
 
 export const scenariosRouter = createTRPCRouter({
   /**
-   * Return the user's base SimulationInput (without running the engine).
-   * The client uses this to show "current" values as placeholder text in
-   * the scenario editor, and can pass it back with overrides to compareRun.
-   */
-  getBaseInput: protectedProcedure.query(async ({ ctx }) => {
-    return assembleSimInput(ctx);
-  }),
-
-  /**
-   * Run up to 3 scenarios in a single request.
-   * The base SimulationInput is assembled once from the DB, then each
-   * scenario's overrides are applied and runSimulation() is called N times.
+   * Assemble base input + run up to 3 scenario variants in one request.
+   * Returning baseInput alongside runs means the client needs only this
+   * single call — no separate getBaseInput round-trip.
    */
   compareRun: protectedProcedure
     .input(
@@ -48,10 +40,10 @@ export const scenariosRouter = createTRPCRouter({
         scenarios: z.array(ScenarioDefSchema).min(1).max(3),
       }),
     )
-    .mutation(async ({ ctx, input }): Promise<ScenarioRun[]> => {
+    .mutation(async ({ ctx, input }): Promise<{ baseInput: SimulationInput; runs: ScenarioRun[] }> => {
       const baseInput = await assembleSimInput(ctx);
 
-      return input.scenarios.map(scenario => {
+      const runs = input.scenarios.map(scenario => {
         const variantInput = applyScenarioOverrides(baseInput, scenario.overrides);
         const result = runSimulation(variantInput);
         return {
@@ -61,5 +53,7 @@ export const scenariosRouter = createTRPCRouter({
           result,
         };
       });
+
+      return { baseInput, runs };
     }),
 });

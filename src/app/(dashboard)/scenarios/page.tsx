@@ -27,15 +27,13 @@ const DEFAULT_SCENARIOS: ScenarioDefinition[] = SCENARIO_TEMPLATES.map((t, i) =>
 export default function ScenariosPage() {
   const [scenarios, setScenarios] = useState<ScenarioDefinition[]>(DEFAULT_SCENARIOS);
 
-  // Fetch base input for placeholder display in lever editors
-  const { data: baseInput } = trpc.scenarios.getBaseInput.useQuery(undefined, {
-    staleTime: 120_000,
-    retry: false,
-  });
-
-  // Run all scenarios whenever definitions change
-  const { data: scenarioRuns, isPending: isLoading, error, mutate: runScenarios } =
+  // Single call: assembles base input + runs all scenario variants.
+  // baseInput is returned alongside runs so no separate round-trip is needed.
+  const { data: compareResult, isPending: isLoading, error, mutate: runScenarios } =
     trpc.scenarios.compareRun.useMutation();
+
+  const baseInput = compareResult?.baseInput ?? null;
+  const scenarioRuns = compareResult?.runs ?? null;
 
   useEffect(() => {
     runScenarios({ scenarios });
