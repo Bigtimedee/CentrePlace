@@ -180,6 +180,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
   let priorYearAgi = 0;
   let ytdOrdinaryIncome = 0;
   let ytdLtcgIncome = 0;
+  let ytdW2Income = 0; // W-2 wages only — needed for CA SDI and city wage taxes
 
   // Carry-forward of annual tax snapshot for Q1-Q3 display
   let displayOrdinaryIncome = 0;
@@ -425,6 +426,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     // ── Tax accounting ──
     // Accumulate year-to-date taxable income
     // Yield income: ordinary yield → ordinary income; qualified yield → LTCG
+    ytdW2Income += w2Income;
     ytdOrdinaryIncome +=
       w2Income +
       rentalNetIncome +
@@ -461,6 +463,8 @@ export function runSimulation(input: SimulationInput): SimulationResult {
         filingStatus: input.profile.filingStatus,
         stateCode: input.profile.stateOfResidence,
         year,
+        w2Wages: ytdW2Income,
+        cityCode: input.profile.cityOfResidence ?? undefined,
       });
 
       const annualTax = taxResult.totalTax;
@@ -485,6 +489,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       priorYearAgi = agi;
       ytdOrdinaryIncome = 0;
       ytdLtcgIncome = 0;
+      ytdW2Income = 0;
     }
 
     // ── Net cash flow → investment capital (or realization capital pool) ──

@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/select";
 import { FormField } from "@/components/ui/form-field";
 import { Toggle } from "@/components/ui/toggle";
 import { US_STATES, CURRENT_YEAR } from "@/lib/constants";
+import { CITIES_BY_STATE } from "@/server/simulation/tax/city-income";
 import { Trash2, PlusCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ export function ProfileForm() {
   const [form, setForm] = useState({
     filingStatus: "single" as "single" | "married_filing_jointly",
     stateOfResidence: "CA",
+    cityOfResidence: null as string | null,
     birthYear: CURRENT_YEAR - 40,
     targetAge: 90,
     assumedReturnRate: 7,      // displayed as percent
@@ -48,6 +50,7 @@ export function ProfileForm() {
       setForm({
         filingStatus: profile.filingStatus,
         stateOfResidence: profile.stateOfResidence,
+        cityOfResidence: profile.cityOfResidence ?? null,
         birthYear: profile.birthYear,
         targetAge: profile.targetAge,
         assumedReturnRate: Math.round(profile.assumedReturnRate * 100 * 10) / 10,
@@ -96,13 +99,27 @@ export function ProfileForm() {
             <FormField label="State of Residence" required>
               <Select
                 value={form.stateOfResidence}
-                onChange={e => setForm(f => ({ ...f, stateOfResidence: e.target.value }))}
+                onChange={e => setForm(f => ({ ...f, stateOfResidence: e.target.value, cityOfResidence: null }))}
               >
                 {US_STATES.map(s => (
                   <option key={s.code} value={s.code}>{s.name}</option>
                 ))}
               </Select>
             </FormField>
+
+            {CITIES_BY_STATE[form.stateOfResidence] && (
+              <FormField label="City / Local Tax Jurisdiction" hint="Leave blank if no city income tax applies to you">
+                <Select
+                  value={form.cityOfResidence ?? ""}
+                  onChange={e => setForm(f => ({ ...f, cityOfResidence: e.target.value || null }))}
+                >
+                  <option value="">None</option>
+                  {CITIES_BY_STATE[form.stateOfResidence].map(city => (
+                    <option key={city.code} value={city.code}>{city.name}</option>
+                  ))}
+                </Select>
+              </FormField>
+            )}
 
             <FormField label="Birth Year" required>
               <Input

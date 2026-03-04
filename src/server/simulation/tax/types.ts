@@ -39,10 +39,18 @@ export interface StateTaxInput {
   shortTermGains: number;
   filingStatus: FilingStatus;
   year: number;
+  /** W-2 wages only (salary + bonus). Used for CA SDI and city wage taxes. Defaults to ordinaryIncome if omitted. */
+  w2Wages?: number;
+  /** City/local tax jurisdiction code (e.g. "NYC", "PHL"). Drives local tax calculation. */
+  cityCode?: string;
 }
 
 export interface StateTaxResult {
   stateIncomeTax: number;
+  /** CA State Disability Insurance (1.1% of W-2 wages). Zero for all other states. */
+  sdiTax: number;
+  /** City/local income tax. Zero if no cityCode or city not recognized. */
+  cityIncomeTax: number;
   effectiveRate: number;
   ltcgTreatment: "ordinary" | "preferential" | "exempt";
 }

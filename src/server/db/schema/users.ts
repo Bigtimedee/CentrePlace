@@ -12,6 +12,8 @@ export const userProfiles = pgTable("user_profiles", {
   assumedReturnRate: real("assumed_return_rate").notNull().default(0.07), // 7%
   postFIReturnRate: real("post_fi_return_rate").notNull().default(0.05), // 5% conservative post-FI
   safeHarborElection: boolean("safe_harbor_election").notNull().default(true),
+  /** City of residence for local income tax modeling (e.g. "NYC", "Philadelphia") */
+  cityOfResidence: text("city_of_residence"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

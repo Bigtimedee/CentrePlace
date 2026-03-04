@@ -16,6 +16,8 @@ export interface SimProfile {
   safeHarborElection: boolean;
   /** Conservative return rate applied after FI is achieved (e.g. 0.05 for 5%) */
   postFIReturnRate: number;
+  /** City/local tax jurisdiction code (e.g. "NYC", "PHL"). Null = no city tax. */
+  cityOfResidence?: string | null;
 }
 
 export interface SimIncome {

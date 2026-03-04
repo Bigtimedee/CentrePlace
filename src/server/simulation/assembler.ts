@@ -205,6 +205,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
       assumedReturnRate: profile.assumedReturnRate,
       safeHarborElection: profile.safeHarborElection,
       postFIReturnRate: profile.postFIReturnRate,
+      cityOfResidence: profile.cityOfResidence ?? null,
     },
     income: income
       ? {

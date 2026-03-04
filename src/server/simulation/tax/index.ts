@@ -6,6 +6,7 @@ export * from "./types";
 export * from "./federal-income";
 export * from "./state-income";
 export * from "./estate-tax";
+export * from "./city-income";
 
 // ── Combined annual tax calculator ───────────────────────────────────────────
 // Convenience function used by the quarterly simulation engine.
@@ -29,6 +30,10 @@ export interface AnnualTaxInput {
   filingStatus: FilingStatus;
   stateCode: string;
   year: number;
+  /** W-2 wages only (salary + bonus). Used for CA SDI and city wage taxes. */
+  w2Wages?: number;
+  /** City/local tax jurisdiction code (e.g. "NYC", "PHL"). */
+  cityCode?: string;
 }
 
 export interface AnnualTaxResult {
@@ -38,6 +43,10 @@ export interface AnnualTaxResult {
   federalDepreciationRecaptureTax: number;
   totalFederalTax: number;
   stateIncomeTax: number;
+  /** CA SDI (1.1% of W-2 wages). Zero for all other states. */
+  sdiTax: number;
+  /** City/local income tax (NYC, Philadelphia, etc.). Zero if not applicable. */
+  cityIncomeTax: number;
   totalTax: number;
   effectiveFederalRate: number;
   effectiveStateRate: number;
@@ -54,6 +63,8 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     filingStatus,
     stateCode,
     year,
+    w2Wages,
+    cityCode,
   } = input;
 
   const federal = calculateFederalTax({
@@ -70,14 +81,17 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     stateCode,
     ordinaryIncome,
     longTermGains,
-    shortTermGains: 0, // short-term gains included in ordinaryIncome
+    shortTermGains: 0,
     filingStatus,
     year,
+    w2Wages,
+    cityCode,
   });
 
   const totalIncome =
     ordinaryIncome + qualifiedDividends + longTermGains + unrecaptured1250Gain;
-  const totalTax = federal.totalFederalTax + state.stateIncomeTax;
+  const totalTax =
+    federal.totalFederalTax + state.stateIncomeTax + state.sdiTax + state.cityIncomeTax;
 
   return {
     federalOrdinaryTax: federal.ordinaryTax,
@@ -86,6 +100,8 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     federalDepreciationRecaptureTax: federal.depreciationRecaptureTax,
     totalFederalTax: federal.totalFederalTax,
     stateIncomeTax: state.stateIncomeTax,
+    sdiTax: state.sdiTax,
+    cityIncomeTax: state.cityIncomeTax,
     totalTax,
     effectiveFederalRate: federal.effectiveRate,
     effectiveStateRate: state.effectiveRate,

@@ -12,6 +12,7 @@
 //   "exempt"        — no state capital gains tax
 
 import type { FilingStatus, StateTaxInput, StateTaxResult } from "./types";
+import { calculateCityTax } from "./city-income";
 
 interface StateBracket {
   rate: number;
@@ -37,11 +38,11 @@ const STATE_CONFIGS: Record<string, StateConfig> = {
   AK: { type: "none", ltcgTreatment: "exempt" },
   FL: { type: "none", ltcgTreatment: "exempt" },
   NV: { type: "none", ltcgTreatment: "exempt" },
-  NH: { type: "none", ltcgTreatment: "exempt", notes: "NH taxes interest/divs only, not wages/LTCG" },
+  NH: { type: "none", ltcgTreatment: "exempt", notes: "NH dividend/interest tax fully phased out as of 2025" },
   SD: { type: "none", ltcgTreatment: "exempt" },
   TN: { type: "none", ltcgTreatment: "exempt" },
   TX: { type: "none", ltcgTreatment: "exempt" },
-  WA: { type: "none", ltcgTreatment: "exempt", notes: "WA 7% capital gains tax on gains >$262k — modeled separately if needed" },
+  WA: { type: "none", ltcgTreatment: "exempt", notes: "WA 7% capital gains excise tax on LTCG above $262K — computed in calculateStateTax" },
   WY: { type: "none", ltcgTreatment: "exempt" },
 
   // ── Flat Rate States ──────────────────────────────────────────────────────
@@ -700,26 +701,57 @@ function applyStateBrackets(brackets: StateBracket[], income: number): number {
 // Main Calculator
 // ─────────────────────────────────────────────────────────────────────────────
 
+// WA capital gains excise tax: 7% on LTCG above $262,000 (2023 threshold)
+const WA_CG_RATE = 0.07;
+const WA_CG_THRESHOLD = 262_000;
+
+// CA SDI rate (unlimited wage base starting 2024)
+const CA_SDI_RATE = 0.011;
+
 export function calculateStateTax(input: StateTaxInput): StateTaxResult {
-  const { stateCode, ordinaryIncome, longTermGains, shortTermGains, filingStatus } =
-    input;
+  const { stateCode, ordinaryIncome, longTermGains, shortTermGains, filingStatus } = input;
+  const w2Wages = input.w2Wages ?? ordinaryIncome;
+  const cityCode = input.cityCode;
 
   const config = STATE_CONFIGS[stateCode.toUpperCase()];
   if (!config) {
-    // Unknown state — return zero to prevent crashes
-    return { stateIncomeTax: 0, effectiveRate: 0, ltcgTreatment: "ordinary" };
+    return { stateIncomeTax: 0, sdiTax: 0, cityIncomeTax: 0, effectiveRate: 0, ltcgTreatment: "ordinary" };
+  }
+
+  // ── WA: no income tax but 7% capital gains excise on LTCG > $262K ──
+  if (stateCode.toUpperCase() === "WA") {
+    const taxableGains = Math.max(0, longTermGains - WA_CG_THRESHOLD);
+    const waCapGainsTax = taxableGains * WA_CG_RATE;
+    const cityIncomeTax = cityCode
+      ? calculateCityTax({ cityCode, w2Wages, ordinaryIncome, longTermGains, filingStatus })
+      : 0;
+    const totalIncome = ordinaryIncome + shortTermGains + longTermGains;
+    return {
+      stateIncomeTax: waCapGainsTax,
+      sdiTax: 0,
+      cityIncomeTax,
+      effectiveRate: totalIncome > 0 ? (waCapGainsTax + cityIncomeTax) / totalIncome : 0,
+      ltcgTreatment: "ordinary",
+    };
   }
 
   if (config.type === "none") {
-    return { stateIncomeTax: 0, effectiveRate: 0, ltcgTreatment: "exempt" };
+    const cityIncomeTax = cityCode
+      ? calculateCityTax({ cityCode, w2Wages, ordinaryIncome, longTermGains, filingStatus })
+      : 0;
+    return { stateIncomeTax: 0, sdiTax: 0, cityIncomeTax, effectiveRate: 0, ltcgTreatment: "exempt" };
   }
+
+  // ── CA SDI: 1.1% on all W-2 wages (no wage cap since 2024) ──
+  const sdiTax = stateCode.toUpperCase() === "CA"
+    ? Math.max(0, w2Wages) * CA_SDI_RATE
+    : 0;
 
   // Compute adjusted long-term gains based on state LTCG treatment
   let taxableLtcg = longTermGains;
   if (config.ltcgTreatment === "preferential") {
     if (config.ltcgRate !== undefined) {
-      // Fixed preferential rate — we'll handle separately below
-      taxableLtcg = 0; // exclude from ordinary income calculation
+      taxableLtcg = 0; // exclude from ordinary income calculation; handled separately below
     } else if (config.ltcgExclusionPct !== undefined) {
       taxableLtcg = longTermGains * (1 - config.ltcgExclusionPct);
     }
@@ -731,20 +763,27 @@ export function calculateStateTax(input: StateTaxInput): StateTaxResult {
   if (config.type === "flat_rate" && config.flatRate !== undefined) {
     stateTax = totalTaxableIncome * config.flatRate;
   } else if (config.type === "brackets" && config.brackets) {
-    const brackets = config.brackets[filingStatus];
-    stateTax = applyStateBrackets(brackets, totalTaxableIncome);
+    stateTax = applyStateBrackets(config.brackets[filingStatus], totalTaxableIncome);
   }
 
-  // If state uses a fixed preferential rate for LTCG, add it separately
   if (config.ltcgTreatment === "preferential" && config.ltcgRate !== undefined) {
     stateTax += longTermGains * config.ltcgRate;
   }
 
+  // ── City / local income tax ──
+  const cityIncomeTax = cityCode
+    ? calculateCityTax({ cityCode, w2Wages, ordinaryIncome, longTermGains, filingStatus })
+    : 0;
+
   const totalIncome = ordinaryIncome + shortTermGains + longTermGains;
-  const effectiveRate = totalIncome > 0 ? stateTax / totalIncome : 0;
+  const effectiveRate = totalIncome > 0
+    ? (stateTax + sdiTax + cityIncomeTax) / totalIncome
+    : 0;
 
   return {
     stateIncomeTax: stateTax,
+    sdiTax,
+    cityIncomeTax,
     effectiveRate,
     ltcgTreatment: config.ltcgTreatment,
   };
