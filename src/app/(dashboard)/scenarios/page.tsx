@@ -8,6 +8,7 @@ import { ScenarioCard } from "@/components/scenarios/scenario-card";
 import { ComparisonProjectionChart } from "@/components/scenarios/comparison-projection-chart";
 import { ComparisonMetricsGrid } from "@/components/scenarios/comparison-metrics-grid";
 import { ComparisonMilestoneTable } from "@/components/scenarios/comparison-milestone-table";
+import { ComparisonFIBreakdown } from "@/components/scenarios/comparison-fi-breakdown";
 import { trpc } from "@/lib/trpc";
 import type { ScenarioDefinition } from "@/server/simulation/engine/scenario-types";
 import { SCENARIO_TEMPLATES, SCENARIO_COLORS } from "@/server/simulation/engine/scenario-types";
@@ -141,6 +142,9 @@ export default function ScenariosPage() {
                 <ComparisonMetricsGrid runs={scenarioRuns} />
               </CardBody>
             </Card>
+
+            {/* FI formula breakdown (expandable) */}
+            <ComparisonFIBreakdown runs={scenarioRuns} />
 
             {/* Milestone table */}
             <Card>
