@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { ForecastCenter } from "@/components/forecast/forecast-center";
+import { NextSectionBanner } from "@/components/layout/next-section-banner";
 
 export default function ForecastPage() {
   return (
@@ -11,6 +12,11 @@ export default function ForecastPage() {
       <div className="mt-8">
         <ForecastCenter />
       </div>
+      <NextSectionBanner
+        href="/tax"
+        label="Tax Planning"
+        description="Projected tax liability, bracket analysis, and carry timing optimization"
+      />
     </div>
   );
 }

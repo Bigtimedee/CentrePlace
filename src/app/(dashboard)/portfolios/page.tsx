@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { PortfoliosForm } from "@/components/forms/portfolios-form";
+import { NextSectionBanner } from "@/components/layout/next-section-banner";
 
 export default function PortfoliosPage() {
   return (
@@ -8,6 +9,11 @@ export default function PortfoliosPage() {
       <div className="mt-8">
         <PortfoliosForm />
       </div>
+      <NextSectionBanner
+        href="/real-estate"
+        label="Real Estate"
+        description="Properties with full amortization, rental income, and sale projections"
+      />
     </div>
   );
 }

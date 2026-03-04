@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { PageHeader } from "@/components/layout/page-header";
+import { NextSectionBanner } from "@/components/layout/next-section-banner";
 import { Card, CardBody } from "@/components/ui/card";
 import { ScenarioCard } from "@/components/scenarios/scenario-card";
 import { ComparisonProjectionChart } from "@/components/scenarios/comparison-projection-chart";
@@ -154,6 +155,11 @@ export default function ScenariosPage() {
           </>
         )}
       </div>
+      <NextSectionBanner
+        href="/forecast"
+        label="Probability Forecast"
+        description="500 Monte Carlo simulations showing the range of FI outcomes under market uncertainty"
+      />
     </div>
   );
 }

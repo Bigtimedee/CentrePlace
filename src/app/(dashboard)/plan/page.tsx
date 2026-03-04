@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { ActionPlanCenter } from "@/components/plan/action-plan-center";
+import { NextSectionBanner } from "@/components/layout/next-section-banner";
 
 export default function PlanPage() {
   return (
@@ -11,6 +12,11 @@ export default function PlanPage() {
       <div className="mt-8">
         <ActionPlanCenter />
       </div>
+      <NextSectionBanner
+        href="/dashboard"
+        label="Dashboard"
+        description="View your complete financial independence projection and key milestones"
+      />
     </div>
   );
 }

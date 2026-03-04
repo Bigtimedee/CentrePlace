@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { CarryForm } from "@/components/forms/carry-form";
+import { NextSectionBanner } from "@/components/layout/next-section-banner";
 
 export default function CarryPage() {
   return (
@@ -8,6 +9,11 @@ export default function CarryPage() {
       <div className="mt-8">
         <CarryForm />
       </div>
+      <NextSectionBanner
+        href="/lp-investments"
+        label="LP Investments"
+        description="Limited partner positions with expected distribution schedules"
+      />
     </div>
   );
 }

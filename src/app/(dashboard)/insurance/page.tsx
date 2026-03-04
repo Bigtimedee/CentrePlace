@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { InsuranceForm } from "@/components/forms/insurance-form";
+import { NextSectionBanner } from "@/components/layout/next-section-banner";
 
 export default function InsurancePage() {
   return (
@@ -8,6 +9,11 @@ export default function InsurancePage() {
       <div className="mt-8">
         <InsuranceForm />
       </div>
+      <NextSectionBanner
+        href="/expenditures"
+        label="Expenditures"
+        description="Recurring annual expenses and one-time future spending events"
+      />
     </div>
   );
 }

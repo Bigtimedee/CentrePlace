@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { IncomeForm } from "@/components/forms/income-form";
+import { NextSectionBanner } from "@/components/layout/next-section-banner";
 
 export default function IncomePage() {
   return (
@@ -8,6 +9,11 @@ export default function IncomePage() {
       <div className="mt-8">
         <IncomeForm />
       </div>
+      <NextSectionBanner
+        href="/carry"
+        label="Carry"
+        description="GP carried interest positions and waterfall projections across all funds"
+      />
     </div>
   );
 }
