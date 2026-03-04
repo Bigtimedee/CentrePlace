@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { NextSectionBanner } from "@/components/layout/next-section-banner";
 import { Card, CardBody } from "@/components/ui/card";
@@ -34,14 +34,12 @@ export default function ScenariosPage() {
   });
 
   // Run all scenarios whenever definitions change
-  const { data: scenarioRuns, isLoading, error } = trpc.scenarios.compareRun.useQuery(
-    { scenarios },
-    {
-      enabled: true,
-      staleTime: 0,
-      retry: false,
-    },
-  );
+  const { data: scenarioRuns, isPending: isLoading, error, mutate: runScenarios } =
+    trpc.scenarios.compareRun.useMutation();
+
+  useEffect(() => {
+    runScenarios({ scenarios });
+  }, [scenarios]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateScenario = useCallback((updated: ScenarioDefinition) => {
     setScenarios(prev => prev.map(s => (s.id === updated.id ? updated : s)));

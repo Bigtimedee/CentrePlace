@@ -48,7 +48,7 @@ export const scenariosRouter = createTRPCRouter({
         scenarios: z.array(ScenarioDefSchema).min(1).max(3),
       }),
     )
-    .query(async ({ ctx, input }): Promise<ScenarioRun[]> => {
+    .mutation(async ({ ctx, input }): Promise<ScenarioRun[]> => {
       const baseInput = await assembleSimInput(ctx);
 
       return input.scenarios.map(scenario => {
