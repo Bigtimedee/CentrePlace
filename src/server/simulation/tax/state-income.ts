@@ -26,6 +26,9 @@ interface StateConfig {
   ltcgTreatment: "ordinary" | "preferential" | "exempt";
   ltcgRate?: number; // only used when treatment = "preferential" with a fixed rate
   ltcgExclusionPct?: number; // partial exclusion (e.g., 0.4 = 40% excluded)
+  /** Special rate for short-term capital gains (e.g. MA 8.5%). When set, STG are
+   *  excluded from the ordinary bracket calculation and taxed at this rate instead. */
+  shortTermGainsRate?: number;
   notes?: string;
 }
 
@@ -58,7 +61,8 @@ const STATE_CONFIGS: Record<string, StateConfig> = {
     flatRate: 0.05,
     ltcgTreatment: "preferential",
     ltcgRate: 0.05,
-    notes: "MA taxes LTCG at 5% (short-term at 8.5%)",
+    shortTermGainsRate: 0.085,
+    notes: "MA taxes LTCG at 5%; short-term capital gains at 8.5% (Part A income)",
   },
   MI: { type: "flat_rate", flatRate: 0.0425, ltcgTreatment: "ordinary" },
   NC: { type: "flat_rate", flatRate: 0.045, ltcgTreatment: "ordinary" },
@@ -757,7 +761,10 @@ export function calculateStateTax(input: StateTaxInput): StateTaxResult {
     }
   }
 
-  const totalTaxableIncome = ordinaryIncome + shortTermGains + taxableLtcg;
+  // States with a special short-term gains rate (e.g. MA 8.5%) exclude STG
+  // from the ordinary bracket calculation and tax them at the special rate instead.
+  const effectiveShortTerm = config.shortTermGainsRate !== undefined ? 0 : shortTermGains;
+  const totalTaxableIncome = ordinaryIncome + effectiveShortTerm + taxableLtcg;
 
   let stateTax = 0;
   if (config.type === "flat_rate" && config.flatRate !== undefined) {
@@ -768,6 +775,11 @@ export function calculateStateTax(input: StateTaxInput): StateTaxResult {
 
   if (config.ltcgTreatment === "preferential" && config.ltcgRate !== undefined) {
     stateTax += longTermGains * config.ltcgRate;
+  }
+
+  // Add short-term gains at the special state rate (e.g. MA Part A income at 8.5%)
+  if (config.shortTermGainsRate !== undefined && shortTermGains > 0) {
+    stateTax += shortTermGains * config.shortTermGainsRate;
   }
 
   // ── City / local income tax ──

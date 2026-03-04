@@ -101,6 +101,7 @@ describe("calculateAnnualTax — combined federal + state", () => {
       filingStatus: "single",
       stateCode: "CO",
       year: 2026,
+      w2Wages: 300_000,
     });
     const federalSum =
       result.federalOrdinaryTax +
@@ -108,8 +109,13 @@ describe("calculateAnnualTax — combined federal + state", () => {
       result.federalNiit +
       result.federalDepreciationRecaptureTax;
     expect(federalSum).toBeCloseTo(result.totalFederalTax, 1);
+    // totalFicaTax components should sum correctly
+    expect(
+      result.ficaSocialSecurityTax + result.ficaMedicareTax + result.ficaAdditionalMedicareTax
+    ).toBeCloseTo(result.totalFicaTax, 1);
     expect(result.totalTax).toBeCloseTo(
-      result.totalFederalTax + result.stateIncomeTax,
+      result.totalFederalTax + result.stateIncomeTax + result.sdiTax +
+      result.cityIncomeTax + result.totalFicaTax,
       1
     );
   });

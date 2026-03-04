@@ -9,6 +9,7 @@
 
 import type { SimulationInput, SimulationResult, QuarterResult } from "./types";
 import { calculateAnnualTax, safeHarborQuarterlyPayment } from "../tax";
+import { getRMDFactor, RMD_ELIGIBLE_ACCOUNT_TYPES, RMD_START_AGE } from "../tax/rmd";
 import {
   computeAnnualSpending,
   computePermanentAnnualIncome,
@@ -180,7 +181,16 @@ export function runSimulation(input: SimulationInput): SimulationResult {
   let priorYearAgi = 0;
   let ytdOrdinaryIncome = 0;
   let ytdLtcgIncome = 0;
-  let ytdW2Income = 0; // W-2 wages only — needed for CA SDI and city wage taxes
+  let ytdW2Income = 0; // W-2 wages only — needed for CA SDI, city wage taxes, and FICA
+
+  // ── RMD state ──
+  // Track traditional account balance separately so RMD amounts shrink as distributions are taken.
+  // Traditional balance grows at the same blended rate as investmentCapital.
+  const totalInitialBalance = input.investmentAccounts.reduce((s, a) => s + a.currentBalance, 0);
+  const traditionalInitialBalance = input.investmentAccounts
+    .filter(a => RMD_ELIGIBLE_ACCOUNT_TYPES.has(a.accountType))
+    .reduce((s, a) => s + a.currentBalance, 0);
+  let traditionalBalance = traditionalInitialBalance;
 
   // Carry-forward of annual tax snapshot for Q1-Q3 display
   let displayOrdinaryIncome = 0;
@@ -191,6 +201,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
   let displayFederalLtcgTax = 0;
   let displayFederalNiit = 0;
   let displayStateTax = 0;
+  let displayFicaTax = 0;
 
   // ── Income state (grows each year) ──
   let currentSalary = input.income?.annualSalary ?? 0;
@@ -224,6 +235,11 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     const quarterlyAppreciationReturn = appreciationRate / 4;
     investmentCapital *= 1 + quarterlyAppreciationReturn;
 
+    // Grow traditional balance at the same rate as investmentCapital
+    if (traditionalBalance > 0) {
+      traditionalBalance *= 1 + quarterlyAppreciationReturn;
+    }
+
     // Annual contributions at Q1 (pre-FI only — checked below after FI test)
     if (isFirstQuarterOfYear) {
       const annualContributions = input.investmentAccounts.reduce(
@@ -231,6 +247,19 @@ export function runSimulation(input: SimulationInput): SimulationResult {
         0,
       );
       investmentCapital += annualContributions;
+    }
+
+    // ── Required Minimum Distributions (RMDs) ──
+    // At the start of each year (Q1) when the user is age 73+, force a distribution
+    // from the traditional account balance. The proceeds remain in the investmentCapital
+    // pool (money moves from tax-deferred to taxable), but add to ordinary taxable income.
+    if (isFirstQuarterOfYear && age >= RMD_START_AGE && traditionalBalance > 0) {
+      const rmdFactor = getRMDFactor(age);
+      if (rmdFactor !== null) {
+        const rmdAmount = Math.min(traditionalBalance, traditionalBalance / rmdFactor);
+        ytdOrdinaryIncome += rmdAmount;
+        traditionalBalance = Math.max(0, traditionalBalance - rmdAmount);
+      }
     }
 
     // ── Yield income from investmentCapital ──
@@ -483,6 +512,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       displayFederalLtcgTax = taxResult.federalLtcgTax;
       displayFederalNiit = taxResult.federalNiit;
       displayStateTax = taxResult.stateIncomeTax;
+      displayFicaTax = taxResult.totalFicaTax;
 
       // Advance tax state for next year
       priorYearTax = annualTax;
@@ -591,6 +621,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       annualFederalLtcgTax: displayFederalLtcgTax,
       annualFederalNiit: displayFederalNiit,
       annualStateTax: displayStateTax,
+      annualFicaTax: displayFicaTax,
     });
   }
 

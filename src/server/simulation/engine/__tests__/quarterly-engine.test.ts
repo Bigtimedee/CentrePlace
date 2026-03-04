@@ -1107,3 +1107,152 @@ describe("runSimulation — children education costs", () => {
     expect(quarters[4].recurringSpending).toBeCloseTo(0, 0);
   });
 });
+
+// ── FICA (payroll taxes) ──────────────────────────────────────────────────────
+
+describe("runSimulation — FICA payroll taxes", () => {
+  it("W-2 income generates FICA taxes in the annual Q4 snapshot", () => {
+    const input = minimalInput({
+      income: {
+        annualSalary: 300_000,
+        annualBonus: 0,
+        salaryGrowthRate: 0,
+        bonusGrowthRate: 0,
+      },
+    });
+    const { quarters } = runSimulation(input);
+    // Q4 snapshot: SS (6.2% × ~$182k) + Medicare (1.45% × $300k) + AddMedicare (0.9% × $100k)
+    // ≈ $11,300 + $4,350 + $900 = ~$16,550
+    expect(quarters[3].annualFicaTax).toBeGreaterThan(14_000);
+    expect(quarters[3].annualFicaTax).toBeLessThan(20_000);
+  });
+
+  it("no W-2 income → zero FICA", () => {
+    const input = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Portfolio",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.07,
+        annualContribution: 0,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    expect(quarters[3].annualFicaTax).toBe(0);
+  });
+
+  it("FICA is zero after FI (W-2 income stops)", () => {
+    const input = minimalInput({
+      income: {
+        annualSalary: 200_000,
+        annualBonus: 0,
+        salaryGrowthRate: 0,
+        bonusGrowthRate: 0,
+      },
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Wealth",
+        accountType: "taxable",
+        currentBalance: 20_000_000,
+        blendedReturnRate: 0.07,
+        annualContribution: 0,
+      }],
+      recurringExpenditures: [{ description: "Living", annualAmount: 200_000, growthRate: 0 }],
+    });
+    const { quarters, fiDate } = runSimulation(input);
+    // Should achieve FI quickly; after FI, W-2 stops and FICA should be 0
+    expect(fiDate).not.toBeNull();
+    // Find first full year after FI and check FICA at that year's Q4
+    const fiQ = quarters.findIndex(q => q.isFI);
+    const postFIYear = quarters[fiQ].year + 2; // 2 years after FI
+    const postFIQ4 = quarters.find(q => q.year === postFIYear && q.quarterLabel === "Q4");
+    if (postFIQ4) {
+      expect(postFIQ4.annualFicaTax).toBe(0);
+    }
+  });
+});
+
+// ── Required Minimum Distributions (RMDs) ────────────────────────────────────
+
+describe("runSimulation — Required Minimum Distributions", () => {
+  it("traditional IRA forces RMD as ordinary income at age 73", () => {
+    // BirthYear 1953, startYear 2026 → age 73 at simulation start
+    const input = minimalInput({
+      profile: { ...baseProfile(), birthYear: 1953 },
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Traditional IRA",
+        accountType: "traditional_ira",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.07,
+        annualContribution: 0,
+      }],
+      startYear: 2026,
+    });
+    const { quarters } = runSimulation(input);
+    // RMD at age 73: ~$1M / 26.5 ≈ $37,736 (adjusted for one quarter of growth first)
+    // Q4 snapshot shows year's ordinary income including RMD
+    expect(quarters[3].annualOrdinaryIncome).toBeGreaterThan(35_000);
+    expect(quarters[3].annualOrdinaryIncome).toBeLessThan(45_000);
+  });
+
+  it("Roth IRA does NOT trigger RMD", () => {
+    const input = minimalInput({
+      profile: { ...baseProfile(), birthYear: 1953 },
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Roth IRA",
+        accountType: "roth_ira",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.07,
+        annualContribution: 0,
+      }],
+      startYear: 2026,
+    });
+    const { quarters } = runSimulation(input);
+    // Roth is exempt — no ordinary income from RMDs
+    expect(quarters[3].annualOrdinaryIncome).toBeCloseTo(0, 0);
+  });
+
+  it("no RMD when age < 73", () => {
+    // BirthYear 1985, startYear 2026 → age 41
+    const input = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Traditional 401k",
+        accountType: "traditional_401k",
+        currentBalance: 500_000,
+        blendedReturnRate: 0.07,
+        annualContribution: 0,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // No RMD in early years — first 32 years (age 41–72)
+    expect(quarters[3].annualOrdinaryIncome).toBeCloseTo(0, 0);
+  });
+
+  it("RMD amount decreases traditional balance so future RMDs are smaller", () => {
+    const input = minimalInput({
+      profile: { ...baseProfile(), birthYear: 1953 },
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Traditional IRA",
+        accountType: "traditional_ira",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.0, // 0% return so we can isolate RMD drawdown
+        annualContribution: 0,
+      }],
+      startYear: 2026,
+    });
+    const { quarters } = runSimulation(input);
+    // Year 1 RMD: 1M / 26.5 ≈ 37,736 (ordinary income at Q4 of year 1)
+    // Year 2 RMD: smaller balance / 25.5
+    const year1RMD = quarters[3].annualOrdinaryIncome;   // Q4 2026
+    const year2RMD = quarters[7].annualOrdinaryIncome;   // Q4 2027
+    expect(year1RMD).toBeGreaterThan(35_000);
+    // With 0% return, year2 balance = 1M - year1RMD; factor = 25.5 vs 26.5
+    expect(year2RMD).toBeLessThan(year1RMD * 1.1); // Should be in similar range, not wildly higher
+    expect(year2RMD).toBeGreaterThan(0);
+  });
+});

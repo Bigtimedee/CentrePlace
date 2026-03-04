@@ -214,6 +214,8 @@ export interface QuarterResult {
   annualFederalLtcgTax: number;
   annualFederalNiit: number;
   annualStateTax: number;
+  /** Employee FICA: Social Security + Medicare + Additional Medicare Tax */
+  annualFicaTax: number;
 }
 
 export interface SimulationResult {

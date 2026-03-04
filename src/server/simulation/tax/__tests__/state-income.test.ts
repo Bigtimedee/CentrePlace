@@ -253,3 +253,45 @@ describe("Edge cases", () => {
     expect(result.stateIncomeTax).toBeGreaterThanOrEqual(0);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MA short-term capital gains (8.5% Part A rate)
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("MA short-term capital gains rate (8.5%)", () => {
+  it("short-term gains taxed at 8.5%, not the ordinary 5% rate", () => {
+    const result = calculateStateTax({
+      ...BASE,
+      stateCode: "MA",
+      ordinaryIncome: 0,
+      longTermGains: 0,
+      shortTermGains: 100_000,
+    });
+    // 8.5% on 100k = 8,500
+    expect(result.stateIncomeTax).toBeCloseTo(8_500, 0);
+  });
+
+  it("ordinary income taxed at 5%, short-term gains at 8.5% — both stack correctly", () => {
+    const result = calculateStateTax({
+      ...BASE,
+      stateCode: "MA",
+      ordinaryIncome: 100_000,
+      longTermGains: 0,
+      shortTermGains: 50_000,
+    });
+    // ordinary: 100k × 5% = 5,000; STG: 50k × 8.5% = 4,250; total = 9,250
+    expect(result.stateIncomeTax).toBeCloseTo(9_250, 0);
+  });
+
+  it("LTCG still taxed at 5% (preferential rate, same as ordinary for MA)", () => {
+    const result = calculateStateTax({
+      ...BASE,
+      stateCode: "MA",
+      ordinaryIncome: 0,
+      longTermGains: 100_000,
+      shortTermGains: 0,
+    });
+    // 5% on 100k = 5,000
+    expect(result.stateIncomeTax).toBeCloseTo(5_000, 0);
+  });
+});

@@ -7,13 +7,16 @@ export * from "./federal-income";
 export * from "./state-income";
 export * from "./estate-tax";
 export * from "./city-income";
+export * from "./payroll-tax";
+export * from "./rmd";
 
 // ── Combined annual tax calculator ───────────────────────────────────────────
 // Convenience function used by the quarterly simulation engine.
-// Returns total tax burden (federal + state) for a given year's income.
+// Returns total tax burden (federal + state + FICA) for a given year's income.
 
 import { calculateFederalTax } from "./federal-income";
 import { calculateStateTax } from "./state-income";
+import { calculateFicaTax } from "./payroll-tax";
 import type { FilingStatus } from "./types";
 
 export interface AnnualTaxInput {
@@ -47,6 +50,14 @@ export interface AnnualTaxResult {
   sdiTax: number;
   /** City/local income tax (NYC, Philadelphia, etc.). Zero if not applicable. */
   cityIncomeTax: number;
+  /** Employee Social Security tax (6.2% up to SS wage base). Zero when no W-2 wages. */
+  ficaSocialSecurityTax: number;
+  /** Employee Medicare tax (1.45% on all W-2 wages). Zero when no W-2 wages. */
+  ficaMedicareTax: number;
+  /** ACA Additional Medicare Tax (0.9% on W-2 wages above $200k/$250k MFJ). */
+  ficaAdditionalMedicareTax: number;
+  /** Sum of all three FICA components. */
+  totalFicaTax: number;
   totalTax: number;
   effectiveFederalRate: number;
   effectiveStateRate: number;
@@ -88,10 +99,18 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     cityCode,
   });
 
+  const fica = calculateFicaTax({
+    w2Wages: w2Wages ?? 0,
+    filingStatus,
+    year,
+  });
+
   const totalIncome =
     ordinaryIncome + qualifiedDividends + longTermGains + unrecaptured1250Gain;
   const totalTax =
-    federal.totalFederalTax + state.stateIncomeTax + state.sdiTax + state.cityIncomeTax;
+    federal.totalFederalTax +
+    state.stateIncomeTax + state.sdiTax + state.cityIncomeTax +
+    fica.totalFicaTax;
 
   return {
     federalOrdinaryTax: federal.ordinaryTax,
@@ -102,6 +121,10 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     stateIncomeTax: state.stateIncomeTax,
     sdiTax: state.sdiTax,
     cityIncomeTax: state.cityIncomeTax,
+    ficaSocialSecurityTax: fica.socialSecurityTax,
+    ficaMedicareTax: fica.medicareTax,
+    ficaAdditionalMedicareTax: fica.additionalMedicareTax,
+    totalFicaTax: fica.totalFicaTax,
     totalTax,
     effectiveFederalRate: federal.effectiveRate,
     effectiveStateRate: state.effectiveRate,
