@@ -12,6 +12,7 @@ const BASE: SimulationInput = {
     targetAge: 90,
     assumedReturnRate: 0.07,
     safeHarborElection: true,
+    postFIReturnRate: 0.05,
   },
   income: {
     annualSalary: 500_000,
@@ -37,6 +38,8 @@ const BASE: SimulationInput = {
     { description: "Travel",          annualAmount: 50_000,  growthRate: 0.02 },
   ],
   oneTimeExpenditures: [],
+  children: [],
+  realizationPolicy: null,
 };
 
 // ── Helper ────────────────────────────────────────────────────────────────────

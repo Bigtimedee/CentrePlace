@@ -901,6 +901,7 @@ describe("runSimulation — children education costs", () => {
   const collegeChild = (): SimulationInput["children"][0] => ({
     name: "Alex",
     birthYear: 2008, // turns 18 in 2026 (Q1 = first college year)
+    annualK12Cost: 0,
     hasCollege: true,
     annualCollegeCost: 80_000,
     hasGradSchool: false,
@@ -935,6 +936,7 @@ describe("runSimulation — children education costs", () => {
       children: [{
         name: "Young child",
         birthYear: 2012,
+        annualK12Cost: 0,
         hasCollege: true,
         annualCollegeCost: 60_000,
         hasGradSchool: false,
@@ -958,6 +960,7 @@ describe("runSimulation — children education costs", () => {
       children: [{
         name: "Scholar",
         birthYear: 2008, // turns 18 in 2026, college 2026–2029, grad 2030–2031
+        annualK12Cost: 0,
         hasCollege: true,
         annualCollegeCost: 80_000,
         hasGradSchool: true,
@@ -984,6 +987,7 @@ describe("runSimulation — children education costs", () => {
         {
           name: "Older",
           birthYear: 2008, // college 2026–2029
+          annualK12Cost: 0,
           hasCollege: true,
           annualCollegeCost: 80_000,
           hasGradSchool: false,
@@ -993,6 +997,7 @@ describe("runSimulation — children education costs", () => {
         {
           name: "Younger",
           birthYear: 2010, // college 2028–2031
+          annualK12Cost: 0,
           hasCollege: true,
           annualCollegeCost: 70_000,
           hasGradSchool: false,
@@ -1088,6 +1093,7 @@ describe("runSimulation — children education costs", () => {
       children: [{
         name: "No tuition",
         birthYear: 2008,
+        annualK12Cost: 0,
         hasCollege: false,
         annualCollegeCost: 100_000,
         hasGradSchool: false,
