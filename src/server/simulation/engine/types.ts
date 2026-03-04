@@ -108,6 +108,21 @@ export interface SimInsurancePolicy {
   isEstateTaxFunding: boolean;
 }
 
+export interface SimChildEducation {
+  name: string;
+  birthYear: number;
+  /** Whether college costs are modeled (false = no tuition projected) */
+  hasCollege: boolean;
+  /** Annual undergraduate tuition — applies for 4 years starting at age 18 */
+  annualCollegeCost: number;
+  /** Whether graduate school costs are modeled */
+  hasGradSchool: boolean;
+  /** Annual grad school cost */
+  annualGradSchoolCost: number;
+  /** Number of years of grad school (starting at age 22) */
+  gradSchoolYears: number;
+}
+
 export interface SimRecurringExpenditure {
   description: string;
   annualAmount: number;
@@ -146,6 +161,7 @@ export interface SimulationInput {
   insurance: SimInsurancePolicy[];
   recurringExpenditures: SimRecurringExpenditure[];
   oneTimeExpenditures: SimOneTimeExpenditure[];
+  children: SimChildEducation[];
   /** Realization reinvestment policy — null means carry/LP flow into investmentCapital as before */
   realizationPolicy: SimRealizationPolicy | null;
   /** Override the simulation start year (defaults to current year) */

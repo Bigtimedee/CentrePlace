@@ -24,6 +24,7 @@ const minimalInput = (overrides: Partial<SimulationInput> = {}): SimulationInput
   insurance: [],
   recurringExpenditures: [],
   oneTimeExpenditures: [],
+  children: [],
   realizationPolicy: null,
   startYear: 2026,
   ...overrides,
@@ -890,5 +891,151 @@ describe("runSimulation — realization reinvestment policy", () => {
       const summed = q.investmentCapital + q.realizationCapital + q.realEstateEquity + q.insuranceCashValue + q.unrealizedCarry;
       expect(q.totalCapital).toBeCloseTo(summed, 0);
     });
+  });
+});
+
+// ── Children education costs ──────────────────────────────────────────────────
+
+describe("runSimulation — children education costs", () => {
+  // startYear 2026; child born 2008 → turns 18 in 2026, college 2026–2029, grad 2030–2031
+  const collegeChild = (): SimulationInput["children"][0] => ({
+    name: "Alex",
+    birthYear: 2008, // turns 18 in 2026 (Q1 = first college year)
+    hasCollege: true,
+    annualCollegeCost: 80_000,
+    hasGradSchool: false,
+    annualGradSchoolCost: 0,
+    gradSchoolYears: 0,
+  });
+
+  it("college tuition applies in all 4 quarters of each college year", () => {
+    // Child born 2008, starts college at 18 (2026), tuition applies 2026–2029
+    const input = minimalInput({ children: [collegeChild()] });
+    const { quarters } = runSimulation(input);
+
+    // 2026 Q1–Q4 (q 0–3): child is 18, college active
+    for (let q = 0; q < 4; q++) {
+      expect(quarters[q].recurringSpending).toBeCloseTo(80_000 / 4, 0);
+    }
+  });
+
+  it("college tuition ends after age 21 (stops at 22)", () => {
+    const input = minimalInput({ children: [collegeChild()] });
+    const { quarters } = runSimulation(input);
+
+    // 2030 Q1 (q=16): child is 22 — college should be over
+    const q2030 = quarters[16];
+    expect(q2030.year).toBe(2030);
+    expect(q2030.recurringSpending).toBeCloseTo(0, 0);
+  });
+
+  it("no tuition before child turns 18", () => {
+    // Child born 2012 — turns 18 in 2030; sim starts 2026
+    const input = minimalInput({
+      children: [{
+        name: "Young child",
+        birthYear: 2012,
+        hasCollege: true,
+        annualCollegeCost: 60_000,
+        hasGradSchool: false,
+        annualGradSchoolCost: 0,
+        gradSchoolYears: 0,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+
+    // 2026–2029 (q 0–15): child is 14–17, no tuition yet
+    for (let q = 0; q < 16; q++) {
+      expect(quarters[q].recurringSpending).toBeCloseTo(0, 0);
+    }
+
+    // 2030 Q1 (q=16): child turns 18 — tuition starts
+    expect(quarters[16].recurringSpending).toBeCloseTo(60_000 / 4, 0);
+  });
+
+  it("grad school costs apply after college ends", () => {
+    const input = minimalInput({
+      children: [{
+        name: "Scholar",
+        birthYear: 2008, // turns 18 in 2026, college 2026–2029, grad 2030–2031
+        hasCollege: true,
+        annualCollegeCost: 80_000,
+        hasGradSchool: true,
+        annualGradSchoolCost: 60_000,
+        gradSchoolYears: 2,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+
+    // 2030 Q1 (q=16): child is 22, grad school active
+    expect(quarters[16].year).toBe(2030);
+    expect(quarters[16].recurringSpending).toBeCloseTo(60_000 / 4, 0);
+
+    // 2031 Q4 (q=23): child is 23, still in grad school
+    expect(quarters[23].recurringSpending).toBeCloseTo(60_000 / 4, 0);
+
+    // 2032 Q1 (q=24): child is 24, grad school over
+    expect(quarters[24].recurringSpending).toBeCloseTo(0, 0);
+  });
+
+  it("two children with overlapping college years both deduct tuition", () => {
+    const input = minimalInput({
+      children: [
+        {
+          name: "Older",
+          birthYear: 2008, // college 2026–2029
+          hasCollege: true,
+          annualCollegeCost: 80_000,
+          hasGradSchool: false,
+          annualGradSchoolCost: 0,
+          gradSchoolYears: 0,
+        },
+        {
+          name: "Younger",
+          birthYear: 2010, // college 2028–2031
+          hasCollege: true,
+          annualCollegeCost: 70_000,
+          hasGradSchool: false,
+          annualGradSchoolCost: 0,
+          gradSchoolYears: 0,
+        },
+      ],
+    });
+    const { quarters } = runSimulation(input);
+
+    // 2028 Q1 (q=8): both children in college — 80k + 70k = 150k/yr = 37.5k/qtr
+    expect(quarters[8].year).toBe(2028);
+    expect(quarters[8].recurringSpending).toBeCloseTo(150_000 / 4, 0);
+  });
+
+  it("education costs are excluded from FI required capital (temporary costs)", () => {
+    // With education costs modeled but a child who will finish college eventually,
+    // required capital should be based on permanent spending only (0 here).
+    const input = minimalInput({
+      children: [collegeChild()],
+      // No recurring expenditures — only education spending
+    });
+    const { quarters } = runSimulation(input);
+
+    // requiredCapital should be 0 (no permanent spending)
+    expect(quarters[0].requiredCapital).toBe(0);
+  });
+
+  it("child with no tuition modeled incurs no education spending", () => {
+    const input = minimalInput({
+      children: [{
+        name: "No tuition",
+        birthYear: 2008,
+        hasCollege: false,
+        annualCollegeCost: 100_000,
+        hasGradSchool: false,
+        annualGradSchoolCost: 0,
+        gradSchoolYears: 0,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // hasCollege = false → no tuition even during college years
+    expect(quarters[0].recurringSpending).toBeCloseTo(0, 0);
+    expect(quarters[4].recurringSpending).toBeCloseTo(0, 0);
   });
 });

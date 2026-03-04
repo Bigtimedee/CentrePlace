@@ -10,6 +10,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import {
   userProfiles,
+  children,
   incomeProfiles,
   carryPositions,
   lpInvestments,
@@ -30,6 +31,7 @@ import type {
   SimInsurancePolicy,
   SimRecurringExpenditure,
   SimOneTimeExpenditure,
+  SimChildEducation,
   SimRealizationPolicy,
 } from "./engine/types";
 import type { Context } from "../trpc/context";
@@ -41,6 +43,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
 
   const [
     profile,
+    userChildren,
     income,
     carry,
     lp,
@@ -53,6 +56,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     policy,
   ] = await Promise.all([
     ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
+    ctx.db.query.children.findMany({ where: eq(children.userId, uid) }),
     ctx.db.query.incomeProfiles.findFirst({ where: eq(incomeProfiles.userId, uid) }),
     ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid), with: { realizations: true } }),
     ctx.db.query.lpInvestments.findMany({ where: eq(lpInvestments.userId, uid) }),
@@ -165,6 +169,16 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     projectedQuarter: e.projectedQuarter as "Q1" | "Q2" | "Q3" | "Q4",
   }));
 
+  const simChildren: SimChildEducation[] = userChildren.map(c => ({
+    name: c.name,
+    birthYear: c.birthYear,
+    hasCollege: c.educationType !== "none",
+    annualCollegeCost: c.annualEducationCost ?? 0,
+    hasGradSchool: c.includesGraduateSchool,
+    annualGradSchoolCost: c.graduateSchoolCost ?? 0,
+    gradSchoolYears: c.graduateSchoolYears ?? 0,
+  }));
+
   const simPolicy: SimRealizationPolicy | null = policy
     ? {
         equityPct: policy.equityPct,
@@ -206,6 +220,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     insurance: simInsurance,
     recurringExpenditures: simRecurring,
     oneTimeExpenditures: simOneTime,
+    children: simChildren,
     realizationPolicy: simPolicy,
   };
 }

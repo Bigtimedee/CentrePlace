@@ -371,6 +371,24 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       }
     }
 
+    // ── Children education costs ──
+    // College (undergraduate): 4 years while child is age 18–21.
+    // Grad school: graduateSchoolYears years while child is age 22–(22+n-1).
+    // These are temporary costs and do NOT feed into the FI required-capital
+    // perpetuity — they reduce investmentCapital during the relevant years only.
+    for (const child of input.children) {
+      const childAge = year - child.birthYear;
+
+      if (child.hasCollege && childAge >= 18 && childAge <= 21) {
+        recurringSpending += child.annualCollegeCost / 4;
+      }
+
+      if (child.hasGradSchool && child.gradSchoolYears > 0 &&
+          childAge >= 22 && childAge < 22 + child.gradSchoolYears) {
+        recurringSpending += child.annualGradSchoolCost / 4;
+      }
+    }
+
     // ── Mortgage payments ──
     let mortgagePayments = 0;
     for (const prop of input.realEstate) {
