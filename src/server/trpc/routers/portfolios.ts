@@ -15,6 +15,9 @@ const accountShape = z.object({
   bondReturnRate: z.number().min(0).max(0.5),
   altReturnRate: z.number().min(0).max(0.5),
   annualContribution: z.number().min(0),
+  ordinaryYieldRate: z.number().min(0).max(0.15).default(0),
+  qualifiedYieldRate: z.number().min(0).max(0.15).default(0),
+  taxExemptYieldRate: z.number().min(0).max(0.15).default(0),
 });
 
 const accountInput = accountShape.refine(

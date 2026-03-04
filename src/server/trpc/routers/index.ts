@@ -13,6 +13,7 @@ import { scenariosRouter } from "./scenarios";
 import { taxRouter } from "./tax";
 import { cashflowRouter } from "./cashflow";
 import { planRouter } from "./plan";
+import { realizationPolicyRouter } from "./realization-policy";
 
 export const appRouter = createTRPCRouter({
   profile: profileRouter,
@@ -29,6 +30,7 @@ export const appRouter = createTRPCRouter({
   tax: taxRouter,
   cashflow: cashflowRouter,
   plan: planRouter,
+  realizationPolicy: realizationPolicyRouter,
 });
 
 export type AppRouter = typeof appRouter;

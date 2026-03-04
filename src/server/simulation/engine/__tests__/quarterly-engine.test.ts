@@ -11,6 +11,7 @@ const baseProfile = (): SimulationInput["profile"] => ({
   targetAge: 90,
   assumedReturnRate: 0.07,
   safeHarborElection: true,
+  postFIReturnRate: 0.05,
 });
 
 const minimalInput = (overrides: Partial<SimulationInput> = {}): SimulationInput => ({
@@ -23,6 +24,7 @@ const minimalInput = (overrides: Partial<SimulationInput> = {}): SimulationInput
   insurance: [],
   recurringExpenditures: [],
   oneTimeExpenditures: [],
+  realizationPolicy: null,
   startYear: 2026,
   ...overrides,
 });
@@ -562,5 +564,331 @@ describe("runSimulation — unrealized carry", () => {
     expect(quarters[6].unrealizedCarry).toBeCloseTo(700_000, 0);
     // After 2029 Q4 (q=16): nothing left
     expect(quarters[16].unrealizedCarry).toBeCloseTo(0, 0);
+  });
+});
+
+// ── Enhancement 1: Portfolio Yield Decomposition ──────────────────────────────
+
+describe("runSimulation — portfolio yield decomposition", () => {
+  it("ordinary yield generates quarterly ordinary income", () => {
+    const input = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Bond Fund",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.06,
+        annualContribution: 0,
+        ordinaryYieldRate: 0.04, // 4% ordinary yield
+        qualifiedYieldRate: 0,
+        taxExemptYieldRate: 0,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // Q1: ordinary income ≈ 1M × 4% / 4 = 10k (capital appreciates first, so slightly above)
+    expect(quarters[0].portfolioYieldIncome).toBeGreaterThan(9_000);
+    expect(quarters[0].portfolioYieldIncome).toBeLessThan(11_000);
+  });
+
+  it("qualified yield contributes to LTCG income in Q4 tax snapshot", () => {
+    const input = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Equity Fund",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.08,
+        annualContribution: 0,
+        ordinaryYieldRate: 0,
+        qualifiedYieldRate: 0.02, // 2% qualified dividend yield
+        taxExemptYieldRate: 0,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // Q4 tax snapshot should include qualified yield as LTCG income
+    // Annual qualified income ≈ 1M × 2% = 20k (4 quarters of ~5k each, capital growing)
+    expect(quarters[3].annualLtcgIncome).toBeGreaterThan(19_000);
+    expect(quarters[3].annualLtcgIncome).toBeLessThan(23_000);
+  });
+
+  it("tax-exempt yield adds to portfolioYieldIncome but NOT to tax base", () => {
+    const input = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Muni Fund",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.05,
+        annualContribution: 0,
+        ordinaryYieldRate: 0,
+        qualifiedYieldRate: 0,
+        taxExemptYieldRate: 0.03, // 3% tax-exempt yield
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // portfolioYieldIncome should reflect the tax-exempt yield ≈ 1M × 3% / 4 = 7.5k
+    expect(quarters[0].portfolioYieldIncome).toBeGreaterThan(7_000);
+    expect(quarters[0].portfolioYieldIncome).toBeLessThan(8_500);
+    // Q4 ordinary income should be 0 (no ordinary/qualified yield)
+    expect(quarters[3].annualOrdinaryIncome).toBeCloseTo(0, 0);
+    expect(quarters[3].annualLtcgIncome).toBeCloseTo(0, 0);
+  });
+
+  it("capital grows at appreciation rate (blended minus yield), not full blended rate", () => {
+    const inputWithYield = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Fund",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.08,
+        annualContribution: 0,
+        ordinaryYieldRate: 0.03,
+        qualifiedYieldRate: 0,
+        taxExemptYieldRate: 0,
+      }],
+    });
+    const inputNoYield = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Fund",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.08,
+        annualContribution: 0,
+      }],
+    });
+    const withYield = runSimulation(inputWithYield);
+    const noYield = runSimulation(inputNoYield);
+
+    // After 1 year, capital should be lower when yield is distributed separately
+    // (appreciation rate = 5% vs full 8%)
+    const capitalWith = withYield.quarters[3].investmentCapital;
+    const capitalWithout = noYield.quarters[3].investmentCapital;
+    expect(capitalWith).toBeLessThan(capitalWithout);
+  });
+
+  it("zero yield rates preserve original capital growth behavior", () => {
+    const inputOld = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Fund",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.08,
+        annualContribution: 0,
+      }],
+    });
+    const inputNew = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Fund",
+        accountType: "taxable",
+        currentBalance: 1_000_000,
+        blendedReturnRate: 0.08,
+        annualContribution: 0,
+        ordinaryYieldRate: 0,
+        qualifiedYieldRate: 0,
+        taxExemptYieldRate: 0,
+      }],
+    });
+    const old = runSimulation(inputOld);
+    const newR = runSimulation(inputNew);
+    // Same capital since yield rates are 0
+    expect(old.quarters[3].investmentCapital).toBeCloseTo(newR.quarters[3].investmentCapital, 0);
+  });
+});
+
+// ── Enhancement 2: Post-FI Glide Path ────────────────────────────────────────
+
+describe("runSimulation — post-FI glide path", () => {
+  it("capital grows more slowly after FI when postFIReturnRate < assumedReturnRate", () => {
+    // Use a known FI quarter, then compare capital growth pre vs post rate switch
+    const inputFast = minimalInput({
+      profile: {
+        ...baseProfile(),
+        assumedReturnRate: 0.10,
+        postFIReturnRate: 0.10, // no rate change
+      },
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Wealth",
+        accountType: "taxable",
+        currentBalance: 10_000_000,
+        blendedReturnRate: 0.10,
+        annualContribution: 0,
+      }],
+      recurringExpenditures: [{ description: "Living", annualAmount: 200_000, growthRate: 0 }],
+    });
+    const inputSlow = minimalInput({
+      profile: {
+        ...baseProfile(),
+        assumedReturnRate: 0.10,
+        postFIReturnRate: 0.04, // switch to conservative after FI
+      },
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Wealth",
+        accountType: "taxable",
+        currentBalance: 10_000_000,
+        blendedReturnRate: 0.10,
+        annualContribution: 0,
+      }],
+      recurringExpenditures: [{ description: "Living", annualAmount: 200_000, growthRate: 0 }],
+    });
+
+    const fast = runSimulation(inputFast);
+    const slow = runSimulation(inputSlow);
+
+    // Both are FI from Q1; after many quarters the slow one should have less capital
+    const fastCapital = fast.quarters[40].totalCapital;
+    const slowCapital = slow.quarters[40].totalCapital;
+    expect(slowCapital).toBeLessThan(fastCapital);
+  });
+
+  it("rate switch happens at the FI quarter", () => {
+    const input = minimalInput({
+      profile: {
+        ...baseProfile(),
+        assumedReturnRate: 0.10,
+        postFIReturnRate: 0.0, // switch to 0% after FI for easy verification
+      },
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Wealth",
+        accountType: "taxable",
+        currentBalance: 5_000_000,
+        blendedReturnRate: 0.10,
+        annualContribution: 0,
+      }],
+      recurringExpenditures: [{ description: "Living", annualAmount: 100_000, growthRate: 0 }],
+    });
+    const { quarters } = runSimulation(input);
+    // FI in Q1 (q=0). After rate switches to 0%, capital should not grow from Q1 onward
+    // (ignoring spending deductions, just check growth is near-zero)
+    const q1Capital = quarters[0].investmentCapital;
+    const q2Capital = quarters[1].investmentCapital;
+    // With 0% appreciation: capital should be approximately equal or slightly less (after spending)
+    expect(q2Capital).toBeLessThanOrEqual(q1Capital + 1); // allow tiny rounding
+  });
+});
+
+// ── Enhancement 3: Realization Reinvestment Policy ───────────────────────────
+
+const basePolicy = (): NonNullable<SimulationInput["realizationPolicy"]> => ({
+  equityPct: 0.50,
+  equityAppreciationRate: 0.055,
+  equityQualifiedYieldRate: 0.015,
+  taxableFixedIncomePct: 0.20,
+  taxableFixedIncomeRate: 0.04,
+  taxExemptFixedIncomePct: 0.10,
+  taxExemptFixedIncomeRate: 0.03,
+  realEstatePct: 0.20,
+  reAppreciationRate: 0.04,
+  reGrossYieldRate: 0.06,
+  reCarryingCostRate: 0.02,
+});
+
+describe("runSimulation — realization reinvestment policy", () => {
+  it("carry proceeds route to realizationCapital when policy is set", () => {
+    const input = minimalInput({
+      realizationPolicy: basePolicy(),
+      carry: [{
+        id: "c1",
+        fundName: "Fund I",
+        expectedGrossCarry: 1_000_000,
+        haircutPct: 0,
+        realizationSchedule: [{ year: 2026, quarter: "Q1", pct: 1.0 }],
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // Q1: 1M carry received, should appear in realizationCapital
+    expect(quarters[0].realizationCapital).toBeGreaterThan(0);
+  });
+
+  it("carry proceeds go to investmentCapital when no policy", () => {
+    const inputNoPolicy = minimalInput({
+      realizationPolicy: null,
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Cash",
+        accountType: "taxable",
+        currentBalance: 0,
+        blendedReturnRate: 0,
+        annualContribution: 0,
+      }],
+      carry: [{
+        id: "c1",
+        fundName: "Fund I",
+        expectedGrossCarry: 1_000_000,
+        haircutPct: 0,
+        realizationSchedule: [{ year: 2026, quarter: "Q2", pct: 1.0 }],
+      }],
+    });
+    const { quarters } = runSimulation(inputNoPolicy);
+    // Q2 (q=1): carry goes to investmentCapital, realizationCapital stays 0
+    expect(quarters[1].realizationCapital).toBe(0);
+    expect(quarters[1].investmentCapital).toBeGreaterThan(900_000);
+  });
+
+  it("policy generates ordinary and qualified yield income", () => {
+    const input = minimalInput({
+      realizationPolicy: basePolicy(),
+      carry: [{
+        id: "c1",
+        fundName: "Fund I",
+        expectedGrossCarry: 1_000_000,
+        haircutPct: 0,
+        realizationSchedule: [{ year: 2026, quarter: "Q1", pct: 1.0 }],
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // By Q4 the policy should generate some taxable yield
+    expect(quarters[3].annualOrdinaryIncome).toBeGreaterThan(0);
+    expect(quarters[3].annualLtcgIncome).toBeGreaterThan(0);
+  });
+
+  it("deficit draw transfers from realizationCapital to cover negative investmentCapital", () => {
+    // Large spending with policy capital available
+    const input = minimalInput({
+      realizationPolicy: basePolicy(),
+      carry: [{
+        id: "c1",
+        fundName: "Fund I",
+        expectedGrossCarry: 2_000_000,
+        haircutPct: 0,
+        realizationSchedule: [{ year: 2026, quarter: "Q1", pct: 1.0 }],
+      }],
+      oneTimeExpenditures: [{
+        description: "Large purchase",
+        amount: 500_000,
+        projectedYear: 2026,
+        projectedQuarter: "Q2",
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // investmentCapital should not go negative (deficit is drawn from realizationCapital)
+    quarters.forEach(q => {
+      expect(q.investmentCapital).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  it("realizationCapital is included in totalCapital", () => {
+    const input = minimalInput({
+      realizationPolicy: basePolicy(),
+      carry: [{
+        id: "c1",
+        fundName: "Fund I",
+        expectedGrossCarry: 1_000_000,
+        haircutPct: 0,
+        realizationSchedule: [{ year: 2026, quarter: "Q1", pct: 1.0 }],
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // totalCapital should equal investmentCapital + realizationCapital + other buckets
+    quarters.forEach(q => {
+      const summed = q.investmentCapital + q.realizationCapital + q.realEstateEquity + q.insuranceCashValue + q.unrealizedCarry;
+      expect(q.totalCapital).toBeCloseTo(summed, 0);
+    });
   });
 });

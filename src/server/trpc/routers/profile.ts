@@ -20,6 +20,7 @@ export const profileRouter = createTRPCRouter({
       targetAge: z.number().int().min(70).max(100),
       assumedReturnRate: z.number().min(0.01).max(0.20),
       safeHarborElection: z.boolean(),
+      postFIReturnRate: z.number().min(0.01).max(0.15),
     }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db

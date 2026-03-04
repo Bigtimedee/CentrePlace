@@ -6,4 +6,5 @@ export * from "./carry";
 export * from "./lp-investments";
 export * from "./real-estate";
 export * from "./insurance";
+export * from "./realization-policy";
 export * from "./relations";

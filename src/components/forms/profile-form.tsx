@@ -26,6 +26,7 @@ export function ProfileForm() {
     targetAge: 90,
     assumedReturnRate: 7,      // displayed as percent
     safeHarborElection: true,
+    postFIReturnRate: 5,       // displayed as percent
   });
 
   const [showChildForm, setShowChildForm] = useState(false);
@@ -50,6 +51,7 @@ export function ProfileForm() {
         targetAge: profile.targetAge,
         assumedReturnRate: Math.round(profile.assumedReturnRate * 100 * 10) / 10,
         safeHarborElection: profile.safeHarborElection,
+        postFIReturnRate: Math.round(profile.postFIReturnRate * 100 * 10) / 10,
       });
     }
   }, [profile]);
@@ -58,6 +60,7 @@ export function ProfileForm() {
     upsert.mutate({
       ...form,
       assumedReturnRate: form.assumedReturnRate / 100,
+      postFIReturnRate: form.postFIReturnRate / 100,
     });
   }
 
@@ -120,7 +123,7 @@ export function ProfileForm() {
               />
             </FormField>
 
-            <FormField label="Assumed Portfolio Return" hint="Annual blended return rate for simulation" required>
+            <FormField label="Assumed Portfolio Return" hint="Annual blended return rate for simulation (pre-FI)" required>
               <Input
                 type="number"
                 min={1}
@@ -129,6 +132,18 @@ export function ProfileForm() {
                 suffix="%"
                 value={form.assumedReturnRate}
                 onChange={e => setForm(f => ({ ...f, assumedReturnRate: parseFloat(e.target.value) || f.assumedReturnRate }))}
+              />
+            </FormField>
+
+            <FormField label="Post-FI Return Rate" hint="Conservative return after FI — shift to bonds/income allocation" required>
+              <Input
+                type="number"
+                min={1}
+                max={15}
+                step={0.5}
+                suffix="%"
+                value={form.postFIReturnRate}
+                onChange={e => setForm(f => ({ ...f, postFIReturnRate: parseFloat(e.target.value) || f.postFIReturnRate }))}
               />
             </FormField>
 

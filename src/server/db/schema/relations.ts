@@ -7,6 +7,7 @@ import { carryPositions, carryRealizations } from "./carry";
 import { lpInvestments } from "./lp-investments";
 import { realEstateProperties, mortgages } from "./real-estate";
 import { insurancePolicies } from "./insurance";
+import { realizationPolicy } from "./realization-policy";
 
 // ── userProfiles ─────────────────────────────────────────────────────────────
 export const userProfilesRelations = relations(userProfiles, ({ many, one }) => ({
@@ -23,6 +24,10 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
   lpInvestments: many(lpInvestments),
   realEstateProperties: many(realEstateProperties),
   insurancePolicies: many(insurancePolicies),
+  realizationPolicy: one(realizationPolicy, {
+    fields: [userProfiles.id],
+    references: [realizationPolicy.userId],
+  }),
 }));
 
 export const childrenRelations = relations(children, ({ one }) => ({
@@ -117,6 +122,14 @@ export const mortgagesRelations = relations(mortgages, ({ one }) => ({
 export const insurancePoliciesRelations = relations(insurancePolicies, ({ one }) => ({
   user: one(userProfiles, {
     fields: [insurancePolicies.userId],
+    references: [userProfiles.id],
+  }),
+}));
+
+// ── realization policy ────────────────────────────────────────────────────────
+export const realizationPolicyRelations = relations(realizationPolicy, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [realizationPolicy.userId],
     references: [userProfiles.id],
   }),
 }));

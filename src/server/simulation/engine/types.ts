@@ -14,6 +14,8 @@ export interface SimProfile {
   /** Annual blended portfolio return rate (e.g. 0.07 for 7%) */
   assumedReturnRate: number;
   safeHarborElection: boolean;
+  /** Conservative return rate applied after FI is achieved (e.g. 0.05 for 5%) */
+  postFIReturnRate: number;
 }
 
 export interface SimIncome {
@@ -60,6 +62,12 @@ export interface SimInvestmentAccount {
   currentBalance: number;
   blendedReturnRate: number; // pre-computed: equity*eRate + bond*bRate + alt*aRate
   annualContribution: number;
+  /** Annual ordinary income yield as % of balance (e.g. bond interest, non-qualified dividends). Default 0. */
+  ordinaryYieldRate?: number;
+  /** Annual qualified dividend yield as % of balance (taxed at LTCG rates). Default 0. */
+  qualifiedYieldRate?: number;
+  /** Annual tax-exempt yield as % of balance (e.g. muni bonds — cash flow only, not taxed). Default 0. */
+  taxExemptYieldRate?: number;
 }
 
 export interface SimRealEstateProperty {
@@ -113,6 +121,20 @@ export interface SimOneTimeExpenditure {
   projectedQuarter: "Q1" | "Q2" | "Q3" | "Q4";
 }
 
+export interface SimRealizationPolicy {
+  equityPct: number;
+  equityAppreciationRate: number;
+  equityQualifiedYieldRate: number;
+  taxableFixedIncomePct: number;
+  taxableFixedIncomeRate: number;
+  taxExemptFixedIncomePct: number;
+  taxExemptFixedIncomeRate: number;
+  realEstatePct: number;
+  reAppreciationRate: number;
+  reGrossYieldRate: number;
+  reCarryingCostRate: number;
+}
+
 /** All inputs to the quarterly simulation engine */
 export interface SimulationInput {
   profile: SimProfile;
@@ -124,6 +146,8 @@ export interface SimulationInput {
   insurance: SimInsurancePolicy[];
   recurringExpenditures: SimRecurringExpenditure[];
   oneTimeExpenditures: SimOneTimeExpenditure[];
+  /** Realization reinvestment policy — null means carry/LP flow into investmentCapital as before */
+  realizationPolicy: SimRealizationPolicy | null;
   /** Override the simulation start year (defaults to current year) */
   startYear?: number;
 }
@@ -139,6 +163,7 @@ export interface QuarterResult {
 
   // Capital balances (end of quarter)
   investmentCapital: number;
+  realizationCapital: number;
   realEstateEquity: number;
   insuranceCashValue: number;
   unrealizedCarry: number;
@@ -151,6 +176,7 @@ export interface QuarterResult {
   carryIncome: number;         // net of haircut
   lpIncome: number;
   rentalNetIncome: number;
+  portfolioYieldIncome: number; // sum of ordinary + qualified + tax-exempt yield this quarter
   recurringSpending: number;
   oneTimeSpending: number;
   mortgagePayments: number;

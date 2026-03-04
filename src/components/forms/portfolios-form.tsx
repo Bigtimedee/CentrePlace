@@ -33,6 +33,9 @@ type FormState = {
   bondReturnRate: number;
   altReturnRate: number;
   annualContribution: number;
+  ordinaryYieldRate: number;  // displayed as %
+  qualifiedYieldRate: number;
+  taxExemptYieldRate: number;
 };
 
 const EMPTY: FormState = {
@@ -46,6 +49,9 @@ const EMPTY: FormState = {
   bondReturnRate: 4,
   altReturnRate: 7,
   annualContribution: 0,
+  ordinaryYieldRate: 0,
+  qualifiedYieldRate: 0,
+  taxExemptYieldRate: 0,
 };
 
 function toMutation(f: FormState) {
@@ -57,6 +63,9 @@ function toMutation(f: FormState) {
     equityReturnRate: f.equityReturnRate / 100,
     bondReturnRate: f.bondReturnRate / 100,
     altReturnRate: f.altReturnRate / 100,
+    ordinaryYieldRate: f.ordinaryYieldRate / 100,
+    qualifiedYieldRate: f.qualifiedYieldRate / 100,
+    taxExemptYieldRate: f.taxExemptYieldRate / 100,
   };
 }
 
@@ -80,6 +89,8 @@ function AccountForm({
     (form.equityPct / 100) * form.equityReturnRate +
     (form.bondPct / 100) * form.bondReturnRate +
     (form.altPct / 100) * form.altReturnRate;
+  const totalYield = form.ordinaryYieldRate + form.qualifiedYieldRate + form.taxExemptYieldRate;
+  const appreciationDisplay = Math.max(0, blendedReturn - totalYield);
 
   return (
     <div className="space-y-5 py-2">
@@ -147,6 +158,30 @@ function AccountForm({
         </div>
       </div>
 
+      {/* Income Yield Decomposition */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-medium text-slate-300">Income Yield</h4>
+          <span className="text-xs text-slate-500">
+            Appreciation rate: {appreciationDisplay.toFixed(2)}% (blended − yield)
+          </span>
+        </div>
+        <p className="text-xs text-slate-500 mb-3">
+          Annual yield as % of balance. Leave all at 0 for tax-deferred accounts (IRA, 401k). Yield splits taxable income from capital appreciation.
+        </p>
+        <div className="grid grid-cols-3 gap-4">
+          <FormField label="Ordinary yield" hint="Bond interest, non-qual dividends">
+            <Input type="number" min={0} max={15} step={0.1} suffix="%" value={form.ordinaryYieldRate} onChange={e => set({ ordinaryYieldRate: parseFloat(e.target.value) || 0 })} />
+          </FormField>
+          <FormField label="Qualified yield" hint="Qualified dividends (LTCG rates)">
+            <Input type="number" min={0} max={15} step={0.1} suffix="%" value={form.qualifiedYieldRate} onChange={e => set({ qualifiedYieldRate: parseFloat(e.target.value) || 0 })} />
+          </FormField>
+          <FormField label="Tax-exempt yield" hint="Muni bond interest (not taxed)">
+            <Input type="number" min={0} max={15} step={0.1} suffix="%" value={form.taxExemptYieldRate} onChange={e => set({ taxExemptYieldRate: parseFloat(e.target.value) || 0 })} />
+          </FormField>
+        </div>
+      </div>
+
       <div className="flex gap-2 justify-end">
         <Button variant="ghost" size="sm" onClick={onCancel}><X className="h-3.5 w-3.5" /> Cancel</Button>
         <Button size="sm" onClick={() => onSave(form)} disabled={isPending || !form.accountName || !allocationOk}>
@@ -162,6 +197,7 @@ function fromRecord(r: {
   equityPct: number; bondPct: number; altPct: number;
   equityReturnRate: number; bondReturnRate: number; altReturnRate: number;
   annualContribution: number;
+  ordinaryYieldRate: number; qualifiedYieldRate: number; taxExemptYieldRate: number;
 }): FormState {
   return {
     accountName: r.accountName,
@@ -174,6 +210,9 @@ function fromRecord(r: {
     bondReturnRate: Math.round(r.bondReturnRate * 100 * 10) / 10,
     altReturnRate: Math.round(r.altReturnRate * 100 * 10) / 10,
     annualContribution: r.annualContribution,
+    ordinaryYieldRate: Math.round(r.ordinaryYieldRate * 100 * 10) / 10,
+    qualifiedYieldRate: Math.round(r.qualifiedYieldRate * 100 * 10) / 10,
+    taxExemptYieldRate: Math.round(r.taxExemptYieldRate * 100 * 10) / 10,
   };
 }
 

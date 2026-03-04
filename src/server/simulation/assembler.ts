@@ -19,6 +19,7 @@ import {
   insurancePolicies,
   expenditures,
   oneTimeExpenditures,
+  realizationPolicy,
 } from "../db/schema";
 import type {
   SimulationInput,
@@ -29,6 +30,7 @@ import type {
   SimInsurancePolicy,
   SimRecurringExpenditure,
   SimOneTimeExpenditure,
+  SimRealizationPolicy,
 } from "./engine/types";
 import type { Context } from "../trpc/context";
 
@@ -48,6 +50,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     policies,
     recurring,
     oneTime,
+    policy,
   ] = await Promise.all([
     ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
     ctx.db.query.incomeProfiles.findFirst({ where: eq(incomeProfiles.userId, uid) }),
@@ -59,6 +62,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     ctx.db.query.insurancePolicies.findMany({ where: eq(insurancePolicies.userId, uid) }),
     ctx.db.query.expenditures.findMany({ where: eq(expenditures.userId, uid) }),
     ctx.db.query.oneTimeExpenditures.findMany({ where: eq(oneTimeExpenditures.userId, uid) }),
+    ctx.db.query.realizationPolicy.findFirst({ where: eq(realizationPolicy.userId, uid) }),
   ]);
 
   if (!profile) {
@@ -102,6 +106,9 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
       a.bondPct * a.bondReturnRate +
       a.altPct * a.altReturnRate,
     annualContribution: a.annualContribution,
+    ordinaryYieldRate: a.ordinaryYieldRate ?? 0,
+    qualifiedYieldRate: a.qualifiedYieldRate ?? 0,
+    taxExemptYieldRate: a.taxExemptYieldRate ?? 0,
   }));
 
   const simRealEstate: SimRealEstateProperty[] = properties.map(p => {
@@ -158,6 +165,22 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     projectedQuarter: e.projectedQuarter as "Q1" | "Q2" | "Q3" | "Q4",
   }));
 
+  const simPolicy: SimRealizationPolicy | null = policy
+    ? {
+        equityPct: policy.equityPct,
+        equityAppreciationRate: policy.equityAppreciationRate,
+        equityQualifiedYieldRate: policy.equityQualifiedYieldRate,
+        taxableFixedIncomePct: policy.taxableFixedIncomePct,
+        taxableFixedIncomeRate: policy.taxableFixedIncomeRate,
+        taxExemptFixedIncomePct: policy.taxExemptFixedIncomePct,
+        taxExemptFixedIncomeRate: policy.taxExemptFixedIncomeRate,
+        realEstatePct: policy.realEstatePct,
+        reAppreciationRate: policy.reAppreciationRate,
+        reGrossYieldRate: policy.reGrossYieldRate,
+        reCarryingCostRate: policy.reCarryingCostRate,
+      }
+    : null;
+
   return {
     profile: {
       filingStatus: profile.filingStatus,
@@ -166,6 +189,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
       targetAge: profile.targetAge,
       assumedReturnRate: profile.assumedReturnRate,
       safeHarborElection: profile.safeHarborElection,
+      postFIReturnRate: profile.postFIReturnRate,
     },
     income: income
       ? {
@@ -182,5 +206,6 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     insurance: simInsurance,
     recurringExpenditures: simRecurring,
     oneTimeExpenditures: simOneTime,
+    realizationPolicy: simPolicy,
   };
 }

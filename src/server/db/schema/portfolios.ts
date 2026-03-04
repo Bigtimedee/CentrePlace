@@ -31,6 +31,11 @@ export const investmentAccounts = pgTable("investment_accounts", {
   // Annual contribution (pre-FI accumulation)
   annualContribution: real("annual_contribution").notNull().default(0),
 
+  // Income yield decomposition (% of balance/yr; default 0 = backwards compatible)
+  ordinaryYieldRate: real("ordinary_yield_rate").notNull().default(0),
+  qualifiedYieldRate: real("qualified_yield_rate").notNull().default(0),
+  taxExemptYieldRate: real("tax_exempt_yield_rate").notNull().default(0),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

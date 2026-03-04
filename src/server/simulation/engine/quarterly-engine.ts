@@ -75,6 +75,32 @@ function weightedBlendedReturnRate(
   }, 0);
 }
 
+// ── Weighted yield rates ──────────────────────────────────────────────────────
+
+interface WeightedYields {
+  ordinaryYieldRate: number;
+  qualifiedYieldRate: number;
+  taxExemptYieldRate: number;
+}
+
+function weightedYieldRates(input: SimulationInput): WeightedYields {
+  const totalBalance = input.investmentAccounts.reduce((s, a) => s + a.currentBalance, 0);
+  if (totalBalance <= 0) {
+    return { ordinaryYieldRate: 0, qualifiedYieldRate: 0, taxExemptYieldRate: 0 };
+  }
+  return input.investmentAccounts.reduce(
+    (acc, a) => {
+      const w = a.currentBalance / totalBalance;
+      return {
+        ordinaryYieldRate: acc.ordinaryYieldRate + w * (a.ordinaryYieldRate ?? 0),
+        qualifiedYieldRate: acc.qualifiedYieldRate + w * (a.qualifiedYieldRate ?? 0),
+        taxExemptYieldRate: acc.taxExemptYieldRate + w * (a.taxExemptYieldRate ?? 0),
+      };
+    },
+    { ordinaryYieldRate: 0, qualifiedYieldRate: 0, taxExemptYieldRate: 0 },
+  );
+}
+
 // ── Unrealized carry ──────────────────────────────────────────────────────────
 
 /**
@@ -126,8 +152,15 @@ export function runSimulation(input: SimulationInput): SimulationResult {
   // Pool all investment account balances
   let investmentCapital = input.investmentAccounts.reduce((s, a) => s + a.currentBalance, 0);
 
-  // Blended return rate: computed once from starting allocation (recomputed would require per-account tracking)
-  const annualBlendedRate = weightedBlendedReturnRate(input, investmentCapital);
+  // Realization capital pool (receives carry/LP proceeds when policy is set)
+  let realizationCapital = 0;
+
+  // Blended return rate: computed once from starting allocation
+  // Enhancement 2: becomes mutable so we can switch to postFIReturnRate after FI
+  let annualBlendedRate = weightedBlendedReturnRate(input, investmentCapital);
+
+  // Pre-compute weighted yield rates (account-level, fixed for simulation)
+  const yields = weightedYieldRates(input);
 
   // Mutable property values and mortgage balances
   const propertyValues = new Map<string, number>(
@@ -184,8 +217,11 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     }
 
     // ── Investment capital: quarterly growth ──
-    const quarterlyReturn = annualBlendedRate / 4;
-    investmentCapital *= 1 + quarterlyReturn;
+    // Appreciation rate = blended rate minus total yield (yield is distributed separately)
+    const totalYieldRate = yields.ordinaryYieldRate + yields.qualifiedYieldRate + yields.taxExemptYieldRate;
+    const appreciationRate = Math.max(0, annualBlendedRate - totalYieldRate);
+    const quarterlyAppreciationReturn = appreciationRate / 4;
+    investmentCapital *= 1 + quarterlyAppreciationReturn;
 
     // Annual contributions at Q1 (pre-FI only — checked below after FI test)
     if (isFirstQuarterOfYear) {
@@ -194,6 +230,39 @@ export function runSimulation(input: SimulationInput): SimulationResult {
         0,
       );
       investmentCapital += annualContributions;
+    }
+
+    // ── Yield income from investmentCapital ──
+    const ordinaryYieldIncome = investmentCapital * yields.ordinaryYieldRate / 4;
+    const qualifiedYieldIncome = investmentCapital * yields.qualifiedYieldRate / 4;
+    const taxExemptYieldIncome = investmentCapital * yields.taxExemptYieldRate / 4;
+    const portfolioYieldIncome = ordinaryYieldIncome + qualifiedYieldIncome + taxExemptYieldIncome;
+
+    // ── Realization capital: grow and generate yield ──
+    let realizationOrdinaryYield = 0;
+    let realizationQualifiedYield = 0;
+    let realizationTaxExemptYield = 0;
+
+    if (realizationCapital > 0 && input.realizationPolicy !== null) {
+      const policy = input.realizationPolicy;
+
+      // Appreciation component (equity + real estate appreciation only)
+      const policyAppreciationRate =
+        policy.equityPct * policy.equityAppreciationRate +
+        policy.realEstatePct * policy.reAppreciationRate;
+      realizationCapital *= 1 + policyAppreciationRate / 4;
+
+      // Yield income from realization capital
+      realizationOrdinaryYield = realizationCapital * (
+        policy.taxableFixedIncomePct * policy.taxableFixedIncomeRate +
+        policy.realEstatePct * (policy.reGrossYieldRate - policy.reCarryingCostRate)
+      ) / 4;
+      realizationQualifiedYield = realizationCapital * (
+        policy.equityPct * policy.equityQualifiedYieldRate
+      ) / 4;
+      realizationTaxExemptYield = realizationCapital * (
+        policy.taxExemptFixedIncomePct * policy.taxExemptFixedIncomeRate
+      ) / 4;
     }
 
     // ── Real estate: quarterly appreciation ──
@@ -332,8 +401,20 @@ export function runSimulation(input: SimulationInput): SimulationResult {
 
     // ── Tax accounting ──
     // Accumulate year-to-date taxable income
-    ytdOrdinaryIncome += w2Income + rentalNetIncome + lpOrdinary;
-    ytdLtcgIncome += carryIncome + lpLtcg + realEstateLtcgThisQuarter;
+    // Yield income: ordinary yield → ordinary income; qualified yield → LTCG
+    ytdOrdinaryIncome +=
+      w2Income +
+      rentalNetIncome +
+      lpOrdinary +
+      ordinaryYieldIncome +
+      realizationOrdinaryYield;
+    ytdLtcgIncome +=
+      carryIncome +
+      lpLtcg +
+      realEstateLtcgThisQuarter +
+      qualifiedYieldIncome +
+      realizationQualifiedYield;
+    // taxExemptYield is excluded from both (cash flow only)
 
     let taxPayment: number;
 
@@ -383,12 +464,36 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       ytdLtcgIncome = 0;
     }
 
-    // ── Net cash flow → investment capital ──
-    const netCashFlow =
-      (w2Income + carryIncome + lpIncome + rentalNetIncome) -
-      (recurringSpending + oneTimeSpending + mortgagePayments + insurancePremiums + taxPayment);
+    // ── Net cash flow → investment capital (or realization capital pool) ──
+    // Tax payments come from investmentCapital regardless of policy.
+    // Carry/LP proceeds route to realizationCapital if policy is set.
 
-    investmentCapital += netCashFlow;
+    let generalIncome = w2Income + rentalNetIncome + portfolioYieldIncome +
+      realizationOrdinaryYield + realizationQualifiedYield + realizationTaxExemptYield;
+
+    if (input.realizationPolicy !== null) {
+      // Carry and LP go to the realization pool; do NOT add to general cash flow
+      realizationCapital += carryIncome + lpIncome;
+    } else {
+      // No policy — carry/LP flow into investmentCapital as before
+      generalIncome += carryIncome + lpIncome;
+    }
+
+    const generalOutflow = recurringSpending + oneTimeSpending + mortgagePayments + insurancePremiums + taxPayment;
+    const netCashFlow =
+      (w2Income + carryIncome + lpIncome + rentalNetIncome + portfolioYieldIncome +
+       realizationOrdinaryYield + realizationQualifiedYield + realizationTaxExemptYield) -
+      generalOutflow;
+
+    investmentCapital += generalIncome - generalOutflow;
+
+    // If investmentCapital goes negative after expenses, draw from realizationCapital
+    if (investmentCapital < 0 && realizationCapital > 0) {
+      const draw = Math.min(-investmentCapital, realizationCapital);
+      realizationCapital -= draw;
+      investmentCapital += draw;
+    }
+
     investmentCapital = Math.max(0, investmentCapital);
 
     // ── Capital totals ──
@@ -398,7 +503,12 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       0,
     );
     const unrealizedCarry = computeUnrealizedCarry(input, year, quarterLabel);
-    const totalCapital = investmentCapital + realEstateEquity + insuranceCashValueTotal + unrealizedCarry;
+    const totalCapital =
+      investmentCapital +
+      realizationCapital +
+      realEstateEquity +
+      insuranceCashValueTotal +
+      unrealizedCarry;
 
     // ── FI test ──
     const annualSpending = computeAnnualSpending(input.recurringExpenditures, year, startYear);
@@ -416,6 +526,9 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     if (isFI && fiDate === null && annualSpending > 0) {
       fiDate = { year, quarter: quarterLabel };
       fiAge = age;
+
+      // Enhancement 2: switch to post-FI return rate after FI is detected
+      annualBlendedRate = input.profile.postFIReturnRate;
     }
 
     quarters.push({
@@ -424,6 +537,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       quarterLabel,
       age,
       investmentCapital,
+      realizationCapital,
       realEstateEquity,
       insuranceCashValue: insuranceCashValueTotal,
       unrealizedCarry,
@@ -434,6 +548,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       carryIncome,
       lpIncome,
       rentalNetIncome,
+      portfolioYieldIncome,
       recurringSpending,
       oneTimeSpending,
       mortgagePayments,

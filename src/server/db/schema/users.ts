@@ -10,6 +10,7 @@ export const userProfiles = pgTable("user_profiles", {
   birthYear: integer("birth_year").notNull(),
   targetAge: integer("target_age").notNull().default(90),
   assumedReturnRate: real("assumed_return_rate").notNull().default(0.07), // 7%
+  postFIReturnRate: real("post_fi_return_rate").notNull().default(0.05), // 5% conservative post-FI
   safeHarborElection: boolean("safe_harbor_election").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
