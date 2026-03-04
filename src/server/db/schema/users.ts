@@ -21,6 +21,7 @@ export const children = pgTable("children", {
   userId: text("user_id").notNull().references(() => userProfiles.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   birthYear: integer("birth_year").notNull(),
+  k12TuitionCost: real("k12_tuition_cost").notNull().default(0), // annual private K-12 tuition (ages 5–17)
   educationType: educationTypeEnum("education_type").notNull().default("none"),
   annualEducationCost: real("annual_education_cost").default(0),
   includesGraduateSchool: boolean("includes_graduate_school").notNull().default(false),

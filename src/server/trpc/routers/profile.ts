@@ -36,6 +36,7 @@ export const profileRouter = createTRPCRouter({
     .input(z.object({
       name: z.string().min(1),
       birthYear: z.number().int().min(2000).max(2025),
+      k12TuitionCost: z.number().min(0).default(0),
       educationType: z.enum(["none", "public", "private"]),
       annualEducationCost: z.number().min(0),
       includesGraduateSchool: z.boolean(),
@@ -52,6 +53,7 @@ export const profileRouter = createTRPCRouter({
       id: z.string(),
       name: z.string().min(1).optional(),
       birthYear: z.number().int().optional(),
+      k12TuitionCost: z.number().min(0).optional(),
       educationType: z.enum(["none", "public", "private"]).optional(),
       annualEducationCost: z.number().min(0).optional(),
       includesGraduateSchool: z.boolean().optional(),

@@ -1021,6 +1021,68 @@ describe("runSimulation — children education costs", () => {
     expect(quarters[0].requiredCapital).toBe(0);
   });
 
+  it("K-12 tuition applies ages 5–17 and stops at 18", () => {
+    // Child born 2014; turns 5 in 2019, turns 18 in 2032. Sim starts 2026 (child is 12).
+    const input = minimalInput({
+      children: [{
+        name: "School-age",
+        birthYear: 2014,
+        annualK12Cost: 40_000,
+        hasCollege: false,
+        annualCollegeCost: 0,
+        hasGradSchool: false,
+        annualGradSchoolCost: 0,
+        gradSchoolYears: 0,
+      }],
+    });
+    const { quarters } = runSimulation(input);
+
+    // 2026 Q1 (q=0): child is 12, K-12 active
+    expect(quarters[0].recurringSpending).toBeCloseTo(40_000 / 4, 0);
+
+    // 2031 Q4 (q=23): child is 17, still K-12
+    expect(quarters[23].year).toBe(2031);
+    expect(quarters[23].recurringSpending).toBeCloseTo(40_000 / 4, 0);
+
+    // 2032 Q1 (q=24): child turns 18, K-12 ends
+    expect(quarters[24].year).toBe(2032);
+    expect(quarters[24].recurringSpending).toBeCloseTo(0, 0);
+  });
+
+  it("K-12 and college costs are both applied in the correct years", () => {
+    // Child born 2008: K-12 up to 17 (2025, already past); college 2026–2029
+    // Child born 2014: K-12 2019–2031; turns 18 in 2032
+    // At sim start 2026, child born 2008 is 18 (college), child born 2014 is 12 (K-12)
+    const input = minimalInput({
+      children: [
+        {
+          name: "College-age",
+          birthYear: 2008,
+          annualK12Cost: 0,
+          hasCollege: true,
+          annualCollegeCost: 80_000,
+          hasGradSchool: false,
+          annualGradSchoolCost: 0,
+          gradSchoolYears: 0,
+        },
+        {
+          name: "K-12",
+          birthYear: 2014,
+          annualK12Cost: 40_000,
+          hasCollege: false,
+          annualCollegeCost: 0,
+          hasGradSchool: false,
+          annualGradSchoolCost: 0,
+          gradSchoolYears: 0,
+        },
+      ],
+    });
+    const { quarters } = runSimulation(input);
+
+    // 2026 Q1 (q=0): college child 18 (80k/yr) + K-12 child 12 (40k/yr) = 120k/yr
+    expect(quarters[0].recurringSpending).toBeCloseTo(120_000 / 4, 0);
+  });
+
   it("child with no tuition modeled incurs no education spending", () => {
     const input = minimalInput({
       children: [{

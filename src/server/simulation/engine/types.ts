@@ -111,6 +111,8 @@ export interface SimInsurancePolicy {
 export interface SimChildEducation {
   name: string;
   birthYear: number;
+  /** Annual private K-12 tuition — applies while child is age 5–17. 0 = not modeling. */
+  annualK12Cost: number;
   /** Whether college costs are modeled (false = no tuition projected) */
   hasCollege: boolean;
   /** Annual undergraduate tuition — applies for 4 years starting at age 18 */

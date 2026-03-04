@@ -379,6 +379,11 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     for (const child of input.children) {
       const childAge = year - child.birthYear;
 
+      // K-12 private tuition: ages 5–17 (kindergarten through senior year)
+      if (child.annualK12Cost > 0 && childAge >= 5 && childAge <= 17) {
+        recurringSpending += child.annualK12Cost / 4;
+      }
+
       if (child.hasCollege && childAge >= 18 && childAge <= 21) {
         recurringSpending += child.annualCollegeCost / 4;
       }

@@ -33,6 +33,7 @@ export function ProfileForm() {
   const [childForm, setChildForm] = useState({
     name: "",
     birthYear: CURRENT_YEAR - 10,
+    k12TuitionCost: 0,
     educationType: "none" as "none" | "public" | "private",
     annualEducationCost: 0,
     includesGraduateSchool: false,
@@ -188,7 +189,10 @@ export function ProfileForm() {
                 <div>
                   <span className="text-sm text-slate-200 font-medium">{child.name}</span>
                   <span className="text-xs text-slate-500 ml-3">
-                    b. {child.birthYear} · {child.educationType !== "none" ? `${child.educationType} school · ${formatCurrency(child.annualEducationCost ?? 0)}/yr` : "No tuition modeled"} · {Math.round((child.inheritancePct ?? 0) * 100)}% estate
+                    b. {child.birthYear}
+                    {(child.k12TuitionCost ?? 0) > 0 && ` · K-12 ${formatCurrency(child.k12TuitionCost ?? 0, true)}/yr`}
+                    {child.educationType !== "none" ? ` · ${child.educationType} college ${formatCurrency(child.annualEducationCost ?? 0, true)}/yr` : ""}
+                    {" "}· {Math.round((child.inheritancePct ?? 0) * 100)}% estate
                   </span>
                 </div>
                 <Button
@@ -224,19 +228,29 @@ export function ProfileForm() {
                 />
               </FormField>
 
-              <FormField label="Education Type">
+              <FormField label="K-12 Private Tuition" hint="Annual cost, ages 5–17. Leave 0 if public or not modeling.">
+                <Input
+                  type="number"
+                  min={0}
+                  prefix="$"
+                  value={childForm.k12TuitionCost}
+                  onChange={e => setChildForm(f => ({ ...f, k12TuitionCost: parseFloat(e.target.value) || 0 }))}
+                />
+              </FormField>
+
+              <FormField label="College Type">
                 <Select
                   value={childForm.educationType}
                   onChange={e => setChildForm(f => ({ ...f, educationType: e.target.value as typeof f.educationType }))}
                 >
-                  <option value="none">Not modeling tuition</option>
+                  <option value="none">Not modeling college</option>
                   <option value="public">Public university</option>
                   <option value="private">Private university</option>
                 </Select>
               </FormField>
 
               {childForm.educationType !== "none" && (
-                <FormField label="Annual Tuition Cost">
+                <FormField label="Annual College Cost">
                   <Input
                     type="number"
                     min={0}

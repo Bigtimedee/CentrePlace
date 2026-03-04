@@ -172,6 +172,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
   const simChildren: SimChildEducation[] = userChildren.map(c => ({
     name: c.name,
     birthYear: c.birthYear,
+    annualK12Cost: c.k12TuitionCost ?? 0,
     hasCollege: c.educationType !== "none",
     annualCollegeCost: c.annualEducationCost ?? 0,
     hasGradSchool: c.includesGraduateSchool,
