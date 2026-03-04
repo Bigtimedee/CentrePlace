@@ -42,23 +42,25 @@ export function buildLiquidityTimeline(
 ): LiquidityTimelineResult {
   const events: CashEvent[] = [];
 
-  // ── 1. Carry events ─────────────────────────────────────────────────────
+  // ── 1. Carry events — one event per realization tranche ─────────────────
   for (const c of input.carry) {
-    const yr = c.expectedRealizationYear;
-    if (yr < startYear || yr > endYear) continue;
-    const gross = c.expectedGrossCarry * (1 - c.haircutPct);
-    if (gross <= 0) continue;
-    const tax = estimateTax(gross, "ltcg");
-    events.push({
-      year: yr,
-      quarter: c.expectedRealizationQuarter,
-      periodKey: pKey(yr, c.expectedRealizationQuarter),
-      source: "carry",
-      label: c.fundName,
-      grossAmount: gross,
-      estimatedTax: tax,
-      netAmount: gross - tax,
-    });
+    for (const tranche of c.realizationSchedule) {
+      const yr = tranche.year;
+      if (yr < startYear || yr > endYear) continue;
+      const gross = c.expectedGrossCarry * tranche.pct * (1 - c.haircutPct);
+      if (gross <= 0) continue;
+      const tax = estimateTax(gross, "ltcg");
+      events.push({
+        year: yr,
+        quarter: tranche.quarter,
+        periodKey: pKey(yr, tranche.quarter),
+        source: "carry",
+        label: c.fundName,
+        grossAmount: gross,
+        estimatedTax: tax,
+        netAmount: gross - tax,
+      });
+    }
   }
 
   // ── 2. LP distribution events ─────────────────────────────────────────────

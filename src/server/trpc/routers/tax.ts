@@ -49,11 +49,14 @@ export const taxRouter = createTRPCRouter({
         const rothCapacity = Math.max(0, ordinary25Top - taxableOrdinary);
         const rothTaxCost = rothCapacity * marginalOrdinary;
 
-        // Carry events this year
+        // Carry events this year — sum up all tranches realizing in this year
         const carryEvents = simInput.carry
-          .filter(c => c.expectedRealizationYear === q.year)
+          .filter(c => c.realizationSchedule.some(t => t.year === q.year))
           .map(c => {
-            const net = c.expectedGrossCarry * (1 - c.haircutPct);
+            const tranchesPct = c.realizationSchedule
+              .filter(t => t.year === q.year)
+              .reduce((s, t) => s + t.pct, 0);
+            const net = c.expectedGrossCarry * tranchesPct * (1 - c.haircutPct);
             const stacked = taxableOrdinary + net + q.annualLtcgIncome;
             const ltcgRate = getMarginalLtcgRate(stacked, filingStatus, q.year);
             return {

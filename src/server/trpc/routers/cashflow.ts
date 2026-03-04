@@ -20,7 +20,8 @@ export const cashflowRouter = createTRPCRouter({
       assembleSimInput(ctx),
       ctx.db.query.carryPositions.findMany({
         where: eq(carryPositions.userId, uid),
-        orderBy: (t, { asc }) => [asc(t.expectedRealizationYear)],
+        with: { realizations: true },
+        orderBy: (t, { asc }) => [asc(t.createdAt)],
       }),
       ctx.db.query.lpInvestments.findMany({
         where: eq(lpInvestments.userId, uid),
@@ -35,6 +36,11 @@ export const cashflowRouter = createTRPCRouter({
     const enrichedCarryFunds: CarryFundSummary[] = fullCarry.map(c => {
       const netCarry = c.expectedGrossCarry * (1 - c.haircutPct);
       const tax = netCarry * 0.238; // 20% LTCG + 3.8% NIIT
+      // Use the earliest realization tranche for display
+      const sortedRealizations = [...(c.realizations ?? [])].sort(
+        (a, b) => a.year - b.year || a.quarter.localeCompare(b.quarter)
+      );
+      const firstTranche = sortedRealizations[0];
       return {
         fundName: c.fundName,
         vintageYear: c.vintageYear,
@@ -44,8 +50,8 @@ export const cashflowRouter = createTRPCRouter({
         expectedGrossCarry: c.expectedGrossCarry,
         haircutPct: c.haircutPct,
         netCarry,
-        realizationYear: c.expectedRealizationYear,
-        realizationQuarter: c.expectedRealizationQuarter as "Q1" | "Q2" | "Q3" | "Q4",
+        realizationYear: firstTranche?.year ?? startYear,
+        realizationQuarter: (firstTranche?.quarter ?? "Q4") as "Q1" | "Q2" | "Q3" | "Q4",
         estimatedTax: tax,
         netAfterTax: netCarry - tax,
         pipelineSharePct: totalNetCarry > 0 ? netCarry / totalNetCarry : 0,

@@ -146,15 +146,14 @@ describe("runSimulation — income", () => {
     expect(q1Year1).toBeCloseTo(55_000, 0);
   });
 
-  it("carry income received in specified quarter", () => {
+  it("carry income received in specified quarter (single tranche)", () => {
     const input = minimalInput({
       carry: [{
         id: "c1",
         fundName: "Fund I",
         expectedGrossCarry: 1_000_000,
         haircutPct: 0.25,
-        expectedRealizationYear: 2028,
-        expectedRealizationQuarter: "Q3",
+        realizationSchedule: [{ year: 2028, quarter: "Q3", pct: 1.0 }],
       }],
     });
     const { quarters } = runSimulation(input);
@@ -163,6 +162,30 @@ describe("runSimulation — income", () => {
     // No carry in adjacent quarters
     expect(quarters[9].carryIncome).toBe(0);
     expect(quarters[11].carryIncome).toBe(0);
+  });
+
+  it("carry income split across multiple tranches", () => {
+    const input = minimalInput({
+      carry: [{
+        id: "c1",
+        fundName: "Fund I",
+        expectedGrossCarry: 1_000_000,
+        haircutPct: 0,
+        realizationSchedule: [
+          { year: 2027, quarter: "Q2", pct: 0.30 },
+          { year: 2029, quarter: "Q4", pct: 0.70 },
+        ],
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // 2027 Q2 = year offset 1, Q2 index 1 → q = 5
+    expect(quarters[5].carryIncome).toBeCloseTo(300_000, 0); // 1M × 0.30
+    // 2029 Q4 = year offset 3, Q4 index 3 → q = 15
+    expect(quarters[15].carryIncome).toBeCloseTo(700_000, 0); // 1M × 0.70
+    // No carry in other quarters
+    expect(quarters[4].carryIncome).toBe(0);
+    expect(quarters[6].carryIncome).toBe(0);
+    expect(quarters[14].carryIncome).toBe(0);
   });
 
   it("LP distributions arrive in correct quarter", () => {
@@ -471,8 +494,7 @@ describe("runSimulation — unrealized carry", () => {
         fundName: "Fund A",
         expectedGrossCarry: 2_000_000,
         haircutPct: 0.20,
-        expectedRealizationYear: 2030,
-        expectedRealizationQuarter: "Q4",
+        realizationSchedule: [{ year: 2030, quarter: "Q4", pct: 1.0 }],
       }],
     });
     const { quarters } = runSimulation(input);
@@ -487,8 +509,7 @@ describe("runSimulation — unrealized carry", () => {
         fundName: "Fund A",
         expectedGrossCarry: 1_000_000,
         haircutPct: 0,
-        expectedRealizationYear: 2027,
-        expectedRealizationQuarter: "Q2",
+        realizationSchedule: [{ year: 2027, quarter: "Q2", pct: 1.0 }],
       }],
     });
     const { quarters } = runSimulation(input);
@@ -496,5 +517,27 @@ describe("runSimulation — unrealized carry", () => {
     expect(quarters[0].unrealizedCarry).toBeCloseTo(1_000_000, 0);
     // 2027 Q2 = q=5; after realization (q=6+) unrealized carry = 0
     expect(quarters[6].unrealizedCarry).toBe(0);
+  });
+
+  it("unrealized carry decreases partially as tranches are realized", () => {
+    const input = minimalInput({
+      carry: [{
+        id: "c1",
+        fundName: "Fund A",
+        expectedGrossCarry: 1_000_000,
+        haircutPct: 0,
+        realizationSchedule: [
+          { year: 2027, quarter: "Q2", pct: 0.30 },
+          { year: 2029, quarter: "Q4", pct: 0.70 },
+        ],
+      }],
+    });
+    const { quarters } = runSimulation(input);
+    // Before any realization: full 1M unrealized
+    expect(quarters[0].unrealizedCarry).toBeCloseTo(1_000_000, 0);
+    // After 2027 Q2 (q=6): 70% still unrealized
+    expect(quarters[6].unrealizedCarry).toBeCloseTo(700_000, 0);
+    // After 2029 Q4 (q=16): nothing left
+    expect(quarters[16].unrealizedCarry).toBeCloseTo(0, 0);
   });
 });

@@ -110,59 +110,63 @@ export function computeActionPlan(
   }
 
   // ── Rule 3: Carry Realization Tax Prep ────────────────────────────────────
-  const nearCarry = simInput.carry.filter(c => {
-    const yearsAway = c.expectedRealizationYear - planYear;
-    return yearsAway >= 0 && yearsAway <= 1;
-  });
-  const soonCarry = simInput.carry.filter(c => {
-    const yearsAway = c.expectedRealizationYear - planYear;
-    return yearsAway > 1 && yearsAway <= 2;
-  });
+  // For each carry position, find the nearest upcoming tranche for classification.
+  for (const c of simInput.carry) {
+    const netCarry = c.expectedGrossCarry * (1 - c.haircutPct);
+    if (netCarry < 50_000) continue;
 
-  for (const c of nearCarry) {
-    const netCarry = c.expectedGrossCarry * (1 - c.haircutPct);
-    if (netCarry < 50_000) continue;
+    // Find the soonest upcoming tranche
+    const upcomingTranches = c.realizationSchedule
+      .filter(t => t.year >= planYear)
+      .sort((a, b) => a.year - b.year || a.quarter.localeCompare(b.quarter));
+    if (upcomingTranches.length === 0) continue;
+
+    const nearestTranche = upcomingTranches[0];
+    const yearsAway = nearestTranche.year - planYear;
+    if (yearsAway > 2) continue;
+
     const estimatedTax = netCarry * 0.238;
-    items.push({
-      id: `carry-prep-${c.id}`,
-      title: `Prepare estimated tax payments for ${c.fundName} carry`,
-      rationale: `Your carry from ${c.fundName} (${fc(netCarry)} net) is scheduled to realize in ${c.expectedRealizationQuarter} ${c.expectedRealizationYear}. Federal LTCG + NIIT of approximately ${fc(estimatedTax)} will be due within 90 days of realization.`,
-      action: `Ensure your Q${c.expectedRealizationYear === planYear ? "4" : "1"} estimated tax payment covers this realization. Consider whether Qualified Opportunity Zone reinvestment is appropriate to defer gain.`,
-      category: "carry_timing",
-      urgency: c.expectedRealizationYear === planYear ? "do_this_year" : "plan_now",
-      dollarImpact: estimatedTax,
-      dollarImpactLabel: "est. tax to prepare for",
-      deepLinkHref: "/cashflow",
-      deepLinkLabel: "View Liquidity Timeline",
-      supportingFigures: [
-        { label: "Gross carry", value: fc(c.expectedGrossCarry) },
-        { label: "Net after haircut", value: fc(netCarry) },
-        { label: "Est. LTCG + NIIT", value: fc(estimatedTax) },
-        { label: "Realization", value: `${c.expectedRealizationQuarter} ${c.expectedRealizationYear}` },
-      ],
-    });
-  }
-  for (const c of soonCarry) {
-    const netCarry = c.expectedGrossCarry * (1 - c.haircutPct);
-    if (netCarry < 50_000) continue;
-    const estimatedTax = netCarry * 0.238;
-    items.push({
-      id: `carry-prep-${c.id}`,
-      title: `Plan for ${c.fundName} carry realization in ${c.expectedRealizationYear}`,
-      rationale: `${c.fundName} carry of ${fc(netCarry)} net is scheduled for ${c.expectedRealizationQuarter} ${c.expectedRealizationYear}. Begin planning now: review QOZ eligibility, ILIT coverage, and estimated payment schedule.`,
-      action: "Discuss with your CPA and attorney now to structure the realization optimally — QOZ reinvestment must be done within 180 days of the gain event.",
-      category: "carry_timing",
-      urgency: "plan_now",
-      dollarImpact: estimatedTax,
-      dollarImpactLabel: "est. tax to prepare for",
-      deepLinkHref: "/cashflow",
-      deepLinkLabel: "View Liquidity Timeline",
-      supportingFigures: [
-        { label: "Net carry", value: fc(netCarry) },
-        { label: "Est. LTCG + NIIT", value: fc(estimatedTax) },
-        { label: "Realization", value: `${c.expectedRealizationQuarter} ${c.expectedRealizationYear}` },
-      ],
-    });
+    const realizationLabel = `${nearestTranche.quarter} ${nearestTranche.year}`;
+    const isNear = yearsAway <= 1;
+
+    if (isNear) {
+      items.push({
+        id: `carry-prep-${c.id}`,
+        title: `Prepare estimated tax payments for ${c.fundName} carry`,
+        rationale: `Your carry from ${c.fundName} (${fc(netCarry)} net) is scheduled to realize starting in ${realizationLabel}. Federal LTCG + NIIT of approximately ${fc(estimatedTax)} will be due within 90 days of realization.`,
+        action: `Ensure your Q${nearestTranche.year === planYear ? "4" : "1"} estimated tax payment covers this realization. Consider whether Qualified Opportunity Zone reinvestment is appropriate to defer gain.`,
+        category: "carry_timing",
+        urgency: nearestTranche.year === planYear ? "do_this_year" : "plan_now",
+        dollarImpact: estimatedTax,
+        dollarImpactLabel: "est. tax to prepare for",
+        deepLinkHref: "/cashflow",
+        deepLinkLabel: "View Liquidity Timeline",
+        supportingFigures: [
+          { label: "Gross carry", value: fc(c.expectedGrossCarry) },
+          { label: "Net after haircut", value: fc(netCarry) },
+          { label: "Est. LTCG + NIIT", value: fc(estimatedTax) },
+          { label: "First realization", value: realizationLabel },
+        ],
+      });
+    } else {
+      items.push({
+        id: `carry-prep-${c.id}`,
+        title: `Plan for ${c.fundName} carry realization in ${nearestTranche.year}`,
+        rationale: `${c.fundName} carry of ${fc(netCarry)} net is scheduled for ${realizationLabel}. Begin planning now: review QOZ eligibility, ILIT coverage, and estimated payment schedule.`,
+        action: "Discuss with your CPA and attorney now to structure the realization optimally — QOZ reinvestment must be done within 180 days of the gain event.",
+        category: "carry_timing",
+        urgency: "plan_now",
+        dollarImpact: estimatedTax,
+        dollarImpactLabel: "est. tax to prepare for",
+        deepLinkHref: "/cashflow",
+        deepLinkLabel: "View Liquidity Timeline",
+        supportingFigures: [
+          { label: "Net carry", value: fc(netCarry) },
+          { label: "Est. LTCG + NIIT", value: fc(estimatedTax) },
+          { label: "First realization", value: realizationLabel },
+        ],
+      });
+    }
   }
 
   // ── Rule 4: Top estate recommendations (up to 3) ─────────────────────────

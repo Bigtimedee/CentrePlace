@@ -19,9 +19,15 @@ type CarryFormState = {
   currentTvpi: number;
   expectedGrossCarry: number;
   haircutPct: number;        // displayed as %
-  expectedRealizationYear: number;
-  expectedRealizationQuarter: "Q1" | "Q2" | "Q3" | "Q4";
   notes: string;
+};
+
+type Tranche = {
+  localId: string;   // client-only key for React rendering
+  id?: string;       // DB id if already persisted
+  year: number;
+  quarter: "Q1" | "Q2" | "Q3" | "Q4";
+  pct: number;       // displayed as % (1–100)
 };
 
 const EMPTY: CarryFormState = {
@@ -32,10 +38,11 @@ const EMPTY: CarryFormState = {
   currentTvpi: 1.0,
   expectedGrossCarry: 0,
   haircutPct: 20,
-  expectedRealizationYear: CURRENT_YEAR + 5,
-  expectedRealizationQuarter: "Q3",
   notes: "",
 };
+
+let localIdCounter = 0;
+function nextLocalId() { return `local-${++localIdCounter}`; }
 
 function toMutation(f: CarryFormState) {
   return {
@@ -46,7 +53,16 @@ function toMutation(f: CarryFormState) {
   };
 }
 
-function fromRecord(r: { fundName: string; vintageYear: number; carryPct: number; totalCommittedCapital: number; currentTvpi: number; expectedGrossCarry: number; haircutPct: number; expectedRealizationYear: number; expectedRealizationQuarter: string; notes: string | null }): CarryFormState {
+function fromRecord(r: {
+  fundName: string;
+  vintageYear: number;
+  carryPct: number;
+  totalCommittedCapital: number;
+  currentTvpi: number;
+  expectedGrossCarry: number;
+  haircutPct: number;
+  notes: string | null;
+}): CarryFormState {
   return {
     fundName: r.fundName,
     vintageYear: r.vintageYear,
@@ -55,25 +71,130 @@ function fromRecord(r: { fundName: string; vintageYear: number; carryPct: number
     currentTvpi: r.currentTvpi,
     expectedGrossCarry: r.expectedGrossCarry,
     haircutPct: Math.round(r.haircutPct * 100 * 10) / 10,
-    expectedRealizationYear: r.expectedRealizationYear,
-    expectedRealizationQuarter: r.expectedRealizationQuarter as "Q1" | "Q2" | "Q3" | "Q4",
     notes: r.notes ?? "",
   };
 }
 
+function tranchesFromRecord(realizations: { id: string; year: number; quarter: string; pct: number }[]): Tranche[] {
+  return realizations.map(r => ({
+    localId: nextLocalId(),
+    id: r.id,
+    year: r.year,
+    quarter: r.quarter as "Q1" | "Q2" | "Q3" | "Q4",
+    pct: Math.round(r.pct * 100 * 10) / 10,
+  }));
+}
+
+// ── Realization Schedule Editor ───────────────────────────────────────────────
+
+function RealizationSchedule({
+  tranches,
+  onChange,
+  onDelete,
+}: {
+  tranches: Tranche[];
+  onChange: (localId: string, patch: Partial<Omit<Tranche, "localId" | "id">>) => void;
+  onDelete: (localId: string) => void;
+}) {
+  const total = tranches.reduce((s, t) => s + t.pct, 0);
+  const totalOk = Math.abs(total - 100) < 0.01;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-xs text-slate-400 pb-0.5">
+        <span>Year</span>
+        <span>Quarter</span>
+        <span>% of Carry</span>
+        <span />
+      </div>
+      {tranches.length === 0 && (
+        <p className="text-xs text-slate-500 italic">No tranches — carry will not be modeled in simulation.</p>
+      )}
+      {tranches.map(t => (
+        <div key={t.localId} className="flex items-center gap-2">
+          <Input
+            type="number"
+            min={2024}
+            max={2070}
+            value={t.year}
+            onChange={e => onChange(t.localId, { year: parseInt(e.target.value) || t.year })}
+            className="w-24"
+          />
+          <Select
+            value={t.quarter}
+            onChange={e => onChange(t.localId, { quarter: e.target.value as "Q1" | "Q2" | "Q3" | "Q4" })}
+            className="w-24"
+          >
+            {QUARTERS.map(q => <option key={q} value={q}>{q}</option>)}
+          </Select>
+          <Input
+            type="number"
+            min={1}
+            max={100}
+            step={5}
+            suffix="%"
+            value={t.pct}
+            onChange={e => onChange(t.localId, { pct: parseFloat(e.target.value) || 0 })}
+            className="w-28"
+          />
+          <button
+            type="button"
+            onClick={() => onDelete(t.localId)}
+            className="text-slate-500 hover:text-red-400 transition-colors"
+            aria-label="Remove tranche"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      ))}
+      <div className={`text-xs font-medium mt-1 ${totalOk ? "text-emerald-400" : "text-amber-400"}`}>
+        Total: {Math.round(total * 10) / 10}%
+        {totalOk ? " ✓" : " — should sum to 100%"}
+      </div>
+    </div>
+  );
+}
+
+// ── Carry Position Form ───────────────────────────────────────────────────────
+
 function CarryPositionForm({
   initial,
+  initialTranches,
+  positionId,
   onSave,
   onCancel,
   isPending,
 }: {
   initial: CarryFormState;
-  onSave: (f: CarryFormState) => void;
+  initialTranches: Tranche[];
+  positionId: string | null; // null = new position
+  onSave: (f: CarryFormState, tranches: Tranche[]) => void;
   onCancel: () => void;
   isPending: boolean;
 }) {
   const [form, setForm] = useState<CarryFormState>(initial);
+  const [tranches, setTranches] = useState<Tranche[]>(initialTranches);
+
   const set = (patch: Partial<CarryFormState>) => setForm(f => ({ ...f, ...patch }));
+
+  function addTranche() {
+    const usedPct = tranches.reduce((s, t) => s + t.pct, 0);
+    const remaining = Math.max(0, Math.round((100 - usedPct) * 10) / 10);
+    setTranches(ts => [...ts, {
+      localId: nextLocalId(),
+      year: CURRENT_YEAR + 5,
+      quarter: "Q4",
+      pct: remaining > 0 ? remaining : 100,
+    }]);
+  }
+
+  function updateTranche(localId: string, patch: Partial<Omit<Tranche, "localId" | "id">>) {
+    setTranches(ts => ts.map(t => t.localId === localId ? { ...t, ...patch } : t));
+  }
+
+  function removeTranche(localId: string) {
+    setTranches(ts => ts.filter(t => t.localId !== localId));
+  }
 
   return (
     <div className="space-y-5 py-2">
@@ -107,22 +228,29 @@ function CarryPositionForm({
           </div>
         </FormField>
 
-        <FormField label="Expected Realization Year">
-          <Input type="number" min={CURRENT_YEAR} max={2070} value={form.expectedRealizationYear} onChange={e => set({ expectedRealizationYear: parseInt(e.target.value) || form.expectedRealizationYear })} />
-        </FormField>
-        <FormField label="Expected Quarter">
-          <Select value={form.expectedRealizationQuarter} onChange={e => set({ expectedRealizationQuarter: e.target.value as "Q1"|"Q2"|"Q3"|"Q4" })}>
-            {QUARTERS.map(q => <option key={q} value={q}>{q}</option>)}
-          </Select>
-        </FormField>
-        <FormField label="Notes" className="md:col-span-1">
+        <FormField label="Notes" className="md:col-span-3">
           <Input value={form.notes} onChange={e => set({ notes: e.target.value })} placeholder="Optional" />
         </FormField>
       </div>
 
+      {/* Realization Schedule */}
+      <div className="border border-slate-700/50 rounded-lg p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-slate-300">Realization Schedule</span>
+          <Button variant="ghost" size="sm" onClick={addTranche}>
+            <PlusCircle className="h-3.5 w-3.5" /> Add Tranche
+          </Button>
+        </div>
+        <RealizationSchedule
+          tranches={tranches}
+          onChange={updateTranche}
+          onDelete={removeTranche}
+        />
+      </div>
+
       <div className="flex gap-2 justify-end">
         <Button variant="ghost" size="sm" onClick={onCancel}><X className="h-3.5 w-3.5" /> Cancel</Button>
-        <Button size="sm" onClick={() => onSave(form)} disabled={isPending || !form.fundName}>
+        <Button size="sm" onClick={() => onSave(form, tranches)} disabled={isPending || !form.fundName}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving…" : "Save Position"}
         </Button>
       </div>
@@ -130,20 +258,98 @@ function CarryPositionForm({
   );
 }
 
+// ── Main CarryForm Component ──────────────────────────────────────────────────
+
 export function CarryForm() {
-  const { data = [], isLoading, refetch } = trpc.carry.list.useQuery();
-  const add = trpc.carry.add.useMutation({ onSuccess: () => { refetch(); setAdding(false); } });
-  const update = trpc.carry.update.useMutation({ onSuccess: () => { refetch(); setEditingId(null); } });
-  const del = trpc.carry.delete.useMutation({ onSuccess: () => refetch() });
+  const utils = trpc.useUtils();
+  const { data = [], isLoading } = trpc.carry.list.useQuery();
+
+  const addPosition = trpc.carry.add.useMutation({
+    onSuccess: () => { utils.carry.list.invalidate(); setAdding(false); },
+  });
+  const updatePosition = trpc.carry.update.useMutation({
+    onSuccess: () => { utils.carry.list.invalidate(); setEditingId(null); },
+  });
+  const delPosition = trpc.carry.delete.useMutation({
+    onSuccess: () => utils.carry.list.invalidate(),
+  });
+
+  const addRealization = trpc.carry.addRealization.useMutation();
+  const updateRealization = trpc.carry.updateRealization.useMutation();
+  const deleteRealization = trpc.carry.deleteRealization.useMutation();
 
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
 
   const totalNetCarry = data.reduce(
     (sum, p) => sum + p.expectedGrossCarry * (1 - p.haircutPct), 0
   );
+
+  async function handleAddSave(f: CarryFormState, tranches: Tranche[]) {
+    setSaving(true);
+    try {
+      const [pos] = await addPosition.mutateAsync(toMutation(f));
+      await Promise.all(tranches.map(t =>
+        addRealization.mutateAsync({
+          carryPositionId: pos.id,
+          year: t.year,
+          quarter: t.quarter,
+          pct: t.pct / 100,
+        })
+      ));
+      utils.carry.list.invalidate();
+      setAdding(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleEditSave(positionId: string, f: CarryFormState, tranches: Tranche[], originalTranches: Tranche[]) {
+    setSaving(true);
+    try {
+      await updatePosition.mutateAsync({ id: positionId, ...toMutation(f) });
+
+      // Delete removed tranches (had id but no longer in list)
+      const keptIds = new Set(tranches.filter(t => t.id).map(t => t.id!));
+      const toRemove = originalTranches.filter(t => t.id && !keptIds.has(t.id));
+      await Promise.all(toRemove.map(t => deleteRealization.mutateAsync({ id: t.id! })));
+
+      // Add new tranches (no id)
+      const toAdd = tranches.filter(t => !t.id);
+      await Promise.all(toAdd.map(t =>
+        addRealization.mutateAsync({
+          carryPositionId: positionId,
+          year: t.year,
+          quarter: t.quarter,
+          pct: t.pct / 100,
+        })
+      ));
+
+      // Update existing tranches that were modified
+      const existingInOriginal = new Map(originalTranches.filter(t => t.id).map(t => [t.id!, t]));
+      const toUpdate = tranches.filter(t => {
+        if (!t.id) return false;
+        const orig = existingInOriginal.get(t.id);
+        return orig && (orig.year !== t.year || orig.quarter !== t.quarter || orig.pct !== t.pct);
+      });
+      await Promise.all(toUpdate.map(t =>
+        updateRealization.mutateAsync({
+          id: t.id!,
+          year: t.year,
+          quarter: t.quarter,
+          pct: t.pct / 100,
+        })
+      ));
+
+      utils.carry.list.invalidate();
+      setEditingId(null);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -164,9 +370,11 @@ export function CarryForm() {
           <CardBody className="border-b border-slate-800">
             <CarryPositionForm
               initial={EMPTY}
-              onSave={f => add.mutate(toMutation(f))}
+              initialTranches={[]}
+              positionId={null}
+              onSave={(f, tranches) => handleAddSave(f, tranches)}
               onCancel={() => setAdding(false)}
-              isPending={add.isPending}
+              isPending={saving}
             />
           </CardBody>
         )}
@@ -175,42 +383,55 @@ export function CarryForm() {
           <CardBody><p className="text-sm text-slate-500">No carry positions added yet.</p></CardBody>
         ) : (
           <div className="divide-y divide-slate-800">
-            {data.map(pos => (
-              <div key={pos.id}>
-                {editingId === pos.id ? (
-                  <div className="px-6 py-4">
-                    <CarryPositionForm
-                      initial={fromRecord(pos)}
-                      onSave={f => update.mutate({ id: pos.id, ...toMutation(f) })}
-                      onCancel={() => setEditingId(null)}
-                      isPending={update.isPending}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-sm font-medium text-slate-200">{pos.fundName}</span>
-                        <span className="text-xs text-slate-500">{pos.vintageYear} vintage · {formatPct(pos.carryPct)} carry</span>
+            {data.map(pos => {
+              const realizationSummary = pos.realizations.length === 0
+                ? "No schedule"
+                : pos.realizations
+                    .sort((a, b) => a.year - b.year || a.quarter.localeCompare(b.quarter))
+                    .map(r => `${Math.round(r.pct * 100)}% in ${r.year} ${r.quarter}`)
+                    .join(", ");
+
+              return (
+                <div key={pos.id}>
+                  {editingId === pos.id ? (
+                    <div className="px-6 py-4">
+                      <CarryPositionForm
+                        initial={fromRecord(pos)}
+                        initialTranches={tranchesFromRecord(pos.realizations)}
+                        positionId={pos.id}
+                        onSave={(f, tranches) =>
+                          handleEditSave(pos.id, f, tranches, tranchesFromRecord(pos.realizations))
+                        }
+                        onCancel={() => setEditingId(null)}
+                        isPending={saving}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline gap-3">
+                          <span className="text-sm font-medium text-slate-200">{pos.fundName}</span>
+                          <span className="text-xs text-slate-500">{pos.vintageYear} vintage · {formatPct(pos.carryPct)} carry</span>
+                        </div>
+                        <div className="text-xs text-slate-500 mt-0.5">
+                          {formatCurrency(pos.totalCommittedCapital, true)} committed · TVPI {pos.currentTvpi.toFixed(2)}× · {realizationSummary}
+                        </div>
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
-                        {formatCurrency(pos.totalCommittedCapital, true)} committed · TVPI {pos.currentTvpi.toFixed(2)}× · Realization {pos.expectedRealizationYear} {pos.expectedRealizationQuarter}
+                      <div className="ml-4 flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="text-sm font-semibold text-emerald-400">{formatCurrency(pos.expectedGrossCarry * (1 - pos.haircutPct), true)}</div>
+                          <div className="text-xs text-slate-500">net carry</div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="sm" onClick={() => setEditingId(pos.id)}><Pencil className="h-3.5 w-3.5" /></Button>
+                          <Button variant="danger" size="sm" onClick={() => delPosition.mutate({ id: pos.id })}><Trash2 className="h-3.5 w-3.5" /></Button>
+                        </div>
                       </div>
                     </div>
-                    <div className="ml-4 flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="text-sm font-semibold text-emerald-400">{formatCurrency(pos.expectedGrossCarry * (1 - pos.haircutPct), true)}</div>
-                        <div className="text-xs text-slate-500">net carry</div>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => setEditingId(pos.id)}><Pencil className="h-3.5 w-3.5" /></Button>
-                        <Button variant="danger" size="sm" onClick={() => del.mutate({ id: pos.id })}><Trash2 className="h-3.5 w-3.5" /></Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </Card>

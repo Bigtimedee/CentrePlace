@@ -51,7 +51,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
   ] = await Promise.all([
     ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
     ctx.db.query.incomeProfiles.findFirst({ where: eq(incomeProfiles.userId, uid) }),
-    ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid) }),
+    ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid), with: { realizations: true } }),
     ctx.db.query.lpInvestments.findMany({ where: eq(lpInvestments.userId, uid) }),
     ctx.db.query.investmentAccounts.findMany({ where: eq(investmentAccounts.userId, uid) }),
     ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid) }),
@@ -75,8 +75,11 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     fundName: c.fundName,
     expectedGrossCarry: c.expectedGrossCarry,
     haircutPct: c.haircutPct,
-    expectedRealizationYear: c.expectedRealizationYear,
-    expectedRealizationQuarter: c.expectedRealizationQuarter as "Q1" | "Q2" | "Q3" | "Q4",
+    realizationSchedule: c.realizations.map(r => ({
+      year: r.year,
+      quarter: r.quarter as "Q1" | "Q2" | "Q3" | "Q4",
+      pct: r.pct,
+    })),
   }));
 
   const simLp: SimLPDistribution[] = lp.flatMap(fund =>

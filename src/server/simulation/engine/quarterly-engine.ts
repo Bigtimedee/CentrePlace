@@ -78,8 +78,8 @@ function weightedBlendedReturnRate(
 // ── Unrealized carry ──────────────────────────────────────────────────────────
 
 /**
- * Sum of expected net carry for positions not yet realized by (year, quarter).
- * A position is still unrealized if its realization date is AFTER the current quarter.
+ * Sum of expected net carry for tranches not yet realized by (year, quarter).
+ * Only tranches whose realization date is AFTER the current quarter are counted.
  */
 function computeUnrealizedCarry(
   input: SimulationInput,
@@ -88,11 +88,13 @@ function computeUnrealizedCarry(
 ): number {
   const qIndex = QUARTER_LABELS.indexOf(quarter);
   return input.carry.reduce((sum, c) => {
-    const isRealized =
-      c.expectedRealizationYear < year ||
-      (c.expectedRealizationYear === year && QUARTER_LABELS.indexOf(c.expectedRealizationQuarter) <= qIndex);
-    if (isRealized) return sum;
-    return sum + c.expectedGrossCarry * (1 - c.haircutPct);
+    const unrealizedFraction = c.realizationSchedule.reduce((f, t) => {
+      const isRealized =
+        t.year < year ||
+        (t.year === year && QUARTER_LABELS.indexOf(t.quarter) <= qIndex);
+      return isRealized ? f : f + t.pct;
+    }, 0);
+    return sum + c.expectedGrossCarry * unrealizedFraction * (1 - c.haircutPct);
   }, 0);
 }
 
@@ -215,12 +217,13 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     const bonusIncome = isFirstQuarterOfYear ? currentBonus : 0;
     const w2Income = salaryIncome + bonusIncome;
 
-    // Carry realizations (LTCG)
+    // Carry realizations (LTCG) — match each tranche individually
     let carryIncome = 0;
     for (const carry of input.carry) {
-      if (carry.expectedRealizationYear === year && carry.expectedRealizationQuarter === quarterLabel) {
-        const netCarry = carry.expectedGrossCarry * (1 - carry.haircutPct);
-        carryIncome += netCarry;
+      for (const tranche of carry.realizationSchedule) {
+        if (tranche.year === year && tranche.quarter === quarterLabel) {
+          carryIncome += carry.expectedGrossCarry * tranche.pct * (1 - carry.haircutPct);
+        }
       }
     }
 

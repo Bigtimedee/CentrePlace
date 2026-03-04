@@ -11,9 +11,18 @@ export const carryPositions = pgTable("carry_positions", {
   currentTvpi: real("current_tvpi").notNull().default(1.0),
   expectedGrossCarry: real("expected_gross_carry").notNull().default(0), // user's estimate
   haircutPct: real("haircut_pct").notNull().default(0.2), // default 20% haircut
-  expectedRealizationYear: integer("expected_realization_year").notNull(),
-  expectedRealizationQuarter: text("expected_realization_quarter").notNull().default("Q3"), // Q1|Q2|Q3|Q4
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const carryRealizations = pgTable("carry_realizations", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  carryPositionId: text("carry_position_id").notNull()
+    .references(() => carryPositions.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => userProfiles.id, { onDelete: "cascade" }),
+  year: integer("year").notNull(),
+  quarter: text("quarter").notNull().default("Q4"), // "Q1"|"Q2"|"Q3"|"Q4"
+  pct: real("pct").notNull(), // fraction of expectedGrossCarry: e.g. 0.30 = 30%
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });

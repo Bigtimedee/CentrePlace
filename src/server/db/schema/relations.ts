@@ -3,7 +3,7 @@ import { userProfiles, children } from "./users";
 import { incomeProfiles } from "./income";
 import { expenditures, oneTimeExpenditures, plaidConnections } from "./expenditures";
 import { investmentAccounts } from "./portfolios";
-import { carryPositions } from "./carry";
+import { carryPositions, carryRealizations } from "./carry";
 import { lpInvestments } from "./lp-investments";
 import { realEstateProperties, mortgages } from "./real-estate";
 import { insurancePolicies } from "./insurance";
@@ -71,10 +71,18 @@ export const investmentAccountsRelations = relations(investmentAccounts, ({ one 
 }));
 
 // ── carry ─────────────────────────────────────────────────────────────────────
-export const carryPositionsRelations = relations(carryPositions, ({ one }) => ({
+export const carryPositionsRelations = relations(carryPositions, ({ one, many }) => ({
   user: one(userProfiles, {
     fields: [carryPositions.userId],
     references: [userProfiles.id],
+  }),
+  realizations: many(carryRealizations),
+}));
+
+export const carryRealizationsRelations = relations(carryRealizations, ({ one }) => ({
+  carryPosition: one(carryPositions, {
+    fields: [carryRealizations.carryPositionId],
+    references: [carryPositions.id],
   }),
 }));
 

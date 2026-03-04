@@ -71,12 +71,15 @@ export function runMonteCarlo(
       .reduce((s, q) => s + q.lpIncome, 0);
   });
 
-  // ── Carry positions by realization year (for varyCarryHaircut) ─────────────
-  const carryByYear = new Map<number, typeof simInput.carry>();
+  // ── Carry tranches by year (for varyCarryHaircut) ───────────────────────────
+  // Build map: year → array of {carry, pct} pairs for each tranche realizing that year
+  type CarryTranche = { carry: typeof simInput.carry[0]; pct: number };
+  const carryByYear = new Map<number, CarryTranche[]>();
   for (const c of simInput.carry) {
-    const yr = c.expectedRealizationYear;
-    if (!carryByYear.has(yr)) carryByYear.set(yr, []);
-    carryByYear.get(yr)!.push(c);
+    for (const t of c.realizationSchedule) {
+      if (!carryByYear.has(t.year)) carryByYear.set(t.year, []);
+      carryByYear.get(t.year)!.push({ carry: c, pct: t.pct });
+    }
   }
 
   // ── Seed investment capital from current account balances ──────────────────
@@ -107,11 +110,11 @@ export function runMonteCarlo(
       // 2. Carry + LP net proceeds (post simplified tax)
       let carryLP: number;
       if (varyCarryHaircut) {
-        const carries = carryByYear.get(year) ?? [];
+        const tranches = carryByYear.get(year) ?? [];
         carryLP =
-          carries.reduce((s, c) => {
+          tranches.reduce((s, { carry: c, pct }) => {
             const randomHaircut = Math.random() * 2 * c.haircutPct;
-            return s + c.expectedGrossCarry * (1 - randomHaircut);
+            return s + c.expectedGrossCarry * pct * (1 - randomHaircut);
           }, 0) + annualLP[t];
       } else {
         carryLP = annualCarry[t] + annualLP[t];

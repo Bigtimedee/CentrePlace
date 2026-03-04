@@ -20,8 +20,8 @@ const BASE: SimulationInput = {
     bonusGrowthRate: 0.03,
   },
   carry: [
-    { id: "c1", fundName: "Fund A", expectedGrossCarry: 5_000_000, haircutPct: 0.30, expectedRealizationYear: 2028, expectedRealizationQuarter: "Q2" },
-    { id: "c2", fundName: "Fund B", expectedGrossCarry: 3_000_000, haircutPct: 0.20, expectedRealizationYear: 2030, expectedRealizationQuarter: "Q4" },
+    { id: "c1", fundName: "Fund A", expectedGrossCarry: 5_000_000, haircutPct: 0.30, realizationSchedule: [{ year: 2028, quarter: "Q2" as const, pct: 1.0 }] },
+    { id: "c2", fundName: "Fund B", expectedGrossCarry: 3_000_000, haircutPct: 0.20, realizationSchedule: [{ year: 2030, quarter: "Q4" as const, pct: 1.0 }] },
   ],
   lpDistributions: [],
   investmentAccounts: [

@@ -40,7 +40,7 @@ export const estateRouter = createTRPCRouter({
       ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid) }),
       ctx.db.query.mortgages.findMany(),
       ctx.db.query.insurancePolicies.findMany({ where: eq(insurancePolicies.userId, uid) }),
-      ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid) }),
+      ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid), with: { realizations: true } }),
       ctx.db.query.lpInvestments.findMany({ where: eq(lpInvestments.userId, uid) }),
     ]);
 
@@ -90,13 +90,16 @@ export const estateRouter = createTRPCRouter({
         deathBenefit: p.deathBenefit,
         outstandingLoanBalance: p.outstandingLoanBalance ?? 0,
       })),
-      carry: carry.map(c => ({
-        id: c.id,
-        fundName: c.fundName,
-        expectedGrossCarry: c.expectedGrossCarry,
-        haircutPct: c.haircutPct,
-        expectedRealizationYear: c.expectedRealizationYear,
-      })),
+      carry: carry.map(c => {
+        const sortedRealizations = [...(c.realizations ?? [])].sort((a, b) => a.year - b.year);
+        return {
+          id: c.id,
+          fundName: c.fundName,
+          expectedGrossCarry: c.expectedGrossCarry,
+          haircutPct: c.haircutPct,
+          expectedRealizationYear: sortedRealizations[0]?.year ?? currentYear,
+        };
+      }),
       lpInvestments: lp.map(l => ({
         id: l.id,
         fundName: l.fundName,

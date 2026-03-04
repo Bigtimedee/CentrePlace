@@ -23,13 +23,18 @@ export interface SimIncome {
   bonusGrowthRate: number;
 }
 
+export interface CarryRealizationTranche {
+  year: number;
+  quarter: "Q1" | "Q2" | "Q3" | "Q4";
+  pct: number; // fraction of expectedGrossCarry (0–1)
+}
+
 export interface SimCarryPosition {
   id: string;
   fundName: string;
   expectedGrossCarry: number;
   haircutPct: number;
-  expectedRealizationYear: number;
-  expectedRealizationQuarter: "Q1" | "Q2" | "Q3" | "Q4";
+  realizationSchedule: CarryRealizationTranche[];
 }
 
 export interface SimLPDistribution {
