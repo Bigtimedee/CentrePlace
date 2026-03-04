@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const CLERK_FRONTEND_API = "https://frontend-api.clerk.services";
-const CLERK_HOST = "clerk.gpretire.com";
+// Once clerk.gpretire.com SSL cert is provisioned, this is the correct upstream.
+const CLERK_FRONTEND_API = "https://clerk.gpretire.com";
+
+// Clerk browser JS is served via Cloudflare's npm CDN proxy.
+// Until clerk.gpretire.com SSL is provisioned we redirect to jsDelivr.
+const NPM_CDN = "https://cdn.jsdelivr.net/npm";
 
 // Headers that should not be forwarded upstream
 const HOP_BY_HOP = new Set([
@@ -19,16 +23,22 @@ const HOP_BY_HOP = new Set([
 async function proxy(req: NextRequest, params: { path: string[] }) {
   const path = params.path.join("/");
   const search = req.nextUrl.search ?? "";
+
+  // /clerk/npm/@clerk/clerk-js@N/dist/... → redirect to jsDelivr
+  // This allows the browser JS to load even while the SSL cert is pending.
+  if (path.startsWith("npm/")) {
+    const cdnPath = path.slice(4); // strip leading "npm/"
+    return NextResponse.redirect(`${NPM_CDN}/${cdnPath}${search}`, 302);
+  }
+
   const upstreamUrl = `${CLERK_FRONTEND_API}/${path}${search}`;
 
-  // Build forwarded headers, overriding Host
   const forwardHeaders = new Headers();
   for (const [key, value] of req.headers.entries()) {
     if (!HOP_BY_HOP.has(key.toLowerCase())) {
       forwardHeaders.set(key, value);
     }
   }
-  forwardHeaders.set("host", CLERK_HOST);
 
   let upstream: Response;
   try {
