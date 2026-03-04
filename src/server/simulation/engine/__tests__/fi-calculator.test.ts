@@ -119,17 +119,27 @@ describe("computePermanentAnnualIncome", () => {
 });
 
 describe("computeRequiredCapital", () => {
-  it("returns PV annuity of net need", () => {
-    const req = computeRequiredCapital(200_000, 50_000, 0.07, 30);
-    // Net need = 150k, PV at 7% for 30 yrs
-    expect(req).toBeCloseTo(pvAnnuity(150_000, 0.07, 30), 0);
+  it("returns netAnnualNeed / returnRate (perpetuity)", () => {
+    // Net need = 150k, perpetuity at 7% = 150k / 0.07 ≈ 2,142,857
+    const req = computeRequiredCapital(200_000, 50_000, 0.07);
+    expect(req).toBeCloseTo(150_000 / 0.07, 0);
   });
 
   it("permanent income equal to spending → 0 required", () => {
-    expect(computeRequiredCapital(100_000, 100_000, 0.07, 30)).toBe(0);
+    expect(computeRequiredCapital(100_000, 100_000, 0.07)).toBe(0);
   });
 
   it("permanent income exceeds spending → 0 required (no negative)", () => {
-    expect(computeRequiredCapital(80_000, 100_000, 0.07, 30)).toBe(0);
+    expect(computeRequiredCapital(80_000, 100_000, 0.07)).toBe(0);
+  });
+
+  it("zero return rate → MAX_SAFE_INTEGER (FI unreachable through income)", () => {
+    expect(computeRequiredCapital(200_000, 0, 0)).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
+  it("higher return rate → lower required capital", () => {
+    const low = computeRequiredCapital(200_000, 0, 0.04);
+    const high = computeRequiredCapital(200_000, 0, 0.09);
+    expect(high).toBeLessThan(low);
   });
 });

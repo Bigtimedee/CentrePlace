@@ -2,15 +2,19 @@
 // FI Calculator — Required Capital Formula
 // ─────────────────────────────────────────────────────────────────────────────
 //
-// Required capital = PV of an annuity that funds (annualSpending - permanentIncome)
-// for the remaining years until targetAge, growing at the assumed return rate.
+// FI is achieved when the investment portfolio generates sufficient annual
+// income to cover spending net of permanent income — without depleting
+// principal. Required capital is the perpetuity lump-sum needed:
 //
-//   PV = PMT × [1 − (1 + r)^(−n)] / r
+//   requiredCapital = netAnnualNeed / returnRate
 //
 // where:
-//   PMT = netAnnualNeed (spending net of permanent income)
-//   r   = assumed annual portfolio return rate
-//   n   = yearsRemaining (targetAge − currentAge)
+//   netAnnualNeed = annualSpending − permanentIncome  (floor 0)
+//   returnRate    = assumed annual portfolio return rate
+//
+// Carry-dollar realizations are assumed to be re-invested (public equities,
+// fixed income, real estate, etc.) and therefore generate ongoing portfolio
+// income at the blended return rate once received.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { SimRecurringExpenditure, SimRealEstateProperty } from "./types";
@@ -54,19 +58,23 @@ export function computePermanentAnnualIncome(properties: SimRealEstateProperty[]
 }
 
 /**
- * Compute total capital required to achieve FI at the given simulation step.
+ * Compute total capital required to achieve FI (perpetuity model).
+ *
+ * The portfolio must generate enough annual return (returnRate × capital)
+ * to cover spending net of permanent income indefinitely, without
+ * drawing down principal.
  *
  * @param annualSpending  Projected annual spending in the current year
  * @param permanentIncome Permanent annual income (net rental) post-FI
  * @param returnRate      Annual portfolio return rate (e.g. 0.07)
- * @param yearsRemaining  Years from current age to targetAge
  */
 export function computeRequiredCapital(
   annualSpending: number,
   permanentIncome: number,
   returnRate: number,
-  yearsRemaining: number,
 ): number {
   const netAnnualNeed = Math.max(0, annualSpending - permanentIncome);
-  return pvAnnuity(netAnnualNeed, returnRate, yearsRemaining);
+  if (netAnnualNeed === 0) return 0;
+  if (returnRate <= 0) return Number.MAX_SAFE_INTEGER;
+  return netAnnualNeed / returnRate;
 }

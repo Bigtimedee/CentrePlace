@@ -188,6 +188,29 @@ describe("runSimulation — income", () => {
     expect(quarters[14].carryIncome).toBe(0);
   });
 
+  it("W-2 income stops in the quarter after FI is first achieved", () => {
+    const input = minimalInput({
+      investmentAccounts: [{
+        id: "a1",
+        accountName: "Wealth",
+        accountType: "taxable",
+        currentBalance: 50_000_000,
+        blendedReturnRate: 0.07,
+        annualContribution: 0,
+      }],
+      income: { annualSalary: 400_000, annualBonus: 0, salaryGrowthRate: 0, bonusGrowthRate: 0 },
+      recurringExpenditures: [{ description: "Living", annualAmount: 200_000, growthRate: 0 }],
+    });
+    const { quarters } = runSimulation(input);
+    // $50M >> requiredCapital ($200k/0.07 ≈ $2.86M) → FI in Q1
+    expect(quarters[0].isFI).toBe(true);
+    // W-2 is still earned in the FI quarter itself
+    expect(quarters[0].w2Income).toBeCloseTo(100_000, 0); // 400k/4
+    // From Q2 onwards, user has stopped full-time employment
+    expect(quarters[1].w2Income).toBe(0);
+    expect(quarters[4].w2Income).toBe(0); // next year Q1 also 0
+  });
+
   it("LP distributions arrive in correct quarter", () => {
     const input = minimalInput({
       lpDistributions: [{

@@ -212,6 +212,12 @@ export function runSimulation(input: SimulationInput): SimulationResult {
 
     // ── Income events this quarter ──
 
+    // W-2 income: stops when FI is achieved — user may discontinue full-time employment
+    if (fiDate !== null) {
+      currentSalary = 0;
+      currentBonus = 0;
+    }
+
     // W-2: salary distributed evenly; bonus paid in Q1
     const salaryIncome = currentSalary / 4;
     const bonusIncome = isFirstQuarterOfYear ? currentBonus : 0;
@@ -397,16 +403,17 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     // ── FI test ──
     const annualSpending = computeAnnualSpending(input.recurringExpenditures, year, startYear);
     const permanentIncome = computePermanentAnnualIncome(input.realEstate);
-    const yearsRemaining = input.profile.targetAge - age;
     const requiredCapital = computeRequiredCapital(
       annualSpending,
       permanentIncome,
       input.profile.assumedReturnRate,
-      yearsRemaining,
     );
 
     const isFI = totalCapital >= requiredCapital;
-    if (isFI && fiDate === null) {
+    // Only mark FI when spending > 0: a defined spending need is required for
+    // FI to be meaningful; this also prevents degenerate detection when no
+    // expenses have been entered.
+    if (isFI && fiDate === null && annualSpending > 0) {
       fiDate = { year, quarter: quarterLabel };
       fiAge = age;
     }
