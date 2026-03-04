@@ -67,12 +67,20 @@ describe("applyScenarioOverrides", () => {
     expect(BASE.profile.assumedReturnRate).toBe(origRate);
   });
 
-  it("overrides assumedReturnRate", () => {
+  it("overrides assumedReturnRate in profile and all account blendedReturnRates", () => {
     const result = apply({ assumedReturnRate: 0.05 });
     expect(result.profile.assumedReturnRate).toBe(0.05);
+    // All accounts must also carry the new rate so capital actually grows at 5%
+    expect(result.investmentAccounts[0].blendedReturnRate).toBe(0.05);
     // other profile fields unchanged
     expect(result.profile.targetAge).toBe(BASE.profile.targetAge);
     expect(result.profile.birthYear).toBe(BASE.profile.birthYear);
+  });
+
+  it("does not alter account blendedReturnRates when assumedReturnRate is not overridden", () => {
+    const result = apply({ targetAge: 85 });
+    expect(result.investmentAccounts[0].blendedReturnRate)
+      .toBe(BASE.investmentAccounts[0].blendedReturnRate);
   });
 
   it("overrides targetAge", () => {

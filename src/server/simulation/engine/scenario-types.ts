@@ -137,6 +137,18 @@ export function applyScenarioOverrides(
           }))
         : base.recurringExpenditures,
 
+    // When assumedReturnRate is overridden, also update every account's
+    // blendedReturnRate so that capital actually grows at the scenario rate.
+    // Without this, the override only affects the FI threshold formula
+    // (requiredCapital = spending / rate) but not real portfolio growth.
+    investmentAccounts:
+      overrides.assumedReturnRate !== undefined
+        ? base.investmentAccounts.map(a => ({
+            ...a,
+            blendedReturnRate: overrides.assumedReturnRate!,
+          }))
+        : base.investmentAccounts,
+
     carry:
       overrides.carryHaircutMultiplier !== undefined
         ? base.carry.map(c => ({
