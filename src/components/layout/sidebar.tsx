@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import {
   LayoutDashboard, User, DollarSign, TrendingUp, Building2,
-  Briefcase, Home, Shield, CreditCard, Scale, BarChart3, Receipt, Waves, ListChecks, Activity
+  Briefcase, Home, Shield, CreditCard, Scale, BarChart3, Receipt, Waves, ListChecks, Activity, Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,8 @@ const itemsWithSectionHeader = navItems.map((item, i) => ({
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user } = useUser();
+  const isAdmin = user?.publicMetadata?.role === "admin";
 
   return (
     <aside className="fixed inset-y-0 left-0 z-50 w-60 bg-slate-900 border-r border-slate-800 flex flex-col">
@@ -67,6 +69,24 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
+
+      {/* Admin link */}
+      {isAdmin && (
+        <div className="px-3 pb-2">
+          <Link
+            href="/admin"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              pathname.startsWith("/admin")
+                ? "bg-slate-800 text-white"
+                : "text-slate-500 hover:text-white hover:bg-slate-800/60"
+            )}
+          >
+            <Settings className="h-4 w-4 flex-shrink-0" />
+            Admin
+          </Link>
+        </div>
+      )}
 
       {/* User button */}
       <div className="h-16 flex items-center px-6 border-t border-slate-800">
