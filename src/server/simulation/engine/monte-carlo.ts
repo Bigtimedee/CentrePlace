@@ -88,6 +88,16 @@ export function runMonteCarlo(
     0,
   );
 
+  // ── Annual net spending per year ────────────────────────────────────────────
+  // Computed directly from expenditures (inflation-adjusted). Rental income is
+  // added separately in step 4, so full gross spending is deducted here.
+  const annualNetSpending = Array.from({ length: YEARS }, (_, t) => {
+    const year = startYear + t;
+    return simInput.recurringExpenditures.reduce((sum, e) => {
+      return sum + e.annualAmount * Math.pow(1 + e.growthRate, year - startYear);
+    }, 0);
+  });
+
   // ── Run N simulations ──────────────────────────────────────────────────────
   // yearEndCapitals[t][sim] = total capital at end of year t for simulation sim
   const yearEndCapitals: number[][] = Array.from({ length: YEARS }, () =>
@@ -127,16 +137,16 @@ export function runMonteCarlo(
       // 4. Rental net income (quarterly × 4 for annual)
       investmentCapital += q4.rentalNetIncome * 4;
 
-      // 5. Annual spending (reverse of 25× rule from requiredCapital)
-      investmentCapital -= q4.requiredCapital * 0.04;
+      // 5. Annual spending (inflation-adjusted gross spending; rental income added above)
+      investmentCapital -= annualNetSpending[t];
 
-      // 6. Total capital: investment + deterministic RE equity + insurance CV
-      const totalCapital =
-        investmentCapital + q4.realEstateEquity + q4.insuranceCashValue;
-      yearEndCapitals[t][sim] = totalCapital;
+      // 6. Track investable capital (investment accounts + carry/LP proceeds).
+      // RE equity and insurance CV are deterministic and excluded from the stochastic
+      // FI test — they cannot generate the investment income stream needed to sustain spending.
+      yearEndCapitals[t][sim] = Math.max(0, investmentCapital) + q4.realEstateEquity + q4.insuranceCashValue;
 
-      // 7. FI detection
-      if (fiYears[sim] === null && totalCapital >= q4.requiredCapital) {
+      // 7. FI detection: investable capital must cover the after-tax perpetuity threshold
+      if (fiYears[sim] === null && investmentCapital >= q4.requiredCapital) {
         fiYears[sim] = year;
       }
     }

@@ -571,13 +571,36 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     // ── FI test ──
     const annualSpending = computeAnnualSpending(input.recurringExpenditures, year, startYear);
     const permanentIncome = computePermanentAnnualIncome(input.realEstate);
+
+    // After-tax return rate for the FI perpetuity threshold.
+    // Yield components are taxed at post-FI rates for high-income earners:
+    //   ordinary investment income (interest, non-qualified divs): ~40% combined
+    //   qualified dividends + LTCG: 23.8% (20% federal + 3.8% NIIT)
+    //   tax-exempt yield (muni bonds): 0%
+    //   appreciation (deferred LTCG): 23.8% on eventual realization
+    const portfolioAppreciationRate = Math.max(
+      0,
+      input.profile.assumedReturnRate -
+        yields.ordinaryYieldRate - yields.qualifiedYieldRate - yields.taxExemptYieldRate,
+    );
+    const afterTaxReturnRate =
+      yields.ordinaryYieldRate * 0.60 +
+      yields.qualifiedYieldRate * 0.762 +
+      yields.taxExemptYieldRate +
+      portfolioAppreciationRate * 0.762;
+
     const requiredCapital = computeRequiredCapital(
       annualSpending,
       permanentIncome,
-      input.profile.assumedReturnRate,
+      afterTaxReturnRate > 0 ? afterTaxReturnRate : input.profile.assumedReturnRate,
     );
 
-    const isFI = totalCapital >= requiredCapital;
+    // FI requires the investable portfolio (investment + realization capital) to generate
+    // sufficient after-tax income in perpetuity. Illiquid real estate equity, insurance
+    // cash values, and unrealized carry are excluded — they cannot directly produce
+    // the investment income stream needed to sustain spending.
+    const investableCapital = investmentCapital + realizationCapital;
+    const isFI = investableCapital >= requiredCapital;
     // Only mark FI when spending > 0: a defined spending need is required for
     // FI to be meaningful; this also prevents degenerate detection when no
     // expenses have been entered.
@@ -585,7 +608,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       fiDate = { year, quarter: quarterLabel };
       fiAge = age;
 
-      // Enhancement 2: switch to post-FI return rate after FI is detected
+      // Switch to post-FI return rate after FI is detected
       annualBlendedRate = input.profile.postFIReturnRate;
     }
 
@@ -639,7 +662,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
     summary: {
       totalCapitalToday: q0.totalCapital,
       requiredCapitalToday: q0.requiredCapital,
-      gapToFI: q0.requiredCapital - q0.totalCapital,
+      gapToFI: q0.requiredCapital - (q0.investmentCapital + q0.realizationCapital),
       projectedAnnualSpending: annualSpendingToday,
       permanentAnnualIncome: permanentIncomeToday,
     },
