@@ -3,6 +3,9 @@ import { type NextRequest } from "next/server";
 import { appRouter } from "@/server/trpc/routers";
 import { createContext } from "@/server/trpc/context";
 
+// Allow up to 30s for simulation-heavy routes (tax, scenarios, forecast)
+export const maxDuration = 30;
+
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
     endpoint: "/api/trpc",

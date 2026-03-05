@@ -1,24 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc";
+import { runSimulation } from "@/server/simulation/engine/quarterly-engine";
+import { runMonteCarlo } from "@/server/simulation/engine/monte-carlo";
+import type { MonteCarloResult } from "@/server/simulation/engine/monte-carlo-types";
 import { Card, CardBody } from "@/components/ui/card";
 import { ForecastControls } from "./forecast-controls";
 import { ForecastSummaryCards } from "./forecast-summary-cards";
 import { MonteCarloChart } from "./monte-carlo-chart";
 import { FiProbabilityChart } from "./fi-probability-chart";
 
+type RunParams = { returnVolatility: number; varyCarryHaircut: boolean };
+
 export function ForecastCenter() {
   const [volatility, setVolatility] = useState(12);
   const [varyCarry, setVaryCarry] = useState(false);
-  const [hasRun, setHasRun] = useState(false);
+  const [runParams, setRunParams] = useState<RunParams | null>(null);
+  const [result, setResult] = useState<MonteCarloResult | null>(null);
+  const [isComputing, setIsComputing] = useState(false);
 
-  const { data, isLoading, error } = trpc.simulation.monteCarlo.useQuery(
-    { returnVolatility: volatility / 100, varyCarryHaircut: varyCarry },
-    { enabled: hasRun, staleTime: 120_000, retry: false },
-  );
+  // Fetch simulation input data from the server (I/O only — fast).
+  // Fetches eagerly so data is ready before the user clicks Run.
+  const { data: simInput, isLoading: inputLoading, error } =
+    trpc.simulation.simInput.useQuery(undefined, {
+      staleTime: 30_000,
+      retry: false,
+    });
 
+  // Run all CPU-heavy computation client-side to avoid serverless timeouts.
+  useEffect(() => {
+    if (!runParams || !simInput) return;
+    setIsComputing(true);
+    setResult(null);
+    // Defer one tick so React can render the spinner before the synchronous computation.
+    const timer = setTimeout(() => {
+      const deterministicResult = runSimulation(simInput);
+      const mcResult = runMonteCarlo(simInput, deterministicResult, {
+        simulations: 500,
+        returnVolatility: runParams.returnVolatility,
+        varyCarryHaircut: runParams.varyCarryHaircut,
+      });
+      setResult(mcResult);
+      setIsComputing(false);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [runParams, simInput]);
+
+  const isLoading = inputLoading || isComputing;
   const isProfileMissing =
     (error as { data?: { code?: string } } | null)?.data?.code === "PRECONDITION_FAILED";
 
@@ -29,7 +59,9 @@ export function ForecastCenter() {
         varyCarry={varyCarry}
         onVolatilityChange={setVolatility}
         onVaryCarryChange={setVaryCarry}
-        onRun={() => setHasRun(true)}
+        onRun={() =>
+          setRunParams({ returnVolatility: volatility / 100, varyCarryHaircut: varyCarry })
+        }
         isLoading={isLoading}
       />
 
@@ -59,24 +91,24 @@ export function ForecastCenter() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
-          Running 500 simulations…
+          {isComputing ? "Running 500 simulations…" : "Loading data…"}
         </div>
       )}
 
       {/* Results */}
-      {data && !error && (
+      {result && !error && (
         <>
-          <ForecastSummaryCards result={data} />
+          <ForecastSummaryCards result={result} />
 
           <Card>
             <CardBody>
-              <MonteCarloChart result={data} />
+              <MonteCarloChart result={result} />
             </CardBody>
           </Card>
 
           <Card>
             <CardBody>
-              <FiProbabilityChart result={data} />
+              <FiProbabilityChart result={result} />
             </CardBody>
           </Card>
 
@@ -87,7 +119,7 @@ export function ForecastCenter() {
       )}
 
       {/* Idle state */}
-      {!hasRun && !error && (
+      {!runParams && !error && !isLoading && (
         <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-12 text-center text-sm text-slate-500">
           Configure your volatility assumptions above and click{" "}
           <strong className="text-slate-400">Run Forecast</strong> to generate 500 simulated market paths.

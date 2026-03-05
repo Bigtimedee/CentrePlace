@@ -1,18 +1,15 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../index";
 import {
   incomeProfiles,
   investmentAccounts,
   realEstateProperties,
-  mortgages,
   insurancePolicies,
   expenditures,
   userProfiles,
 } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { runSimulation } from "../../simulation/engine/quarterly-engine";
-import { runMonteCarlo } from "../../simulation/engine/monte-carlo";
 import { optimizeWithdrawals } from "../../simulation/engine/withdrawal-optimizer";
 import { computeAnnualSpending, computePermanentAnnualIncome } from "../../simulation/engine/fi-calculator";
 import { assembleSimInput } from "../../simulation/assembler";
@@ -36,13 +33,12 @@ export const simulationRouter = createTRPCRouter({
     const uid = ctx.userId;
     const currentYear = new Date().getFullYear();
 
-    const [profile, income, accounts, properties, allMortgages, policies, recurring] =
+    const [profile, income, accounts, properties, policies, recurring] =
       await Promise.all([
         ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
         ctx.db.query.incomeProfiles.findFirst({ where: eq(incomeProfiles.userId, uid) }),
         ctx.db.query.investmentAccounts.findMany({ where: eq(investmentAccounts.userId, uid) }),
-        ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid) }),
-        ctx.db.query.mortgages.findMany(),
+        ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid), with: { mortgage: true } }),
         ctx.db.query.insurancePolicies.findMany({ where: eq(insurancePolicies.userId, uid) }),
         ctx.db.query.expenditures.findMany({ where: eq(expenditures.userId, uid) }),
       ]);
@@ -54,34 +50,29 @@ export const simulationRouter = createTRPCRouter({
       });
     }
 
-    const mortgageByPropertyId = new Map(allMortgages.map(m => [m.propertyId, m]));
-
-    const simRealEstate: SimRealEstateProperty[] = properties.map(p => {
-      const m = mortgageByPropertyId.get(p.id);
-      return {
-        id: p.id,
-        propertyName: p.propertyName,
-        propertyType: p.propertyType,
-        currentValue: p.currentValue,
-        purchasePrice: p.purchasePrice,
-        purchaseYear: p.purchaseYear,
-        appreciationRate: p.appreciationRate,
-        ownershipPct: p.ownershipPct,
-        llcValuationDiscountPct: p.llcValuationDiscountPct ?? 0,
-        annualRentalIncome: p.annualRentalIncome ?? 0,
-        annualOperatingExpenses: p.annualOperatingExpenses ?? 0,
-        projectedSaleYear: p.projectedSaleYear ?? null,
-        projectedSaleQuarter: (p.projectedSaleQuarter ?? null) as "Q1" | "Q2" | "Q3" | "Q4" | null,
-        is1031Exchange: p.is1031Exchange,
-        mortgage: m
-          ? {
-              outstandingBalance: m.outstandingBalance,
-              interestRate: m.interestRate,
-              remainingTermMonths: m.remainingTermMonths,
-            }
-          : null,
-      };
-    });
+    const simRealEstate: SimRealEstateProperty[] = properties.map(p => ({
+      id: p.id,
+      propertyName: p.propertyName,
+      propertyType: p.propertyType,
+      currentValue: p.currentValue,
+      purchasePrice: p.purchasePrice,
+      purchaseYear: p.purchaseYear,
+      appreciationRate: p.appreciationRate,
+      ownershipPct: p.ownershipPct,
+      llcValuationDiscountPct: p.llcValuationDiscountPct ?? 0,
+      annualRentalIncome: p.annualRentalIncome ?? 0,
+      annualOperatingExpenses: p.annualOperatingExpenses ?? 0,
+      projectedSaleYear: p.projectedSaleYear ?? null,
+      projectedSaleQuarter: (p.projectedSaleQuarter ?? null) as "Q1" | "Q2" | "Q3" | "Q4" | null,
+      is1031Exchange: p.is1031Exchange,
+      mortgage: p.mortgage
+        ? {
+            outstandingBalance: p.mortgage.outstandingBalance,
+            interestRate: p.mortgage.interestRate,
+            remainingTermMonths: p.mortgage.remainingTermMonths,
+          }
+        : null,
+    }));
 
     const simRecurring: SimRecurringExpenditure[] = recurring.map(e => ({
       description: e.description,
@@ -127,23 +118,11 @@ export const simulationRouter = createTRPCRouter({
   }),
 
   /**
-   * Run 500 Monte Carlo simulations to produce a probabilistic FI forecast.
-   * Returns annual capital bands (p10–p90) and FI probability crossings.
+   * Return the raw SimulationInput for the authenticated user.
+   * All CPU-intensive computation (runSimulation, runMonteCarlo) runs client-side
+   * to avoid Vercel serverless function timeouts.
    */
-  monteCarlo: protectedProcedure
-    .input(
-      z.object({
-        returnVolatility: z.number().min(0.01).max(0.50).default(0.12),
-        varyCarryHaircut: z.boolean().default(false),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const simInput = await assembleSimInput(ctx);
-      const deterministicResult = runSimulation(simInput);
-      return runMonteCarlo(simInput, deterministicResult, {
-        simulations: 500,
-        returnVolatility: input.returnVolatility,
-        varyCarryHaircut: input.varyCarryHaircut,
-      });
-    }),
+  simInput: protectedProcedure.query(async ({ ctx }) => {
+    return assembleSimInput(ctx);
+  }),
 });

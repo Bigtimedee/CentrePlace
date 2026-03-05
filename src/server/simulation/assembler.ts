@@ -13,10 +13,10 @@ import {
   children,
   incomeProfiles,
   carryPositions,
+  carryRealizations,
   lpInvestments,
   investmentAccounts,
   realEstateProperties,
-  mortgages,
   insurancePolicies,
   expenditures,
   oneTimeExpenditures,
@@ -46,10 +46,10 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     userChildren,
     income,
     carry,
+    carryReals,
     lp,
     accounts,
     properties,
-    allMortgages,
     policies,
     recurring,
     oneTime,
@@ -58,11 +58,11 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
     ctx.db.query.children.findMany({ where: eq(children.userId, uid) }),
     ctx.db.query.incomeProfiles.findFirst({ where: eq(incomeProfiles.userId, uid) }),
-    ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid), with: { realizations: true } }),
+    ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid) }),
+    ctx.db.query.carryRealizations.findMany({ where: eq(carryRealizations.userId, uid) }),
     ctx.db.query.lpInvestments.findMany({ where: eq(lpInvestments.userId, uid) }),
     ctx.db.query.investmentAccounts.findMany({ where: eq(investmentAccounts.userId, uid) }),
-    ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid) }),
-    ctx.db.query.mortgages.findMany(),
+    ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid), with: { mortgage: true } }),
     ctx.db.query.insurancePolicies.findMany({ where: eq(insurancePolicies.userId, uid) }),
     ctx.db.query.expenditures.findMany({ where: eq(expenditures.userId, uid) }),
     ctx.db.query.oneTimeExpenditures.findMany({ where: eq(oneTimeExpenditures.userId, uid) }),
@@ -76,18 +76,18 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     });
   }
 
-  const mortgageByPropertyId = new Map(allMortgages.map(m => [m.propertyId, m]));
-
   const simCarry: SimCarryPosition[] = carry.map(c => ({
     id: c.id,
     fundName: c.fundName,
     expectedGrossCarry: c.expectedGrossCarry,
     haircutPct: c.haircutPct,
-    realizationSchedule: c.realizations.map(r => ({
-      year: r.year,
-      quarter: r.quarter as "Q1" | "Q2" | "Q3" | "Q4",
-      pct: r.pct,
-    })),
+    realizationSchedule: carryReals
+      .filter(r => r.carryPositionId === c.id)
+      .map(r => ({
+        year: r.year,
+        quarter: r.quarter as "Q1" | "Q2" | "Q3" | "Q4",
+        pct: r.pct,
+      })),
   }));
 
   const simLp: SimLPDistribution[] = lp.flatMap(fund =>
@@ -115,32 +115,29 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     taxExemptYieldRate: a.taxExemptYieldRate ?? 0,
   }));
 
-  const simRealEstate: SimRealEstateProperty[] = properties.map(p => {
-    const m = mortgageByPropertyId.get(p.id);
-    return {
-      id: p.id,
-      propertyName: p.propertyName,
-      propertyType: p.propertyType,
-      currentValue: p.currentValue,
-      purchasePrice: p.purchasePrice,
-      purchaseYear: p.purchaseYear,
-      appreciationRate: p.appreciationRate,
-      ownershipPct: p.ownershipPct,
-      llcValuationDiscountPct: p.llcValuationDiscountPct ?? 0,
-      annualRentalIncome: p.annualRentalIncome ?? 0,
-      annualOperatingExpenses: p.annualOperatingExpenses ?? 0,
-      projectedSaleYear: p.projectedSaleYear ?? null,
-      projectedSaleQuarter: (p.projectedSaleQuarter ?? null) as "Q1" | "Q2" | "Q3" | "Q4" | null,
-      is1031Exchange: p.is1031Exchange,
-      mortgage: m
-        ? {
-            outstandingBalance: m.outstandingBalance,
-            interestRate: m.interestRate,
-            remainingTermMonths: m.remainingTermMonths,
-          }
-        : null,
-    };
-  });
+  const simRealEstate: SimRealEstateProperty[] = properties.map(p => ({
+    id: p.id,
+    propertyName: p.propertyName,
+    propertyType: p.propertyType,
+    currentValue: p.currentValue,
+    purchasePrice: p.purchasePrice,
+    purchaseYear: p.purchaseYear,
+    appreciationRate: p.appreciationRate,
+    ownershipPct: p.ownershipPct,
+    llcValuationDiscountPct: p.llcValuationDiscountPct ?? 0,
+    annualRentalIncome: p.annualRentalIncome ?? 0,
+    annualOperatingExpenses: p.annualOperatingExpenses ?? 0,
+    projectedSaleYear: p.projectedSaleYear ?? null,
+    projectedSaleQuarter: (p.projectedSaleQuarter ?? null) as "Q1" | "Q2" | "Q3" | "Q4" | null,
+    is1031Exchange: p.is1031Exchange,
+    mortgage: p.mortgage
+      ? {
+          outstandingBalance: p.mortgage.outstandingBalance,
+          interestRate: p.mortgage.interestRate,
+          remainingTermMonths: p.mortgage.remainingTermMonths,
+        }
+      : null,
+  }));
 
   const simInsurance: SimInsurancePolicy[] = policies.map(p => ({
     id: p.id,

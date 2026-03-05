@@ -5,7 +5,6 @@ import {
   children,
   investmentAccounts,
   realEstateProperties,
-  mortgages,
   insurancePolicies,
   carryPositions,
   lpInvestments,
@@ -29,7 +28,6 @@ export const estateRouter = createTRPCRouter({
       userChildren,
       accounts,
       properties,
-      allMortgages,
       policies,
       carry,
       lp,
@@ -37,8 +35,7 @@ export const estateRouter = createTRPCRouter({
       ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
       ctx.db.query.children.findMany({ where: eq(children.userId, uid) }),
       ctx.db.query.investmentAccounts.findMany({ where: eq(investmentAccounts.userId, uid) }),
-      ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid) }),
-      ctx.db.query.mortgages.findMany(),
+      ctx.db.query.realEstateProperties.findMany({ where: eq(realEstateProperties.userId, uid), with: { mortgage: true } }),
       ctx.db.query.insurancePolicies.findMany({ where: eq(insurancePolicies.userId, uid) }),
       ctx.db.query.carryPositions.findMany({ where: eq(carryPositions.userId, uid), with: { realizations: true } }),
       ctx.db.query.lpInvestments.findMany({ where: eq(lpInvestments.userId, uid) }),
@@ -50,8 +47,6 @@ export const estateRouter = createTRPCRouter({
         message: "Profile not found. Please complete your profile setup.",
       });
     }
-
-    const mortgageByPropertyId = new Map(allMortgages.map(m => [m.propertyId, m]));
 
     const estateResult = calculateEstate({
       profile: {
@@ -71,17 +66,14 @@ export const estateRouter = createTRPCRouter({
         accountType: a.accountType,
         currentBalance: a.currentBalance,
       })),
-      realEstate: properties.map(p => {
-        const m = mortgageByPropertyId.get(p.id);
-        return {
-          id: p.id,
-          propertyName: p.propertyName,
-          currentValue: p.currentValue,
-          ownershipPct: p.ownershipPct,
-          llcValuationDiscountPct: p.llcValuationDiscountPct ?? 0,
-          mortgage: m ? { outstandingBalance: m.outstandingBalance } : null,
-        };
-      }),
+      realEstate: properties.map(p => ({
+        id: p.id,
+        propertyName: p.propertyName,
+        currentValue: p.currentValue,
+        ownershipPct: p.ownershipPct,
+        llcValuationDiscountPct: p.llcValuationDiscountPct ?? 0,
+        mortgage: p.mortgage ? { outstandingBalance: p.mortgage.outstandingBalance } : null,
+      })),
       insurance: policies.map(p => ({
         id: p.id,
         policyName: p.policyName,
