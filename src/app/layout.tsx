@@ -7,8 +7,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CentrePlace",
+  title: "GPretire.com",
   description: "Financial independence planning for GP/LP investors",
+  icons: {
+    icon: "/logo.jpeg",
+    apple: "/logo.jpeg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -41,8 +41,9 @@ export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-50 w-60 bg-slate-900 border-r border-slate-800 flex flex-col">
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-slate-800">
-        <span className="text-lg font-semibold tracking-tight text-white">CentrePlace</span>
+      <div className="h-16 flex items-center gap-3 px-4 border-b border-slate-800">
+        <img src="/logo.jpeg" alt="GPretire.com" className="h-9 w-9 rounded-full object-cover flex-shrink-0" />
+        <span className="text-base font-semibold tracking-tight text-white">GPretire.com</span>
       </div>
 
       {/* Navigation */}

@@ -33,6 +33,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-950">
       <div className="w-full max-w-sm mx-auto px-6">
         <div className="mb-8 text-center">
+          <img src="/logo.jpeg" alt="GPretire.com" className="w-16 h-16 rounded-full object-cover mx-auto mb-4" />
           <h1 className="text-2xl font-semibold text-slate-100 mb-1">Reset your password</h1>
           <p className="text-slate-400 text-sm">
             Enter your email and we will send a reset code.

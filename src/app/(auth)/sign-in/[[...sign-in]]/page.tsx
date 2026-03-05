@@ -4,6 +4,10 @@ import Link from "next/link";
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950">
+      <div className="flex items-center gap-3 mb-6">
+        <img src="/logo.jpeg" alt="GPretire.com" className="h-12 w-12 rounded-full object-cover" />
+        <span className="text-xl font-semibold text-white">GPretire.com</span>
+      </div>
       <SignIn />
       <p className="mt-4 text-sm text-slate-500">
         Forgot your password?{" "}
