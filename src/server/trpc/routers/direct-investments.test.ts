@@ -11,15 +11,14 @@ import { z } from "zod";
 
 const directInvestmentShape = z.object({
   securityName: z.string().min(1),
-  ticker: z.string().optional(),
   assetClass: z.enum(["equity", "bond", "alt", "cash"]),
-  category: z.string().optional(),
-  shares: z.number().min(0).optional(),
-  pricePerShare: z.number().min(0).optional(),
+  industry: z.string().optional(),
+  stage: z.string().optional(),
+  ownershipPct: z.number().min(0).max(100).optional(),
   currentValue: z.number().min(0),
   costBasis: z.number().min(0).optional(),
   purchaseDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal("")),
-  accountId: z.string().optional(),
+  expectedExitYear: z.number().int().min(2000).max(2100).optional(),
   expectedReturnRate: z.number().min(0).max(0.5).default(0.07),
   ordinaryYieldRate: z.number().min(0).max(0.15).default(0),
   qualifiedYieldRate: z.number().min(0).max(0.15).default(0),
@@ -28,7 +27,7 @@ const directInvestmentShape = z.object({
 });
 
 const VALID_MINIMAL = {
-  securityName: "Apple Inc.",
+  securityName: "Acme Ventures LLC",
   assetClass: "equity" as const,
   currentValue: 50_000,
 };
@@ -36,7 +35,7 @@ const VALID_MINIMAL = {
 describe("directInvestmentShape — valid inputs", () => {
   it("parses a valid minimal input", () => {
     const result = directInvestmentShape.parse(VALID_MINIMAL);
-    expect(result.securityName).toBe("Apple Inc.");
+    expect(result.securityName).toBe("Acme Ventures LLC");
     expect(result.currentValue).toBe(50_000);
   });
 
@@ -73,6 +72,22 @@ describe("directInvestmentShape — valid inputs", () => {
   it("accepts purchaseDate as undefined (optional)", () => {
     const result = directInvestmentShape.parse({ ...VALID_MINIMAL });
     expect(result.purchaseDate).toBeUndefined();
+  });
+
+  it("industry and stage are optional — omitting both is valid", () => {
+    const result = directInvestmentShape.parse(VALID_MINIMAL);
+    expect(result.industry).toBeUndefined();
+    expect(result.stage).toBeUndefined();
+  });
+
+  it("accepts industry and stage when provided", () => {
+    const result = directInvestmentShape.parse({
+      ...VALID_MINIMAL,
+      industry: "FinTech",
+      stage: "Series B",
+    });
+    expect(result.industry).toBe("FinTech");
+    expect(result.stage).toBe("Series B");
   });
 });
 
@@ -135,6 +150,80 @@ describe("directInvestmentShape — required field validation", () => {
   it("throws when assetClass is missing", () => {
     const { assetClass: _omit, ...noClass } = VALID_MINIMAL;
     expect(() => directInvestmentShape.parse(noClass)).toThrow();
+  });
+});
+
+describe("directInvestmentShape — ownershipPct validation", () => {
+  it("accepts ownershipPct of 0", () => {
+    const result = directInvestmentShape.parse({ ...VALID_MINIMAL, ownershipPct: 0 });
+    expect(result.ownershipPct).toBe(0);
+  });
+
+  it("accepts ownershipPct of 100", () => {
+    const result = directInvestmentShape.parse({ ...VALID_MINIMAL, ownershipPct: 100 });
+    expect(result.ownershipPct).toBe(100);
+  });
+
+  it("accepts a fractional ownershipPct", () => {
+    const result = directInvestmentShape.parse({ ...VALID_MINIMAL, ownershipPct: 2.5 });
+    expect(result.ownershipPct).toBe(2.5);
+  });
+
+  it("throws when ownershipPct exceeds 100", () => {
+    expect(() =>
+      directInvestmentShape.parse({ ...VALID_MINIMAL, ownershipPct: 101 })
+    ).toThrow();
+  });
+
+  it("throws when ownershipPct is negative", () => {
+    expect(() =>
+      directInvestmentShape.parse({ ...VALID_MINIMAL, ownershipPct: -1 })
+    ).toThrow();
+  });
+
+  it("ownershipPct is optional — omitting it is valid", () => {
+    const result = directInvestmentShape.parse(VALID_MINIMAL);
+    expect(result.ownershipPct).toBeUndefined();
+  });
+});
+
+describe("directInvestmentShape — expectedExitYear validation", () => {
+  it("accepts expectedExitYear of 2028", () => {
+    const result = directInvestmentShape.parse({ ...VALID_MINIMAL, expectedExitYear: 2028 });
+    expect(result.expectedExitYear).toBe(2028);
+  });
+
+  it("accepts expectedExitYear at min boundary of 2000", () => {
+    const result = directInvestmentShape.parse({ ...VALID_MINIMAL, expectedExitYear: 2000 });
+    expect(result.expectedExitYear).toBe(2000);
+  });
+
+  it("accepts expectedExitYear at max boundary of 2100", () => {
+    const result = directInvestmentShape.parse({ ...VALID_MINIMAL, expectedExitYear: 2100 });
+    expect(result.expectedExitYear).toBe(2100);
+  });
+
+  it("throws when expectedExitYear is 1999 (below min 2000)", () => {
+    expect(() =>
+      directInvestmentShape.parse({ ...VALID_MINIMAL, expectedExitYear: 1999 })
+    ).toThrow();
+  });
+
+  it("throws when expectedExitYear is 2101 (above max 2100)", () => {
+    expect(() =>
+      directInvestmentShape.parse({ ...VALID_MINIMAL, expectedExitYear: 2101 })
+    ).toThrow();
+  });
+
+  it("throws when expectedExitYear is not an integer", () => {
+    expect(() =>
+      directInvestmentShape.parse({ ...VALID_MINIMAL, expectedExitYear: 2028.5 })
+    ).toThrow();
+  });
+
+  it("expectedExitYear is optional — omitting it is valid", () => {
+    const result = directInvestmentShape.parse(VALID_MINIMAL);
+    expect(result.expectedExitYear).toBeUndefined();
   });
 });
 

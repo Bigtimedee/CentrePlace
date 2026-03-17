@@ -16,16 +16,15 @@ import type { SimInvestmentAccount } from "./engine/types";
 interface DirectInvestmentRow {
   id: string;
   userId: string;
-  accountId: string | null;
   securityName: string;
-  ticker: string | null;
   assetClass: string;
-  category: string | null;
-  shares: number | null;
-  pricePerShare: number | null;
+  industry: string | null;
+  stage: string | null;
+  ownershipPct: number | null;
   currentValue: number;
   costBasis: number | null;
   purchaseDate: string | null;
+  expectedExitYear: number | null;
   expectedReturnRate: number;
   ordinaryYieldRate: number;
   qualifiedYieldRate: number;
@@ -56,16 +55,15 @@ function makeRow(overrides: Partial<DirectInvestmentRow> = {}): DirectInvestment
   return {
     id: "inv-1",
     userId: "user-1",
-    accountId: null,
-    securityName: "Apple Inc.",
-    ticker: "AAPL",
+    securityName: "Acme Ventures LLC",
     assetClass: "equity",
-    category: null,
-    shares: 100,
-    pricePerShare: 500,
+    industry: "SaaS",
+    stage: "Series A",
+    ownershipPct: 5,
     currentValue: 50_000,
     costBasis: 30_000,
     purchaseDate: "2020-01-15",
+    expectedExitYear: 2030,
     expectedReturnRate: 0.08,
     ordinaryYieldRate: 0.005,
     qualifiedYieldRate: 0.01,
@@ -130,7 +128,7 @@ describe("directInvestment → SimInvestmentAccount mapping", () => {
     expect(account.taxExemptYieldRate).toBe(0.02);
   });
 
-  it("zero yield rates remain zero (bonds with no distribution)", () => {
+  it("zero yield rates remain zero (positions with no distribution)", () => {
     const row = makeRow({ ordinaryYieldRate: 0, qualifiedYieldRate: 0, taxExemptYieldRate: 0 });
     const account = mapDirectInvestmentToSimAccount(row);
     expect(account.ordinaryYieldRate).toBe(0);
@@ -141,9 +139,9 @@ describe("directInvestment → SimInvestmentAccount mapping", () => {
 
 describe("multiple direct investments all appear in output", () => {
   const rows: DirectInvestmentRow[] = [
-    makeRow({ id: "inv-1", securityName: "Apple Inc.", currentValue: 50_000, expectedReturnRate: 0.08 }),
-    makeRow({ id: "inv-2", securityName: "US Treasury Bond", currentValue: 100_000, expectedReturnRate: 0.045, assetClass: "bond" }),
-    makeRow({ id: "inv-3", securityName: "Bridgewater All Weather", currentValue: 200_000, expectedReturnRate: 0.06, assetClass: "alt" }),
+    makeRow({ id: "inv-1", securityName: "Acme Ventures LLC", currentValue: 50_000, expectedReturnRate: 0.08 }),
+    makeRow({ id: "inv-2", securityName: "Riverstone Capital Fund", currentValue: 100_000, expectedReturnRate: 0.045, assetClass: "alt" }),
+    makeRow({ id: "inv-3", securityName: "Bridgewater Direct", currentValue: 200_000, expectedReturnRate: 0.06, assetClass: "alt" }),
   ];
 
   it("maps all rows — output length equals input length", () => {
@@ -177,9 +175,9 @@ describe("multiple direct investments all appear in output", () => {
 
   it("account names match the original securityName values", () => {
     const accounts = rows.map(mapDirectInvestmentToSimAccount);
-    expect(accounts[0].accountName).toBe("Apple Inc.");
-    expect(accounts[1].accountName).toBe("US Treasury Bond");
-    expect(accounts[2].accountName).toBe("Bridgewater All Weather");
+    expect(accounts[0].accountName).toBe("Acme Ventures LLC");
+    expect(accounts[1].accountName).toBe("Riverstone Capital Fund");
+    expect(accounts[2].accountName).toBe("Bridgewater Direct");
   });
 });
 
@@ -197,5 +195,21 @@ describe("edge cases", () => {
   it("minimum expectedReturnRate of 0 maps to blendedReturnRate of 0", () => {
     const account = mapDirectInvestmentToSimAccount(makeRow({ expectedReturnRate: 0 }));
     expect(account.blendedReturnRate).toBe(0);
+  });
+
+  it("null industry and stage fields do not affect the mapping", () => {
+    const account = mapDirectInvestmentToSimAccount(makeRow({ industry: null, stage: null }));
+    expect(account.currentBalance).toBe(50_000);
+    expect(account.accountName).toBe("Acme Ventures LLC");
+  });
+
+  it("null ownershipPct does not affect the mapping", () => {
+    const account = mapDirectInvestmentToSimAccount(makeRow({ ownershipPct: null }));
+    expect(account.currentBalance).toBe(50_000);
+  });
+
+  it("null expectedExitYear does not affect the mapping", () => {
+    const account = mapDirectInvestmentToSimAccount(makeRow({ expectedExitYear: null }));
+    expect(account.currentBalance).toBe(50_000);
   });
 });
