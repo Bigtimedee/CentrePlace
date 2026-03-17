@@ -13,14 +13,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "email is required" }, { status: 400 });
   }
 
+  const origin = req.nextUrl.origin;
   const clerk = await clerkClient();
   try {
     await clerk.invitations.createInvitation({
       emailAddress: email,
-      redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up`,
+      redirectUrl: `${origin}/sign-up`,
     });
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
+    const clerkErr = err as { clerkError?: boolean; errors?: { longMessage?: string; message?: string }[]; status?: number };
+    if (clerkErr.clerkError && clerkErr.errors?.length) {
+      const msg = clerkErr.errors[0].longMessage ?? clerkErr.errors[0].message ?? "Failed to create invitation.";
+      return NextResponse.json({ error: msg }, { status: clerkErr.status ?? 400 });
+    }
     const msg = err instanceof Error ? err.message : "Failed to create invitation.";
     return NextResponse.json({ error: msg }, { status: 400 });
   }
