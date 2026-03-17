@@ -10,7 +10,7 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts";
-import { formatCurrency, formatPct } from "@/lib/utils";
+import { formatPct } from "@/lib/utils";
 import type { AnnualTaxProjection } from "@/server/simulation/tax/projection-types";
 
 function fmtK(value: number) {

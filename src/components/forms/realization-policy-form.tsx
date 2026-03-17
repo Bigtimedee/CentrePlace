@@ -67,6 +67,7 @@ export function RealizationPolicyForm() {
 
   useEffect(() => {
     if (policy) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEnabled(true);
       setForm({
         equityPct: pct(policy.equityPct),

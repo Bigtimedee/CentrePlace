@@ -11,7 +11,7 @@
 //   "preferential"  — reduced rate or partial exclusion
 //   "exempt"        — no state capital gains tax
 
-import type { FilingStatus, StateTaxInput, StateTaxResult } from "./types";
+import type { StateTaxInput, StateTaxResult } from "./types";
 import { calculateCityTax } from "./city-income";
 
 interface StateBracket {

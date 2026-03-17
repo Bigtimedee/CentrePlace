@@ -211,7 +211,6 @@ export function runSimulation(input: SimulationInput): SimulationResult {
   // ── RMD state ──
   // Track traditional account balance separately so RMD amounts shrink as distributions are taken.
   // Traditional balance grows at the same blended rate as investmentCapital.
-  const totalInitialBalance = input.investmentAccounts.reduce((s, a) => s + a.currentBalance, 0);
   const traditionalInitialBalance = input.investmentAccounts
     .filter(a => RMD_ELIGIBLE_ACCOUNT_TYPES.has(a.accountType))
     .reduce((s, a) => s + a.currentBalance, 0);

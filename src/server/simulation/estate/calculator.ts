@@ -154,8 +154,6 @@ export function calculateEstate(input: EstateCalcInput): EstateCalculationResult
   const { profile, children, currentYear } = input;
   const filing = profile.filingStatus;
   const stateCode = profile.stateOfResidence;
-  const currentAge = currentYear - profile.birthYear;
-
   const components: EstateComponent[] = [];
 
   // ── 1. Investment Accounts ────────────────────────────────────────────────

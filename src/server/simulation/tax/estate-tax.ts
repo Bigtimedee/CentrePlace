@@ -262,8 +262,7 @@ function calcFederalEstateTax(
 
 function calcStateEstateTax(
   grossEstate: number,
-  stateCode: string,
-  filingStatus: FilingStatus
+  stateCode: string
 ): number {
   const config = STATE_ESTATE_CONFIGS[stateCode.toUpperCase()];
   if (!config?.hasEstateTax) return 0;
@@ -326,7 +325,7 @@ export function calculateEstateTax(input: EstateTaxInput): EstateTaxResult {
   );
 
   const federalEstateTax = calcFederalEstateTax(federalTaxableEstate, filingStatus);
-  const stateEstateTax = calcStateEstateTax(netEstateBeforeTax, stateCode, filingStatus);
+  const stateEstateTax = calcStateEstateTax(netEstateBeforeTax, stateCode);
 
   const totalEstateTax = federalEstateTax + stateEstateTax;
 

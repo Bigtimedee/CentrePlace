@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
@@ -42,7 +43,7 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-50 w-60 bg-slate-900 border-r border-slate-800 flex flex-col">
       {/* Logo */}
       <div className="h-16 flex items-center gap-3 px-4 border-b border-slate-800">
-        <img src="/logo.jpeg" alt="GPretire.com" className="h-9 w-9 rounded-full object-cover flex-shrink-0" />
+        <Image src="/logo.jpeg" alt="GPretire.com" width={36} height={36} className="h-9 w-9 rounded-full object-cover flex-shrink-0" />
         <span className="text-base font-semibold tracking-tight text-white">GPretire.com</span>
       </div>
 

@@ -10,8 +10,7 @@ import type { EstateCalculationResult } from "../estate/calculator";
 import type { EstateRecommendation } from "../estate/recommendations";
 import type { LiquidityTimelineResult } from "../cashflow/types";
 import type { ActionItem, ActionCategory, ActionUrgency, AnnualActionPlanResult } from "./types";
-import { getMarginalOrdinaryRate, getMarginalLtcgRate } from "../tax/federal-income";
-import { FEDERAL_EXEMPTION_2026 } from "../tax/estate-tax";
+import { getMarginalOrdinaryRate } from "../tax/federal-income";
 
 // ── 2026 bracket thresholds (mirrors federal-income.ts) ──────────────────────
 const STD_DED = { single: 8_300, married_filing_jointly: 16_600 } as const;
@@ -55,7 +54,6 @@ export function computeActionPlan(
   const rothCapacity = Math.max(0, ordinary25Top - taxableOrdinary);
   const ltcgZeroHeadroom = Math.max(0, ltcgZeroTop - stackedForLtcg);
   const marginalOrdinary = getMarginalOrdinaryRate(taxableOrdinary, filingStatus, planYear);
-  const marginalLtcg = getMarginalLtcgRate(stackedForLtcg, filingStatus, planYear);
 
   // ── FI status ─────────────────────────────────────────────────────────────
   const { summary, fiDate, fiAge } = simResult;

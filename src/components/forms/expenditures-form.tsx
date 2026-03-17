@@ -9,7 +9,7 @@ import { Select } from "@/components/ui/select";
 import { FormField } from "@/components/ui/form-field";
 import { Pencil, Trash2, PlusCircle, X, Check, Link2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { CURRENT_YEAR, QUARTERS, EXPENDITURE_CATEGORIES } from "@/lib/constants";
+import { CURRENT_YEAR, QUARTERS } from "@/lib/constants";
 
 const CATEGORY_LABELS: Record<string, string> = {
   housing: "Housing",

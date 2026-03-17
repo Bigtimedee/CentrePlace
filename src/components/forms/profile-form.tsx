@@ -47,6 +47,7 @@ export function ProfileForm() {
   // Hydrate form from server data
   useEffect(() => {
     if (profile) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm({
         filingStatus: profile.filingStatus,
         stateOfResidence: profile.stateOfResidence,

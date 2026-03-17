@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { TrendingUp, BarChart3, Receipt, Activity } from "lucide-react";
@@ -13,7 +14,7 @@ export default async function RootPage() {
       {/* Nav */}
       <header className="flex items-center justify-between px-8 py-5 border-b border-slate-800/60">
         <div className="flex items-center gap-3">
-          <img src="/logo.jpeg" alt="GPretire.com" className="h-9 w-9 rounded-full object-cover" />
+          <Image src="/logo.jpeg" alt="GPretire.com" width={36} height={36} className="h-9 w-9 rounded-full object-cover" />
           <span className="text-base font-semibold tracking-tight">GPretire.com</span>
         </div>
         <Link
@@ -26,9 +27,11 @@ export default async function RootPage() {
 
       {/* Hero */}
       <section className="flex flex-col items-center text-center px-6 pt-24 pb-20">
-        <img
+        <Image
           src="/logo.jpeg"
           alt="GPretire.com"
+          width={112}
+          height={112}
           className="w-28 h-28 rounded-full object-cover mb-8 ring-4 ring-slate-800"
         />
         <h1 className="text-5xl font-bold tracking-tight text-white mb-4 max-w-2xl leading-tight">

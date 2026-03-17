@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../index";
 import { assembleSimInput } from "../../simulation/assembler";
 import { runSimulation } from "../../simulation/engine/quarterly-engine";
@@ -9,12 +8,6 @@ import { computeActionPlan } from "../../simulation/plan/action-plan";
 import {
   children,
   insurancePolicies,
-  userProfiles,
-  investmentAccounts,
-  realEstateProperties,
-  mortgages,
-  carryPositions,
-  lpInvestments,
 } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import type { AnnualActionPlanResult } from "../../simulation/plan/types";

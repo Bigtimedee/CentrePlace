@@ -3,7 +3,7 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { formatCurrency, formatPct } from "@/lib/utils";
-import { TrendingUp, Target, Calendar, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Calendar, AlertCircle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 function MetricTile({

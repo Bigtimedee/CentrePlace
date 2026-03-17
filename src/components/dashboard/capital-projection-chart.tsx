@@ -43,7 +43,6 @@ function CustomTooltip({ active, payload, label }: {
   label?: number;
 }) {
   if (!active || !payload?.length) return null;
-  const row = payload[0];
   return (
     <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[160px]">
       <p className="text-slate-400 mb-2 font-medium">Year {label}</p>

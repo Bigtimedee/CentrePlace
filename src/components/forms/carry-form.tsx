@@ -160,7 +160,6 @@ function RealizationSchedule({
 function CarryPositionForm({
   initial,
   initialTranches,
-  positionId,
   onSave,
   onCancel,
   isPending,

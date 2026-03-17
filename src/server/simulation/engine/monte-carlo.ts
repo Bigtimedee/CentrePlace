@@ -56,7 +56,7 @@ export function runMonteCarlo(
     ) ?? null;
   });
 
-  // ── Annual carry and LP sums across all 4 quarters ─────────────────────────
+  // ── Annual carry, LP, and W-2 sums across all 4 quarters ──────────────────
   const annualCarry = Array.from({ length: YEARS }, (_, t) => {
     const year = startYear + t;
     return deterministicResult.quarters
@@ -69,6 +69,14 @@ export function runMonteCarlo(
     return deterministicResult.quarters
       .filter(q => q.year === year)
       .reduce((s, q) => s + q.lpIncome, 0);
+  });
+
+  // W-2 income includes bonus paid in Q1 — sum all 4 quarters to capture it correctly
+  const annualW2 = Array.from({ length: YEARS }, (_, t) => {
+    const year = startYear + t;
+    return deterministicResult.quarters
+      .filter(q => q.year === year)
+      .reduce((s, q) => s + q.w2Income, 0);
   });
 
   // ── Carry tranches by year (for varyCarryHaircut) ───────────────────────────
@@ -117,22 +125,22 @@ export function runMonteCarlo(
       const Z = randNormal();
       investmentCapital *= Math.exp(Z * σ + (μ - (σ * σ) / 2));
 
-      // 2. Carry + LP net proceeds (post simplified tax)
+      // 2. Carry + LP net proceeds (post simplified tax); floor at 0 (no negative carry)
       let carryLP: number;
       if (varyCarryHaircut) {
         const tranches = carryByYear.get(year) ?? [];
         carryLP =
-          tranches.reduce((s, { carry: c, pct }) => {
+          Math.max(0, tranches.reduce((s, { carry: c, pct }) => {
             const randomHaircut = Math.random() * 2 * c.haircutPct;
             return s + c.expectedGrossCarry * pct * (1 - randomHaircut);
-          }, 0) + annualLP[t];
+          }, 0)) + Math.max(0, annualLP[t]);
       } else {
-        carryLP = annualCarry[t] + annualLP[t];
+        carryLP = Math.max(0, annualCarry[t]) + Math.max(0, annualLP[t]);
       }
       investmentCapital += carryLP * (1 - CARRY_TAX);
 
-      // 3. W-2 net income (quarterly × 4 for annual, simplified tax)
-      investmentCapital += q4.w2Income * 4 * (1 - W2_TAX);
+      // 3. W-2 net income (annual sum across all quarters captures salary + bonus)
+      investmentCapital += annualW2[t] * (1 - W2_TAX);
 
       // 4. Rental net income (quarterly × 4 for annual)
       investmentCapital += q4.rentalNetIncome * 4;
