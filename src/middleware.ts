@@ -7,9 +7,6 @@ const isPublicRoute = createRouteMatcher([
   "/invite-only(.*)",
   "/forgot-password(.*)",
   "/reset-password(.*)",
-  "/api/trpc(.*)",
-  "/api/admin/invite(.*)", // protected by its own admin check
-  "/api/admin/users(.*)",  // protected by its own admin check
   "/clerk(.*)",
 ]);
 
