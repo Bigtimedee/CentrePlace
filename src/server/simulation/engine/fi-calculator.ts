@@ -48,10 +48,15 @@ export function computeAnnualSpending(
 /**
  * Compute the permanent annual income that reduces the capital required for FI.
  * Only rental and commercial properties contribute permanent income post-FI.
+ * Properties that have been sold (propertyValues value === 0) are excluded.
  */
-export function computePermanentAnnualIncome(properties: SimRealEstateProperty[]): number {
+export function computePermanentAnnualIncome(
+  properties: SimRealEstateProperty[],
+  propertyValues?: Map<string, number>,
+): number {
   return properties.reduce((sum, p) => {
     if (p.propertyType !== "rental" && p.propertyType !== "commercial") return sum;
+    if (propertyValues !== undefined && (propertyValues.get(p.id) ?? 0) <= 0) return sum; // sold
     const netAnnual = (p.annualRentalIncome - p.annualOperatingExpenses) * p.ownershipPct;
     return sum + Math.max(0, netAnnual);
   }, 0);

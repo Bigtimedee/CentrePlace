@@ -177,8 +177,33 @@ export function runSimulation(input: SimulationInput): SimulationResult {
   );
 
   // ── Tax state ──
-  let priorYearTax = 0;
-  let priorYearAgi = 0;
+  // Seed priorYearTax with a year-0 estimate so Q1–Q3 estimated payments
+  // in the first simulation year are reasonable rather than zero.
+  const year0OrdinaryIncome =
+    (input.income?.annualSalary ?? 0) +
+    (input.income?.annualBonus ?? 0) +
+    investmentCapital * yields.ordinaryYieldRate +
+    input.realEstate.reduce((s, p) => {
+      if (p.propertyType !== "rental" && p.propertyType !== "commercial") return s;
+      return s + Math.max(0, (p.annualRentalIncome - p.annualOperatingExpenses) * p.ownershipPct);
+    }, 0);
+  const year0LtcgIncome = investmentCapital * yields.qualifiedYieldRate;
+  const year0W2 = input.income?.annualSalary ?? 0;
+  const year0Agi = year0OrdinaryIncome + year0LtcgIncome;
+  const year0TaxResult = calculateAnnualTax({
+    ordinaryIncome: year0OrdinaryIncome,
+    qualifiedDividends: 0,
+    longTermGains: year0LtcgIncome,
+    unrecaptured1250Gain: 0,
+    agi: year0Agi,
+    filingStatus: input.profile.filingStatus,
+    stateCode: input.profile.stateOfResidence,
+    year: startYear - 1,
+    w2Wages: year0W2,
+    cityCode: input.profile.cityOfResidence ?? undefined,
+  });
+  let priorYearTax = year0TaxResult.totalTax;
+  let priorYearAgi = year0Agi;
   let ytdOrdinaryIncome = 0;
   let ytdLtcgIncome = 0;
   let ytdW2Income = 0; // W-2 wages only — needed for CA SDI, city wage taxes, and FICA
@@ -240,8 +265,8 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       traditionalBalance *= 1 + quarterlyAppreciationReturn;
     }
 
-    // Annual contributions at Q1 (pre-FI only — checked below after FI test)
-    if (isFirstQuarterOfYear) {
+    // Annual contributions at Q1 (pre-FI only)
+    if (isFirstQuarterOfYear && fiDate === null) {
       const annualContributions = input.investmentAccounts.reduce(
         (s, a) => s + a.annualContribution,
         0,
@@ -368,10 +393,11 @@ export function runSimulation(input: SimulationInput): SimulationResult {
 
       realEstateSaleProceeds += netProceeds;
 
-      // Capital gain = net proceeds − adjusted basis (purchase price × ownershipPct)
+      // Capital gain = sale value − adjusted basis (purchase price × ownershipPct)
+      // The mortgage payoff is a cash outflow, not a reduction in the taxable gain.
       if (!prop.is1031Exchange) {
         const basis = prop.purchasePrice * prop.ownershipPct;
-        const gain = Math.max(0, netProceeds - basis);
+        const gain = Math.max(0, saleValue - basis);
         realEstateLtcgThisQuarter += gain;
       }
 
@@ -570,7 +596,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
 
     // ── FI test ──
     const annualSpending = computeAnnualSpending(input.recurringExpenditures, year, startYear);
-    const permanentIncome = computePermanentAnnualIncome(input.realEstate);
+    const permanentIncome = computePermanentAnnualIncome(input.realEstate, propertyValues);
 
     // After-tax return rate for the FI perpetuity threshold.
     // Yield components are taxed at post-FI rates for high-income earners:
