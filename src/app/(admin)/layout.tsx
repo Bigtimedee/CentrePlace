@@ -7,19 +7,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const user = await currentUser();
   if (!user) redirect("/sign-in");
 
+  let role = user.publicMetadata?.role as string | undefined;
+
   // Auto-promote designated admin on first visit
-  if (
-    user.primaryEmailAddress?.emailAddress === process.env.ADMIN_EMAIL &&
-    user.publicMetadata?.role !== "admin"
-  ) {
+  if (user.primaryEmailAddress?.emailAddress === process.env.ADMIN_EMAIL && role !== "admin") {
     const clerk = await clerkClient();
-    await clerk.users.updateUserMetadata(user.id, {
-      publicMetadata: { role: "admin" },
-    });
-    redirect("/admin");
+    await clerk.users.updateUserMetadata(user.id, { publicMetadata: { role: "admin" } });
+    role = "admin"; // treat as promoted for this request; session JWT refreshes on next load
   }
 
-  if (user.publicMetadata?.role !== "admin") {
+  if (role !== "admin") {
     redirect("/dashboard");
   }
 
