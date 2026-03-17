@@ -5,9 +5,10 @@ export const educationTypeEnum = pgEnum("education_type", ["none", "public", "pr
 
 export const userProfiles = pgTable("user_profiles", {
   id: text("id").primaryKey(), // Clerk user ID
+  username: text("username"),
   filingStatus: filingStatusEnum("filing_status").notNull().default("single"),
   stateOfResidence: text("state_of_residence").notNull().default("CA"),
-  birthYear: integer("birth_year").notNull(),
+  birthYear: integer("birth_year").notNull().default(1980),
   targetAge: integer("target_age").notNull().default(90),
   assumedReturnRate: real("assumed_return_rate").notNull().default(0.07), // 7%
   postFIReturnRate: real("post_fi_return_rate").notNull().default(0.05), // 5% conservative post-FI

@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/layout/sidebar";
+import { UsernameGate } from "@/components/layout/username-gate";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -6,7 +7,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Sidebar />
       <main className="pl-60">
         <div className="max-w-7xl mx-auto px-8 py-8">
-          {children}
+          <UsernameGate>
+            {children}
+          </UsernameGate>
         </div>
       </main>
     </div>

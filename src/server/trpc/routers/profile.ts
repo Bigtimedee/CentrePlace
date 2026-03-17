@@ -33,6 +33,18 @@ export const profileRouter = createTRPCRouter({
         });
     }),
 
+  setUsername: protectedProcedure
+    .input(z.object({ username: z.string().min(2).max(40).regex(/^[a-zA-Z0-9_\- ]+$/, "Username may only contain letters, numbers, spaces, hyphens, or underscores.") }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .insert(userProfiles)
+        .values({ id: ctx.userId, username: input.username, updatedAt: new Date() })
+        .onConflictDoUpdate({
+          target: userProfiles.id,
+          set: { username: input.username, updatedAt: new Date() },
+        });
+    }),
+
   addChild: protectedProcedure
     .input(z.object({
       name: z.string().min(1),
