@@ -34,7 +34,7 @@ export const profileRouter = createTRPCRouter({
     }),
 
   setUsername: protectedProcedure
-    .input(z.object({ username: z.string().min(2).max(40).regex(/^[a-zA-Z0-9_\- ]+$/, "Username may only contain letters, numbers, spaces, hyphens, or underscores.") }))
+    .input(z.object({ username: z.string().min(2).max(40).regex(/^[a-zA-Z0-9_.\- ]+$/, "Username may only contain letters, numbers, spaces, periods, hyphens, or underscores.") }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .insert(userProfiles)
