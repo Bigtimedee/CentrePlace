@@ -1,15 +1,16 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { UserTable } from "@/components/admin/user-table";
 import { InviteUserForm } from "@/components/admin/invite-user-form";
+import { InvitationTable } from "@/components/admin/invitation-table";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
   const clerk = await clerkClient();
-  const { data: users } = await clerk.users.getUserList({
-    limit: 200,
-    orderBy: "-created_at",
-  });
+  const [{ data: users }, { data: invitations }] = await Promise.all([
+    clerk.users.getUserList({ limit: 200, orderBy: "-created_at" }),
+    clerk.invitations.getInvitationList({ status: "pending", limit: 200 }),
+  ]);
 
   const rows = users.map((u) => ({
     id: u.id,
@@ -19,6 +20,12 @@ export default async function AdminUsersPage() {
     banned: u.banned,
     createdAt: u.createdAt,
     role: (u.publicMetadata?.role as string | undefined) ?? null,
+  }));
+
+  const inviteRows = invitations.map((inv) => ({
+    id: inv.id,
+    email: inv.emailAddress,
+    createdAt: inv.createdAt,
   }));
 
   return (
@@ -35,6 +42,14 @@ export default async function AdminUsersPage() {
       </div>
 
       <UserTable users={rows} />
+
+      {inviteRows.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-lg font-semibold text-slate-100 mb-1">Pending Invitations</h2>
+          <p className="text-slate-400 text-sm mb-4">{inviteRows.length} pending</p>
+          <InvitationTable invitations={inviteRows} />
+        </div>
+      )}
     </div>
   );
 }
