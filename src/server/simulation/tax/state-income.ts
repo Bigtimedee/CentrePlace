@@ -562,9 +562,9 @@ const STATE_CONFIGS: Record<string, StateConfig> = {
         { rate: 0.099,  upTo: Infinity },
       ],
       married_filing_jointly: [
-        { rate: 0.0475, upTo: 18_400 },
-        { rate: 0.0675, upTo: 46_200 },
-        { rate: 0.0875, upTo: 250_000 },
+        { rate: 0.0475, upTo: 36_800 },
+        { rate: 0.0675, upTo: 92_400 },
+        { rate: 0.0875, upTo: 500_000 },
         { rate: 0.099,  upTo: Infinity },
       ],
     },
