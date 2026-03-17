@@ -1,4 +1,4 @@
-import { pgTable, text, integer, real, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, real, boolean, timestamp, pgEnum, index } from "drizzle-orm/pg-core";
 
 export const filingStatusEnum = pgEnum("filing_status", ["single", "married_filing_jointly"]);
 export const educationTypeEnum = pgEnum("education_type", ["none", "public", "private"]);
@@ -32,4 +32,6 @@ export const children = pgTable("children", {
   inheritancePct: real("inheritance_pct").default(0), // estate beneficiary allocation
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("children_user_id_idx").on(t.userId),
+]);

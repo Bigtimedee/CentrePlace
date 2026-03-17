@@ -1,4 +1,4 @@
-import { pgTable, text, real, integer, jsonb, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, real, integer, jsonb, timestamp, index } from "drizzle-orm/pg-core";
 import { userProfiles } from "./users";
 
 // Each distribution event in the jsonb array
@@ -21,4 +21,6 @@ export const lpInvestments = pgTable("lp_investments", {
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("lp_investments_user_id_idx").on(t.userId),
+]);

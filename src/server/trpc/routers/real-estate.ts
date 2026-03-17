@@ -27,7 +27,10 @@ const mortgageInput = z.object({
   interestRate: z.number().min(0).max(0.3),
   remainingTermMonths: z.number().int().min(1).max(360),
   loanType: z.enum(["fixed", "arm"]),
-  armAdjustmentSchedule: z.string().optional(),
+  armAdjustmentSchedule: z.array(z.object({
+    adjustmentYear: z.number().int().min(2024).max(2070),
+    newRate: z.number().min(0).max(0.3),
+  })).optional(),
 });
 
 export const realEstateRouter = createTRPCRouter({

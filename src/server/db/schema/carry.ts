@@ -1,4 +1,4 @@
-import { pgTable, text, real, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, real, integer, timestamp, index } from "drizzle-orm/pg-core";
 import { userProfiles } from "./users";
 
 export const carryPositions = pgTable("carry_positions", {
@@ -14,7 +14,9 @@ export const carryPositions = pgTable("carry_positions", {
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("carry_positions_user_id_idx").on(t.userId),
+]);
 
 export const carryRealizations = pgTable("carry_realizations", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -25,4 +27,7 @@ export const carryRealizations = pgTable("carry_realizations", {
   quarter: text("quarter").notNull().default("Q4"), // "Q1"|"Q2"|"Q3"|"Q4"
   pct: real("pct").notNull(), // fraction of expectedGrossCarry: e.g. 0.30 = 30%
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("carry_realizations_user_id_idx").on(t.userId),
+  index("carry_realizations_position_id_idx").on(t.carryPositionId),
+]);

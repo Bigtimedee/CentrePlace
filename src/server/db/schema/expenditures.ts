@@ -1,5 +1,6 @@
-import { pgTable, text, real, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, real, integer, boolean, timestamp, index } from "drizzle-orm/pg-core";
 import { userProfiles } from "./users";
+import { children } from "./users";
 
 export const expenditures = pgTable("expenditures", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -11,7 +12,9 @@ export const expenditures = pgTable("expenditures", {
   isPlaidSynced: boolean("is_plaid_synced").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("expenditures_user_id_idx").on(t.userId),
+]);
 
 export const oneTimeExpenditures = pgTable("one_time_expenditures", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -22,10 +25,12 @@ export const oneTimeExpenditures = pgTable("one_time_expenditures", {
   projectedQuarter: text("projected_quarter").notNull().default("Q2"), // Q1|Q2|Q3|Q4
   category: text("category").notNull().default("other"),
   isChildEducation: boolean("is_child_education").notNull().default(false),
-  childId: text("child_id"), // link to children table for auto-projected education costs
+  childId: text("child_id").references(() => children.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("one_time_expenditures_user_id_idx").on(t.userId),
+]);
 
 // Stores Plaid access tokens per connected account
 export const plaidConnections = pgTable("plaid_connections", {
@@ -36,4 +41,6 @@ export const plaidConnections = pgTable("plaid_connections", {
   institutionName: text("institution_name"),
   lastSyncedAt: timestamp("last_synced_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("plaid_connections_user_id_idx").on(t.userId),
+]);

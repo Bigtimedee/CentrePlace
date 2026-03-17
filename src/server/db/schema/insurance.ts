@@ -1,4 +1,4 @@
-import { pgTable, text, real, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, real, integer, boolean, timestamp, pgEnum, index } from "drizzle-orm/pg-core";
 import { userProfiles } from "./users";
 
 export const policyTypeEnum = pgEnum("policy_type", ["term", "whole_life", "ppli"]);
@@ -35,4 +35,6 @@ export const insurancePolicies = pgTable("insurance_policies", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("insurance_policies_user_id_idx").on(t.userId),
+]);

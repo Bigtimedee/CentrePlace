@@ -1,4 +1,4 @@
-import { pgTable, text, real, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, real, timestamp, pgEnum, index } from "drizzle-orm/pg-core";
 import { userProfiles } from "./users";
 
 export const accountTypeEnum = pgEnum("account_type", [
@@ -38,4 +38,6 @@ export const investmentAccounts = pgTable("investment_accounts", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("investment_accounts_user_id_idx").on(t.userId),
+]);

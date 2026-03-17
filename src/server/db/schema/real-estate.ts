@@ -1,4 +1,4 @@
-import { pgTable, text, real, integer, boolean, timestamp, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, real, integer, boolean, timestamp, pgEnum, jsonb, index } from "drizzle-orm/pg-core";
 import { userProfiles } from "./users";
 
 export const propertyTypeEnum = pgEnum("property_type", [
@@ -10,6 +10,8 @@ export const propertyTypeEnum = pgEnum("property_type", [
 ]);
 
 export const loanTypeEnum = pgEnum("loan_type", ["fixed", "arm"]);
+
+export type ArmAdjustment = { adjustmentYear: number; newRate: number };
 
 export const realEstateProperties = pgTable("real_estate_properties", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -38,7 +40,9 @@ export const realEstateProperties = pgTable("real_estate_properties", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (t) => [
+  index("real_estate_properties_user_id_idx").on(t.userId),
+]);
 
 export const mortgages = pgTable("mortgages", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -47,8 +51,8 @@ export const mortgages = pgTable("mortgages", {
   interestRate: real("interest_rate").notNull(),
   remainingTermMonths: integer("remaining_term_months").notNull(),
   loanType: loanTypeEnum("loan_type").notNull().default("fixed"),
-  // ARM adjustment schedule stored as jsonb: [{adjustmentYear, newRate}]
-  armAdjustmentSchedule: text("arm_adjustment_schedule"), // JSON string
+  // ARM adjustment schedule: [{adjustmentYear, newRate}]
+  armAdjustmentSchedule: jsonb("arm_adjustment_schedule").$type<ArmAdjustment[]>(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
