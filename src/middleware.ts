@@ -7,7 +7,6 @@ const isPublicRoute = createRouteMatcher([
   "/invite-only(.*)",
   "/forgot-password(.*)",
   "/reset-password(.*)",
-  "/clerk(.*)",
 ]);
 
 // Cookie set when a user arrives with a valid Clerk invitation ticket.
@@ -43,11 +42,6 @@ export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect();
   }
-}, {
-  frontendApiProxy: {
-    enabled: true,
-    path: "/clerk",
-  },
 });
 
 export const config = {
