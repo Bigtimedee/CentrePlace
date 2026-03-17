@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../index";
 import { realEstateProperties, mortgages } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
@@ -62,6 +63,11 @@ export const realEstateRouter = createTRPCRouter({
   upsertMortgage: protectedProcedure
     .input(mortgageInput)
     .mutation(async ({ ctx, input }) => {
+      const prop = await ctx.db.query.realEstateProperties.findFirst({
+        where: and(eq(realEstateProperties.id, input.propertyId), eq(realEstateProperties.userId, ctx.userId)),
+        columns: { id: true },
+      });
+      if (!prop) throw new TRPCError({ code: "NOT_FOUND" });
       await ctx.db
         .insert(mortgages)
         .values(input)
@@ -74,6 +80,11 @@ export const realEstateRouter = createTRPCRouter({
   deleteMortgage: protectedProcedure
     .input(z.object({ propertyId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const prop = await ctx.db.query.realEstateProperties.findFirst({
+        where: and(eq(realEstateProperties.id, input.propertyId), eq(realEstateProperties.userId, ctx.userId)),
+        columns: { id: true },
+      });
+      if (!prop) throw new TRPCError({ code: "NOT_FOUND" });
       await ctx.db.delete(mortgages).where(eq(mortgages.propertyId, input.propertyId));
     }),
 });

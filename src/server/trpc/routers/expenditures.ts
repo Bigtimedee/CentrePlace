@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "../index";
-import { expenditures, oneTimeExpenditures } from "../../db/schema";
+import { expenditures, oneTimeExpenditures, children } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
 
 export const expendituresRouter = createTRPCRouter({
@@ -62,6 +63,13 @@ export const expendituresRouter = createTRPCRouter({
       childId: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      if (input.childId) {
+        const child = await ctx.db.query.children.findFirst({
+          where: and(eq(children.id, input.childId), eq(children.userId, ctx.userId)),
+          columns: { id: true },
+        });
+        if (!child) throw new TRPCError({ code: "NOT_FOUND" });
+      }
       return ctx.db.insert(oneTimeExpenditures).values({ userId: ctx.userId, ...input }).returning();
     }),
 

@@ -39,7 +39,14 @@ export const portfoliosRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(z.object({ id: z.string() }).merge(accountShape.partial()))
+    .input(z.object({ id: z.string() }).merge(accountShape.partial()).superRefine((d, ctx) => {
+      const { equityPct, bondPct, altPct } = d;
+      if (equityPct !== undefined && bondPct !== undefined && altPct !== undefined) {
+        if (Math.abs(equityPct + bondPct + altPct - 1) >= 0.001) {
+          ctx.addIssue({ code: "custom", message: "Asset allocation must sum to 100%", path: ["equityPct"] });
+        }
+      }
+    }))
     .mutation(async ({ ctx, input }) => {
       const { id, ...data } = input;
       await ctx.db.update(investmentAccounts)

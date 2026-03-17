@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../index";
 import { userProfiles, children } from "../../db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export const profileRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
@@ -53,7 +53,7 @@ export const profileRouter = createTRPCRouter({
     .input(z.object({
       id: z.string(),
       name: z.string().min(1).optional(),
-      birthYear: z.number().int().optional(),
+      birthYear: z.number().int().min(2000).max(2025).optional(),
       k12TuitionCost: z.number().min(0).optional(),
       educationType: z.enum(["none", "public", "private"]).optional(),
       annualEducationCost: z.number().min(0).optional(),
@@ -66,12 +66,12 @@ export const profileRouter = createTRPCRouter({
       const { id, ...data } = input;
       await ctx.db.update(children)
         .set({ ...data, updatedAt: new Date() })
-        .where(eq(children.id, id));
+        .where(and(eq(children.id, id), eq(children.userId, ctx.userId)));
     }),
 
   deleteChild: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.delete(children).where(eq(children.id, input.id));
+      await ctx.db.delete(children).where(and(eq(children.id, input.id), eq(children.userId, ctx.userId)));
     }),
 });
