@@ -90,6 +90,18 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
       })),
   }));
 
+  for (const c of simCarry) {
+    if (c.realizationSchedule.length > 0) {
+      const total = c.realizationSchedule.reduce((s, t) => s + t.pct, 0);
+      if (Math.abs(total - 1) >= 0.001) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Carry position "${c.fundName}" realization schedule percentages must sum to 100% (currently ${Math.round(total * 100)}%).`,
+        });
+      }
+    }
+  }
+
   const simLp: SimLPDistribution[] = lp.flatMap(fund =>
     (fund.expectedDistributions ?? []).map(d => ({
       fundName: fund.fundName,
