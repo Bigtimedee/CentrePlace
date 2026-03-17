@@ -16,15 +16,14 @@ type AssetClass = "equity" | "bond" | "alt" | "cash";
 
 type FormState = {
   securityName: string;
-  ticker: string;
   assetClass: AssetClass;
-  category: string;
-  shares: string;
-  pricePerShare: string;
+  industry: string;
+  stage: string;
+  ownershipPct: string;
   currentValue: string;
   costBasis: string;
   purchaseDate: string;
-  accountId: string;
+  expectedExitYear: string;
   notes: string;
   // Display as percent (e.g., 7 for 7%), stored as decimal (0.07)
   expectedReturnRate: number;
@@ -37,15 +36,14 @@ type FormState = {
 
 const EMPTY: FormState = {
   securityName: "",
-  ticker: "",
   assetClass: "equity",
-  category: "individual_stock",
-  shares: "",
-  pricePerShare: "",
+  industry: "",
+  stage: "",
+  ownershipPct: "",
   currentValue: "",
   costBasis: "",
   purchaseDate: "",
-  accountId: "",
+  expectedExitYear: "",
   notes: "",
   expectedReturnRate: 7,
   ordinaryYieldRate: 0,
@@ -67,17 +65,15 @@ const ASSET_CLASS_LABELS: Record<string, string> = {
   cash: "Cash",
 };
 
-const CATEGORY_LABELS: Record<string, string> = {
-  individual_stock: "Individual Stock",
-  etf: "ETF",
-  crypto: "Crypto",
-  precious_metal: "Precious Metal",
-  private_equity: "Private Equity",
-  startup_equity: "Startup Equity",
-  reit: "REIT",
-  bond: "Bond",
-  other: "Other",
-};
+const STAGE_OPTIONS = [
+  "Seed",
+  "Series A",
+  "Series B",
+  "Series C",
+  "Growth",
+  "Late Stage",
+  "Pre-IPO",
+];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -86,18 +82,22 @@ function parseOptionalFloat(val: string): number | undefined {
   return isNaN(n) ? undefined : n;
 }
 
+function parseOptionalInt(val: string): number | undefined {
+  const n = parseInt(val, 10);
+  return isNaN(n) ? undefined : n;
+}
+
 function buildMutationPayload(form: FormState) {
   return {
     securityName: form.securityName,
-    ticker: form.ticker || undefined,
     assetClass: form.assetClass,
-    category: form.category || undefined,
-    shares: parseOptionalFloat(form.shares),
-    pricePerShare: parseOptionalFloat(form.pricePerShare),
+    industry: form.industry || undefined,
+    stage: form.stage || undefined,
+    ownershipPct: parseOptionalFloat(form.ownershipPct),
     currentValue: parseFloat(form.currentValue) || 0,
     costBasis: parseOptionalFloat(form.costBasis),
     purchaseDate: form.purchaseDate || undefined,
-    accountId: form.accountId || undefined,
+    expectedExitYear: parseOptionalInt(form.expectedExitYear),
     notes: form.notes || undefined,
     expectedReturnRate: form.expectedReturnRate / 100,
     ordinaryYieldRate: form.ordinaryYieldRate / 100,
@@ -110,13 +110,11 @@ function buildMutationPayload(form: FormState) {
 
 function DirectInvestmentForm({
   initial,
-  accounts,
   onSave,
   onCancel,
   isPending,
 }: {
   initial: FormState;
-  accounts: { id: string; accountName: string }[];
   onSave: (f: FormState) => void;
   onCancel: () => void;
   isPending: boolean;
@@ -126,36 +124,17 @@ function DirectInvestmentForm({
 
   const set = (patch: Partial<FormState>) => setForm((f) => ({ ...f, ...patch }));
 
-  function handleSharesOrPrice(patch: Partial<FormState>) {
-    const next = { ...form, ...patch };
-    const s = parseFloat(next.shares);
-    const p = parseFloat(next.pricePerShare);
-    if (!isNaN(s) && !isNaN(p)) {
-      next.currentValue = (s * p).toFixed(2);
-    }
-    setForm(next);
-  }
-
   const isValid = form.securityName.trim().length > 0 && parseFloat(form.currentValue) >= 0;
 
   return (
     <div className="space-y-5 py-2">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Security Name — full width */}
-        <FormField label="Security Name" required className="md:col-span-2">
+        <FormField label="Company Name" required className="md:col-span-2">
           <Input
             value={form.securityName}
             onChange={(e) => set({ securityName: e.target.value })}
-            placeholder="Apple Inc., Bitcoin, VTSAX…"
-          />
-        </FormField>
-
-        {/* Ticker */}
-        <FormField label="Ticker / Symbol">
-          <Input
-            value={form.ticker}
-            onChange={(e) => set({ ticker: e.target.value })}
-            placeholder="AAPL, BTC"
+            placeholder="Acme Corp, HealthCo Inc…"
           />
         </FormField>
 
@@ -172,20 +151,39 @@ function DirectInvestmentForm({
           </Select>
         </FormField>
 
-        {/* Category */}
-        <FormField label="Category">
-          <Select value={form.category} onChange={(e) => set({ category: e.target.value })}>
-            <option value="">— None —</option>
-            <option value="individual_stock">Individual Stock</option>
-            <option value="etf">ETF</option>
-            <option value="crypto">Crypto</option>
-            <option value="precious_metal">Precious Metal</option>
-            <option value="private_equity">Private Equity</option>
-            <option value="startup_equity">Startup Equity</option>
-            <option value="reit">REIT</option>
-            <option value="bond">Bond</option>
-            <option value="other">Other</option>
+        {/* Industry */}
+        <FormField label="Industry" hint="e.g. SaaS, Healthcare, Fintech">
+          <Input
+            value={form.industry}
+            onChange={(e) => set({ industry: e.target.value })}
+            placeholder="SaaS, Healthcare, Fintech…"
+          />
+        </FormField>
+
+        {/* Stage */}
+        <FormField label="Stage">
+          <Select value={form.stage} onChange={(e) => set({ stage: e.target.value })}>
+            <option value="">— Unknown —</option>
+            {STAGE_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </Select>
+        </FormField>
+
+        {/* Ownership % */}
+        <FormField label="Ownership %" hint="Your equity stake as a percentage">
+          <Input
+            type="number"
+            min={0}
+            max={100}
+            step={0.01}
+            suffix="%"
+            value={form.ownershipPct}
+            onChange={(e) => set({ ownershipPct: e.target.value })}
+            placeholder="e.g. 2.5"
+          />
         </FormField>
 
         {/* Current Value */}
@@ -196,28 +194,6 @@ function DirectInvestmentForm({
             prefix="$"
             value={form.currentValue}
             onChange={(e) => set({ currentValue: e.target.value })}
-          />
-        </FormField>
-
-        {/* Shares */}
-        <FormField label="Shares / Units">
-          <Input
-            type="number"
-            min={0}
-            value={form.shares}
-            onChange={(e) => handleSharesOrPrice({ shares: e.target.value })}
-            placeholder="0"
-          />
-        </FormField>
-
-        {/* Price per Share */}
-        <FormField label="Price per Share">
-          <Input
-            type="number"
-            min={0}
-            prefix="$"
-            value={form.pricePerShare}
-            onChange={(e) => handleSharesOrPrice({ pricePerShare: e.target.value })}
           />
         </FormField>
 
@@ -241,16 +217,17 @@ function DirectInvestmentForm({
           />
         </FormField>
 
-        {/* Account Association */}
-        <FormField label="Account Association">
-          <Select value={form.accountId} onChange={(e) => set({ accountId: e.target.value })}>
-            <option value="">— Unassociated —</option>
-            {accounts.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.accountName}
-              </option>
-            ))}
-          </Select>
+        {/* Expected Exit Year */}
+        <FormField label="Expected Exit Year" hint="Projected liquidity event year">
+          <Input
+            type="number"
+            min={2000}
+            max={2100}
+            step={1}
+            value={form.expectedExitYear}
+            onChange={(e) => set({ expectedExitYear: e.target.value })}
+            placeholder="e.g. 2028"
+          />
         </FormField>
 
         {/* Notes — full width */}
@@ -357,7 +334,6 @@ export function DirectInvestmentsForm() {
   const utils = trpc.useUtils();
 
   const { data = [], isLoading } = trpc.directInvestments.list.useQuery();
-  const { data: portfolios = [] } = trpc.portfolios.list.useQuery();
 
   const invalidate = () => utils.directInvestments.list.invalidate();
 
@@ -368,21 +344,18 @@ export function DirectInvestmentsForm() {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const accounts = portfolios.map((p) => ({ id: p.id, accountName: p.accountName }));
-
-  // Build initial form state from a stored record (decimal → percent conversion)
+  // Build initial form state from a stored record (decimal -> percent conversion)
   function recordToForm(rec: (typeof data)[number]): FormState {
     return {
       securityName: rec.securityName,
-      ticker: rec.ticker ?? "",
       assetClass: rec.assetClass as AssetClass,
-      category: rec.category ?? "",
-      shares: rec.shares != null ? String(rec.shares) : "",
-      pricePerShare: rec.pricePerShare != null ? String(rec.pricePerShare) : "",
+      industry: rec.industry ?? "",
+      stage: rec.stage ?? "",
+      ownershipPct: rec.ownershipPct != null ? String(rec.ownershipPct) : "",
       currentValue: String(rec.currentValue),
       costBasis: rec.costBasis != null ? String(rec.costBasis) : "",
       purchaseDate: rec.purchaseDate ?? "",
-      accountId: rec.accountId ?? "",
+      expectedExitYear: rec.expectedExitYear != null ? String(rec.expectedExitYear) : "",
       notes: rec.notes ?? "",
       expectedReturnRate: (rec.expectedReturnRate ?? 0.07) * 100,
       ordinaryYieldRate: (rec.ordinaryYieldRate ?? 0) * 100,
@@ -406,7 +379,7 @@ export function DirectInvestmentsForm() {
     <Card>
       <CardHeader
         title="Direct Investments"
-        description="Individually held positions outside brokerage accounts"
+        description="Privately held company investments"
         action={
           !adding && (
             <Button
@@ -425,7 +398,6 @@ export function DirectInvestmentsForm() {
         <CardBody className="border-b border-slate-800">
           <DirectInvestmentForm
             initial={EMPTY}
-            accounts={accounts}
             onSave={(f) => add.mutate(buildMutationPayload(f))}
             onCancel={() => setAdding(false)}
             isPending={add.isPending}
@@ -465,7 +437,6 @@ export function DirectInvestmentsForm() {
                 <div className="px-6 py-4">
                   <DirectInvestmentForm
                     initial={recordToForm(inv)}
-                    accounts={accounts}
                     onSave={(f) => update.mutate({ id: inv.id, ...buildMutationPayload(f) })}
                     onCancel={() => setEditingId(null)}
                     isPending={update.isPending}
@@ -478,8 +449,8 @@ export function DirectInvestmentsForm() {
                       <span className="text-sm font-medium text-slate-200">
                         {inv.securityName}
                       </span>
-                      {inv.ticker && (
-                        <span className="text-xs text-slate-500">{inv.ticker}</span>
+                      {inv.stage && (
+                        <span className="text-xs text-slate-500">{inv.stage}</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -488,14 +459,17 @@ export function DirectInvestmentsForm() {
                       >
                         {ASSET_CLASS_LABELS[inv.assetClass] ?? inv.assetClass}
                       </span>
-                      {inv.category && (
+                      {inv.industry && (
+                        <span className="text-xs text-slate-500">{inv.industry}</span>
+                      )}
+                      {inv.ownershipPct != null && (
                         <span className="text-xs text-slate-500">
-                          {CATEGORY_LABELS[inv.category] ?? inv.category}
+                          {inv.ownershipPct}% ownership
                         </span>
                       )}
-                      {inv.shares != null && (
+                      {inv.expectedExitYear != null && (
                         <span className="text-xs text-slate-500">
-                          {inv.shares.toLocaleString()} shares
+                          Exit: {inv.expectedExitYear}
                         </span>
                       )}
                     </div>

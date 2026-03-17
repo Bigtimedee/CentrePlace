@@ -175,8 +175,4 @@ export const directInvestmentsRelations = relations(directInvestments, ({ one })
     fields: [directInvestments.userId],
     references: [userProfiles.id],
   }),
-  account: one(investmentAccounts, {
-    fields: [directInvestments.accountId],
-    references: [investmentAccounts.id],
-  }),
 }));
