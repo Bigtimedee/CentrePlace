@@ -299,7 +299,7 @@ export interface CityTaxInput {
 }
 
 export function calculateCityTax(input: CityTaxInput): number {
-  const config = CITY_CONFIGS[input.cityCode.toUpperCase()];
+  const config = CITY_CONFIGS[input.cityCode.trim().toUpperCase()];
   if (!config) return 0;
 
   // Determine the taxable income base
