@@ -39,6 +39,9 @@ async function proxy(req: NextRequest, params: { path: string[] }) {
       forwardHeaders.set(key, value);
     }
   }
+  // Clerk uses the Host header to identify which app instance the request belongs to.
+  // We must set it to the Clerk Frontend API domain (not the proxy's own host).
+  forwardHeaders.set("host", new URL(CLERK_FRONTEND_API).host);
 
   let upstream: Response;
   try {
