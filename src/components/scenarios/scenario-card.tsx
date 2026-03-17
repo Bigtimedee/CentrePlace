@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, X, Plus } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+
 import type { ScenarioDefinition, ScenarioOverride } from "@/server/simulation/engine/scenario-types";
 import type { SimulationInput } from "@/server/simulation/engine/types";
 import { SCENARIO_COLORS } from "@/server/simulation/engine/scenario-types";
@@ -108,6 +108,8 @@ function overrideSummary(overrides: ScenarioOverride): string[] {
 // ── Main card ─────────────────────────────────────────────────────────────────
 
 export function ScenarioCard(props: Props | AddButtonProps) {
+  const [expanded, setExpanded] = useState(false);
+
   if (props.isAddButton) {
     return (
       <button
@@ -121,7 +123,6 @@ export function ScenarioCard(props: Props | AddButtonProps) {
   }
 
   const { scenario, isBase, baseInput, onChange, onRemove } = props;
-  const [expanded, setExpanded] = useState(false);
 
   const overrides = scenario.overrides;
   const baseReturnRate = baseInput?.profile.assumedReturnRate ?? 0.07;

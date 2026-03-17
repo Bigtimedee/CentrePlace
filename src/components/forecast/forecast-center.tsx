@@ -32,6 +32,7 @@ export function ForecastCenter() {
   // Run all CPU-heavy computation client-side to avoid serverless timeouts.
   useEffect(() => {
     if (!runParams || !simInput) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsComputing(true);
     setResult(null);
     // Defer one tick so React can render the spinner before the synchronous computation.
