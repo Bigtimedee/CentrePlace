@@ -219,13 +219,32 @@ describe("carry positions", () => {
             fundName: "Fund III",
             expectedGrossCarry: 10_000_000,
             haircutPct: 0.30,
-            expectedRealizationYear: 2029,
+            realizationSchedule: [{ year: 2029, pct: 1.0 }],
           },
         ],
       }),
     );
-    // 10M × (1 - 0.30) = 7M
+    // 10M × 1.0 unrealized × (1 - 0.30) = 7M
     expect(result.grossEstate).toBe(7_000_000);
+  });
+
+  it("excludes already-realized tranches from gross estate", () => {
+    const result = calculateEstate(
+      makeInput({
+        carry: [
+          {
+            id: "c1",
+            fundName: "Fund III",
+            expectedGrossCarry: 10_000_000,
+            haircutPct: 0.30,
+            // 40% already realized in 2025, 60% future
+            realizationSchedule: [{ year: 2025, pct: 0.4 }, { year: 2029, pct: 0.6 }],
+          },
+        ],
+      }),
+    );
+    // Only 60% unrealized: 10M × 0.6 × (1 - 0.30) = 4.2M
+    expect(result.grossEstate).toBeCloseTo(4_200_000);
   });
 
   it("skips carry positions with zero or negative net carry", () => {
@@ -237,7 +256,7 @@ describe("carry positions", () => {
             fundName: "Zeroed Fund",
             expectedGrossCarry: 5_000_000,
             haircutPct: 1.0,
-            expectedRealizationYear: 2028,
+            realizationSchedule: [{ year: 2028, pct: 1.0 }],
           },
         ],
       }),
@@ -533,7 +552,7 @@ describe("full scenario — high-net-worth single in OR", () => {
         },
       ],
       carry: [
-        { id: "c1", fundName: "PE Fund III", expectedGrossCarry: 4_000_000, haircutPct: 0.25, expectedRealizationYear: 2029 },
+        { id: "c1", fundName: "PE Fund III", expectedGrossCarry: 4_000_000, haircutPct: 0.25, realizationSchedule: [{ year: 2029, pct: 1.0 }] },
       ],
       lpInvestments: [
         { id: "lp1", fundName: "Buyout IV", currentNav: 2_000_000 },

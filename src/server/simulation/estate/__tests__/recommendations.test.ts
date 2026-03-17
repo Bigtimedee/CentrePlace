@@ -518,7 +518,7 @@ describe("QOZ rule", () => {
         { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 8_000_000 },
       ],
       carry: [
-        { id: "c1", fundName: "Fund", expectedGrossCarry: 500_000, haircutPct: 0.20, expectedRealizationYear: 2028 },
+        { id: "c1", fundName: "Fund", expectedGrossCarry: 500_000, haircutPct: 0.20, realizationSchedule: [{ year: 2028, pct: 1.0 }] },
       ],
     });
     expect(ids).not.toContain("qualified-opportunity-zone");
@@ -529,7 +529,7 @@ describe("QOZ rule", () => {
     // Gross estate = $1.2M < 70% of $7.18M ($5.026M) → should NOT trigger
     const ids = recIds({
       carry: [
-        { id: "c1", fundName: "Fund", expectedGrossCarry: 1_500_000, haircutPct: 0.20, expectedRealizationYear: 2028 },
+        { id: "c1", fundName: "Fund", expectedGrossCarry: 1_500_000, haircutPct: 0.20, realizationSchedule: [{ year: 2028, pct: 1.0 }] },
       ],
     });
     expect(ids).not.toContain("qualified-opportunity-zone");
@@ -542,7 +542,7 @@ describe("QOZ rule", () => {
         { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 8_000_000 },
       ],
       carry: [
-        { id: "c1", fundName: "Fund", expectedGrossCarry: 5_000_000, haircutPct: 0.20, expectedRealizationYear: 2028 },
+        { id: "c1", fundName: "Fund", expectedGrossCarry: 5_000_000, haircutPct: 0.20, realizationSchedule: [{ year: 2028, pct: 1.0 }] },
       ],
     });
     expect(ids).toContain("qualified-opportunity-zone");

@@ -138,7 +138,7 @@ export interface EstateCalcInput {
     fundName: string;
     expectedGrossCarry: number;
     haircutPct: number;
-    expectedRealizationYear: number;
+    realizationSchedule: Array<{ year: number; pct: number }>;
   }>;
   lpInvestments: Array<{
     id: string;
@@ -242,20 +242,23 @@ export function calculateEstate(input: EstateCalcInput): EstateCalculationResult
     }
   }
 
-  // ── 4. Carry Positions (unrealized) ──────────────────────────────────────
+  // ── 4. Carry Positions (unrealized tranches only) ─────────────────────────
   for (const carry of input.carry) {
-    // Include all unrealized carry (realization year > currentYear, or current year not yet passed)
-    const netCarry = carry.expectedGrossCarry * (1 - carry.haircutPct);
+    // Only count tranches that have not yet realized (year > currentYear)
+    const futureTranches = carry.realizationSchedule.filter(t => t.year > currentYear);
+    const unrealizedPct = futureTranches.reduce((s, t) => s + t.pct, 0);
+    const netCarry = carry.expectedGrossCarry * unrealizedPct * (1 - carry.haircutPct);
     if (netCarry <= 0) continue;
 
-    const yearsToRealization = carry.expectedRealizationYear - currentYear;
+    const firstYear = futureTranches.sort((a, b) => a.year - b.year)[0]?.year ?? currentYear + 1;
+    const yearsToRealization = firstYear - currentYear;
     components.push({
       category: "carry",
       id: carry.id,
       name: `Carry — ${carry.fundName}`,
       estateValue: netCarry,
       inEstate: true,
-      notes: `Expected ${formatCompact(netCarry)} net carry; realizing ~${carry.expectedRealizationYear} (${yearsToRealization > 0 ? `${yearsToRealization} yrs` : "this year"})`,
+      notes: `Expected ${formatCompact(netCarry)} net carry (unrealized); first realization ~${firstYear} (${yearsToRealization > 0 ? `${yearsToRealization} yrs` : "this year"})`,
     });
   }
 

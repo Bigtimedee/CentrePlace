@@ -71,16 +71,13 @@ export const planRouter = createTRPCRouter({
         deathBenefit: p.deathBenefit,
         outstandingLoanBalance: p.outstandingLoanBalance ?? 0,
       })),
-      carry: simInput.carry.map(c => {
-        const sortedSchedule = [...c.realizationSchedule].sort((a, b) => a.year - b.year);
-        return {
-          id: c.id,
-          fundName: c.fundName,
-          expectedGrossCarry: c.expectedGrossCarry,
-          haircutPct: c.haircutPct,
-          expectedRealizationYear: sortedSchedule[0]?.year ?? new Date().getFullYear(),
-        };
-      }),
+      carry: simInput.carry.map(c => ({
+        id: c.id,
+        fundName: c.fundName,
+        expectedGrossCarry: c.expectedGrossCarry,
+        haircutPct: c.haircutPct,
+        realizationSchedule: c.realizationSchedule.map(t => ({ year: t.year, pct: t.pct })),
+      })),
       lpInvestments: simInput.lpDistributions
         .reduce((acc, d) => {
           if (!acc.some(x => x.fundName === d.fundName)) {
