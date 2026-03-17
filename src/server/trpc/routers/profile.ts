@@ -36,7 +36,7 @@ export const profileRouter = createTRPCRouter({
   addChild: protectedProcedure
     .input(z.object({
       name: z.string().min(1),
-      birthYear: z.number().int().min(2000).max(2025),
+      birthYear: z.number().int().min(2000).max(new Date().getFullYear()),
       k12TuitionCost: z.number().min(0).default(0),
       educationType: z.enum(["none", "public", "private"]),
       annualEducationCost: z.number().min(0),
@@ -53,7 +53,7 @@ export const profileRouter = createTRPCRouter({
     .input(z.object({
       id: z.string(),
       name: z.string().min(1).optional(),
-      birthYear: z.number().int().min(2000).max(2025).optional(),
+      birthYear: z.number().int().min(2000).max(new Date().getFullYear()).optional(),
       k12TuitionCost: z.number().min(0).optional(),
       educationType: z.enum(["none", "public", "private"]).optional(),
       annualEducationCost: z.number().min(0).optional(),

@@ -5,9 +5,9 @@ import { eq } from "drizzle-orm";
 
 export const incomeRouter = createTRPCRouter({
   get: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.query.incomeProfiles.findFirst({
+    return (await ctx.db.query.incomeProfiles.findFirst({
       where: eq(incomeProfiles.userId, ctx.userId),
-    }) ?? null;
+    })) ?? null;
   }),
 
   upsert: protectedProcedure

@@ -244,7 +244,7 @@ export function computeActionPlan(
         id: "insurance-gap",
         title: "Close the estate tax funding gap with additional ILIT coverage",
         rationale: `Your projected estate tax of ${fc(estate.totalEstateTax)} exceeds your ILIT-owned estate-funding insurance coverage of ${fc(estateFundingCoverage)} by ${fc(gap)}. Without adequate coverage, heirs may be forced to liquidate assets to pay the estate tax bill.`,
-        action: "Work with a life insurance specialist to add an ILIT-owned policy sized to cover the ${fc(gap)} gap. Term life is least expensive; whole life or PPLI provides additional planning flexibility.",
+        action: `Work with a life insurance specialist to add an ILIT-owned policy sized to cover the ${fc(gap)} gap. Term life is least expensive; whole life or PPLI provides additional planning flexibility.`,
         category: "insurance_review",
         urgency: "plan_now",
         dollarImpact: gap,
