@@ -21,6 +21,7 @@ import {
   expenditures,
   oneTimeExpenditures,
   realizationPolicy,
+  directInvestments,
 } from "../db/schema";
 import type {
   SimulationInput,
@@ -54,6 +55,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     recurring,
     oneTime,
     policy,
+    directInvs,
   ] = await Promise.all([
     ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
     ctx.db.query.children.findMany({ where: eq(children.userId, uid) }),
@@ -67,6 +69,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     ctx.db.query.expenditures.findMany({ where: eq(expenditures.userId, uid) }),
     ctx.db.query.oneTimeExpenditures.findMany({ where: eq(oneTimeExpenditures.userId, uid) }),
     ctx.db.query.realizationPolicy.findFirst({ where: eq(realizationPolicy.userId, uid) }),
+    ctx.db.query.directInvestments.findMany({ where: eq(directInvestments.userId, uid) }),
   ]);
 
   if (!profile) {
@@ -112,20 +115,33 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     })),
   );
 
-  const simAccounts: SimInvestmentAccount[] = accounts.map(a => ({
-    id: a.id,
-    accountName: a.accountName,
-    accountType: a.accountType,
-    currentBalance: a.currentBalance,
-    blendedReturnRate:
-      a.equityPct * a.equityReturnRate +
-      a.bondPct * a.bondReturnRate +
-      a.altPct * a.altReturnRate,
-    annualContribution: a.annualContribution,
-    ordinaryYieldRate: a.ordinaryYieldRate ?? 0,
-    qualifiedYieldRate: a.qualifiedYieldRate ?? 0,
-    taxExemptYieldRate: a.taxExemptYieldRate ?? 0,
-  }));
+  const simAccounts: SimInvestmentAccount[] = [
+    ...accounts.map(a => ({
+      id: a.id,
+      accountName: a.accountName,
+      accountType: a.accountType,
+      currentBalance: a.currentBalance,
+      blendedReturnRate:
+        a.equityPct * a.equityReturnRate +
+        a.bondPct * a.bondReturnRate +
+        a.altPct * a.altReturnRate,
+      annualContribution: a.annualContribution,
+      ordinaryYieldRate: a.ordinaryYieldRate ?? 0,
+      qualifiedYieldRate: a.qualifiedYieldRate ?? 0,
+      taxExemptYieldRate: a.taxExemptYieldRate ?? 0,
+    })),
+    ...directInvs.map(d => ({
+      id: d.id,
+      accountName: d.securityName,
+      accountType: "taxable" as const,
+      currentBalance: d.currentValue,
+      blendedReturnRate: d.expectedReturnRate,
+      annualContribution: 0,
+      ordinaryYieldRate: d.ordinaryYieldRate,
+      qualifiedYieldRate: d.qualifiedYieldRate,
+      taxExemptYieldRate: d.taxExemptYieldRate,
+    })),
+  ];
 
   const simRealEstate: SimRealEstateProperty[] = properties.map(p => ({
     id: p.id,

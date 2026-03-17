@@ -9,6 +9,7 @@ import { realEstateProperties, mortgages } from "./real-estate";
 import { insurancePolicies } from "./insurance";
 import { realizationPolicy } from "./realization-policy";
 import { accountStatements, accountHoldings } from "./holdings";
+import { directInvestments } from "./direct-investments";
 
 // ── userProfiles ─────────────────────────────────────────────────────────────
 export const userProfilesRelations = relations(userProfiles, ({ many, one }) => ({
@@ -31,6 +32,7 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
   }),
   accountStatements: many(accountStatements),
   accountHoldings: many(accountHoldings),
+  directInvestments: many(directInvestments),
 }));
 
 export const childrenRelations = relations(children, ({ one }) => ({
@@ -164,5 +166,17 @@ export const realizationPolicyRelations = relations(realizationPolicy, ({ one })
   user: one(userProfiles, {
     fields: [realizationPolicy.userId],
     references: [userProfiles.id],
+  }),
+}));
+
+// ── direct investments ────────────────────────────────────────────────────────
+export const directInvestmentsRelations = relations(directInvestments, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [directInvestments.userId],
+    references: [userProfiles.id],
+  }),
+  account: one(investmentAccounts, {
+    fields: [directInvestments.accountId],
+    references: [investmentAccounts.id],
   }),
 }));

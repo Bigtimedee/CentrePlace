@@ -8,4 +8,5 @@ export * from "./real-estate";
 export * from "./insurance";
 export * from "./realization-policy";
 export * from "./holdings";
+export * from "./direct-investments";
 export * from "./relations";
