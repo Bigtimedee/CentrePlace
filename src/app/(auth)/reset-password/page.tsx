@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function ResetPasswordPage() {
-  const { signIn, setActive, isLoaded } = useSignIn();
+  const { signIn } = useSignIn();
   const router = useRouter();
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +17,7 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded || loading) return;
+    if (!signIn || loading) return;
     if (password !== confirm) {
       setError("Passwords do not match.");
       return;
@@ -29,15 +29,12 @@ export default function ResetPasswordPage() {
     setError("");
     setLoading(true);
     try {
-      const result = await signIn.attemptFirstFactor({
-        strategy: "reset_password_email_code",
-        code,
-        password,
-      });
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        router.push("/dashboard");
-      }
+      const { error: verifyError } = await signIn.resetPasswordEmailCode.verifyCode({ code });
+      if (verifyError) throw verifyError;
+      const { error: submitError } = await signIn.resetPasswordEmailCode.submitPassword({ password });
+      if (submitError) throw submitError;
+      await signIn.finalize();
+      router.push("/dashboard");
     } catch {
       setError("Invalid or expired code. Request a new one and try again.");
     } finally {

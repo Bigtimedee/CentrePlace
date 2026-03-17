@@ -6,7 +6,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function ForgotPasswordPage() {
-  const { signIn, isLoaded } = useSignIn();
+  const { signIn } = useSignIn();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -14,14 +14,14 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded || loading) return;
+    if (!signIn || loading) return;
     setError("");
     setLoading(true);
     try {
-      await signIn.create({
-        strategy: "reset_password_email_code",
-        identifier: email,
-      });
+      const { error: createError } = await signIn.create({ identifier: email });
+      if (createError) throw createError;
+      const { error: sendError } = await signIn.resetPasswordEmailCode.sendCode();
+      if (sendError) throw sendError;
       setSent(true);
     } catch {
       setError("Unable to send a reset email. Check that the address is correct.");
