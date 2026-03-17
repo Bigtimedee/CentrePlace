@@ -1,6 +1,4 @@
 import Anthropic from "@anthropic-ai/sdk";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdf = require("pdf-parse") as (buffer: Buffer) => Promise<{ text: string }>;
 
 export interface ParsedHolding {
   ticker?: string;
@@ -50,7 +48,11 @@ export async function parseStatementBuffer(
   let text = "";
 
   if (mimeType === "application/pdf") {
-    const parsed = await pdf(fileBuffer);
+    // Dynamic import prevents pdf-parse from being bundled at build time,
+    // avoiding the DOMMatrix ReferenceError from @napi-rs/canvas
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const pdfParse = require("pdf-parse") as (buffer: Buffer) => Promise<{ text: string }>;
+    const parsed = await pdfParse(fileBuffer);
     text = parsed.text;
   } else {
     // plain text / CSV
