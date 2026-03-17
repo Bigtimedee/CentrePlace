@@ -58,8 +58,16 @@ export const carryRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const position = await ctx.db.query.carryPositions.findFirst({
         where: and(eq(carryPositions.id, input.carryPositionId), eq(carryPositions.userId, ctx.userId)),
+        with: { realizations: true },
       });
       if (!position) throw new TRPCError({ code: "NOT_FOUND" });
+      const existingTotal = (position.realizations ?? []).reduce((s, r) => s + r.pct, 0);
+      if (existingTotal + input.pct > 1.0 + 1e-9) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Realization percentages would exceed 100%. Current total: ${Math.round(existingTotal * 100)}%, adding ${Math.round(input.pct * 100)}%.`,
+        });
+      }
       const [row] = await ctx.db.insert(carryRealizations).values({
         carryPositionId: input.carryPositionId,
         userId: ctx.userId,
@@ -78,9 +86,28 @@ export const carryRouter = createTRPCRouter({
       pct: z.number().min(0.01).max(1.0).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const { id, ...fields } = input;
+      const { id, pct, ...fields } = input;
+      if (pct !== undefined) {
+        const existing = await ctx.db.query.carryRealizations.findFirst({
+          where: and(eq(carryRealizations.id, id), eq(carryRealizations.userId, ctx.userId)),
+        });
+        if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
+        const siblings = await ctx.db.query.carryRealizations.findMany({
+          where: and(
+            eq(carryRealizations.carryPositionId, existing.carryPositionId),
+            eq(carryRealizations.userId, ctx.userId),
+          ),
+        });
+        const othersTotal = siblings.filter(r => r.id !== id).reduce((s, r) => s + r.pct, 0);
+        if (othersTotal + pct > 1.0 + 1e-9) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Realization percentages would exceed 100%. Other tranches total: ${Math.round(othersTotal * 100)}%, updating to ${Math.round(pct * 100)}%.`,
+          });
+        }
+      }
       await ctx.db.update(carryRealizations)
-        .set(fields)
+        .set({ ...fields, ...(pct !== undefined ? { pct } : {}) })
         .where(and(eq(carryRealizations.id, id), eq(carryRealizations.userId, ctx.userId)));
     }),
 
