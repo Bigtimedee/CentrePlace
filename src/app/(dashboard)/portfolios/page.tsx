@@ -2,13 +2,17 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PortfoliosForm } from "@/components/forms/portfolios-form";
 import { RealizationPolicyForm } from "@/components/forms/realization-policy-form";
 import { NextSectionBanner } from "@/components/layout/next-section-banner";
+import { PortfolioAllocationDashboard } from "@/components/portfolios/portfolio-allocation-dashboard";
+import { HoldingsPanelsList } from "@/components/portfolios/holdings-panels-list";
 
 export default function PortfoliosPage() {
   return (
     <div>
       <PageHeader title="Investment Portfolios" description="Taxable accounts, IRAs, 401(k)s — with asset allocation and return assumptions" />
       <div className="mt-8 space-y-6">
+        <PortfolioAllocationDashboard />
         <PortfoliosForm />
+        <HoldingsPanelsList />
         <RealizationPolicyForm />
       </div>
       <NextSectionBanner

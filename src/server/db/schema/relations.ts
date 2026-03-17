@@ -8,6 +8,7 @@ import { lpInvestments } from "./lp-investments";
 import { realEstateProperties, mortgages } from "./real-estate";
 import { insurancePolicies } from "./insurance";
 import { realizationPolicy } from "./realization-policy";
+import { accountStatements, accountHoldings } from "./holdings";
 
 // ── userProfiles ─────────────────────────────────────────────────────────────
 export const userProfilesRelations = relations(userProfiles, ({ many, one }) => ({
@@ -28,6 +29,8 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
     fields: [userProfiles.id],
     references: [realizationPolicy.userId],
   }),
+  accountStatements: many(accountStatements),
+  accountHoldings: many(accountHoldings),
 }));
 
 export const childrenRelations = relations(children, ({ one }) => ({
@@ -68,10 +71,40 @@ export const plaidConnectionsRelations = relations(plaidConnections, ({ one }) =
 }));
 
 // ── portfolios ────────────────────────────────────────────────────────────────
-export const investmentAccountsRelations = relations(investmentAccounts, ({ one }) => ({
+export const investmentAccountsRelations = relations(investmentAccounts, ({ one, many }) => ({
   user: one(userProfiles, {
     fields: [investmentAccounts.userId],
     references: [userProfiles.id],
+  }),
+  statements: many(accountStatements),
+  holdings: many(accountHoldings),
+}));
+
+// ── holdings ──────────────────────────────────────────────────────────────────
+export const accountStatementsRelations = relations(accountStatements, ({ one, many }) => ({
+  user: one(userProfiles, {
+    fields: [accountStatements.userId],
+    references: [userProfiles.id],
+  }),
+  account: one(investmentAccounts, {
+    fields: [accountStatements.accountId],
+    references: [investmentAccounts.id],
+  }),
+  holdings: many(accountHoldings),
+}));
+
+export const accountHoldingsRelations = relations(accountHoldings, ({ one }) => ({
+  statement: one(accountStatements, {
+    fields: [accountHoldings.statementId],
+    references: [accountStatements.id],
+  }),
+  user: one(userProfiles, {
+    fields: [accountHoldings.userId],
+    references: [userProfiles.id],
+  }),
+  account: one(investmentAccounts, {
+    fields: [accountHoldings.accountId],
+    references: [investmentAccounts.id],
   }),
 }));
 

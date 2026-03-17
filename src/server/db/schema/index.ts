@@ -7,4 +7,5 @@ export * from "./lp-investments";
 export * from "./real-estate";
 export * from "./insurance";
 export * from "./realization-policy";
+export * from "./holdings";
 export * from "./relations";
