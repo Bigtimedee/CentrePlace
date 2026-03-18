@@ -5,6 +5,7 @@ import { NextSectionBanner } from "@/components/layout/next-section-banner";
 import { PortfolioAllocationDashboard } from "@/components/portfolios/portfolio-allocation-dashboard";
 import { HoldingsPanelsList } from "@/components/portfolios/holdings-panels-list";
 import { DirectInvestmentsForm } from "@/components/portfolios/direct-investments-form";
+import { CryptoHoldingsForm } from "@/components/portfolios/crypto-holdings-form";
 
 export default function PortfoliosPage() {
   return (
@@ -15,6 +16,7 @@ export default function PortfoliosPage() {
         <PortfoliosForm />
         <HoldingsPanelsList />
         <DirectInvestmentsForm />
+        <CryptoHoldingsForm />
         <RealizationPolicyForm />
       </div>
       <NextSectionBanner
