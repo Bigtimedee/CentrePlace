@@ -22,6 +22,7 @@ import {
   oneTimeExpenditures,
   realizationPolicy,
   directInvestments,
+  cryptoHoldings,
 } from "../db/schema";
 import type {
   SimulationInput,
@@ -56,6 +57,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     oneTime,
     policy,
     directInvs,
+    cryptoRows,
   ] = await Promise.all([
     ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
     ctx.db.query.children.findMany({ where: eq(children.userId, uid) }),
@@ -70,6 +72,7 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     ctx.db.query.oneTimeExpenditures.findMany({ where: eq(oneTimeExpenditures.userId, uid) }),
     ctx.db.query.realizationPolicy.findFirst({ where: eq(realizationPolicy.userId, uid) }),
     ctx.db.query.directInvestments.findMany({ where: eq(directInvestments.userId, uid) }),
+    ctx.db.select().from(cryptoHoldings).where(eq(cryptoHoldings.userId, uid)),
   ]);
 
   if (!profile) {
@@ -140,6 +143,18 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
       ordinaryYieldRate: d.ordinaryYieldRate,
       qualifiedYieldRate: d.qualifiedYieldRate,
       taxExemptYieldRate: d.taxExemptYieldRate,
+    })),
+    ...cryptoRows.map(c => ({
+      id: c.id,
+      accountName: c.symbol ? `${c.coinName} (${c.symbol})` : c.coinName,
+      accountType: "taxable" as const,
+      currentBalance: c.currentValue,
+      blendedReturnRate: c.expectedAppreciationRate,
+      annualContribution: 0,
+      ordinaryYieldRate: 0,
+      qualifiedYieldRate: 0,
+      taxExemptYieldRate: 0,
+      // TODO v2: consume expectedSaleYear + saleFraction for one-time LTCG liquidation event
     })),
     ...carry
       .filter(c => c.currentAccountBalance != null && c.currentAccountBalance !== 0)

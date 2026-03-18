@@ -10,6 +10,7 @@ import { insurancePolicies } from "./insurance";
 import { realizationPolicy } from "./realization-policy";
 import { accountStatements, accountHoldings } from "./holdings";
 import { directInvestments } from "./direct-investments";
+import { cryptoHoldings } from "./crypto-holdings";
 
 // ── userProfiles ─────────────────────────────────────────────────────────────
 export const userProfilesRelations = relations(userProfiles, ({ many, one }) => ({
@@ -33,6 +34,7 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
   accountStatements: many(accountStatements),
   accountHoldings: many(accountHoldings),
   directInvestments: many(directInvestments),
+  cryptoHoldings: many(cryptoHoldings),
 }));
 
 export const childrenRelations = relations(children, ({ one }) => ({
@@ -173,6 +175,14 @@ export const realizationPolicyRelations = relations(realizationPolicy, ({ one })
 export const directInvestmentsRelations = relations(directInvestments, ({ one }) => ({
   user: one(userProfiles, {
     fields: [directInvestments.userId],
+    references: [userProfiles.id],
+  }),
+}));
+
+// ── crypto holdings ───────────────────────────────────────────────────────────
+export const cryptoHoldingsRelations = relations(cryptoHoldings, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [cryptoHoldings.userId],
     references: [userProfiles.id],
   }),
 }));
