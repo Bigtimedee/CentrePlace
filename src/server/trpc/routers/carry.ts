@@ -12,6 +12,7 @@ const carryInput = z.object({
   currentTvpi: z.number().min(0),
   expectedGrossCarry: z.number().min(0),
   haircutPct: z.number().min(0).max(0.9),
+  currentAccountBalance: z.number().min(0).nullable().optional(),
   notes: z.string().optional(),
 });
 

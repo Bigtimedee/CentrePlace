@@ -141,6 +141,19 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
       qualifiedYieldRate: d.qualifiedYieldRate,
       taxExemptYieldRate: d.taxExemptYieldRate,
     })),
+    ...carry
+      .filter(c => c.currentAccountBalance != null && c.currentAccountBalance !== 0)
+      .map(c => ({
+        id: `carry-balance-${c.id}`,
+        accountName: `${c.fundName} – Current Balance`,
+        accountType: "taxable" as const,
+        currentBalance: c.currentAccountBalance as number,
+        blendedReturnRate: profile.assumedReturnRate,
+        annualContribution: 0,
+        ordinaryYieldRate: 0,
+        qualifiedYieldRate: 0,
+        taxExemptYieldRate: 0,
+      })),
   ];
 
   const simRealEstate: SimRealEstateProperty[] = properties.map(p => ({

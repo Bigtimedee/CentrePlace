@@ -19,6 +19,7 @@ type CarryFormState = {
   currentTvpi: number;
   expectedGrossCarry: number;
   haircutPct: number;        // displayed as %
+  currentAccountBalance: number | null;
   notes: string;
 };
 
@@ -38,6 +39,7 @@ const EMPTY: CarryFormState = {
   currentTvpi: 1.0,
   expectedGrossCarry: 0,
   haircutPct: 20,
+  currentAccountBalance: null,
   notes: "",
 };
 
@@ -49,6 +51,7 @@ function toMutation(f: CarryFormState) {
     ...f,
     carryPct: f.carryPct / 100,
     haircutPct: f.haircutPct / 100,
+    currentAccountBalance: f.currentAccountBalance,
     notes: f.notes || undefined,
   };
 }

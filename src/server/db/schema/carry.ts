@@ -11,6 +11,7 @@ export const carryPositions = pgTable("carry_positions", {
   currentTvpi: real("current_tvpi").notNull().default(1.0),
   expectedGrossCarry: real("expected_gross_carry").notNull().default(0), // user's estimate
   haircutPct: real("haircut_pct").notNull().default(0.2), // default 20% haircut
+  currentAccountBalance: real("current_account_balance"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
