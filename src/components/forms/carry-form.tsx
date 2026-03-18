@@ -64,6 +64,7 @@ function fromRecord(r: {
   currentTvpi: number;
   expectedGrossCarry: number;
   haircutPct: number;
+  currentAccountBalance?: number | null;
   notes: string | null;
 }): CarryFormState {
   return {
@@ -74,6 +75,7 @@ function fromRecord(r: {
     currentTvpi: r.currentTvpi,
     expectedGrossCarry: r.expectedGrossCarry,
     haircutPct: Math.round(r.haircutPct * 100 * 10) / 10,
+    currentAccountBalance: r.currentAccountBalance ?? null,
     notes: r.notes ?? "",
   };
 }
@@ -228,6 +230,21 @@ function CarryPositionForm({
           <div className="flex items-center h-9 px-3 bg-slate-800/50 border border-slate-700/50 rounded-md text-sm text-emerald-400 font-medium">
             {formatCurrency(form.expectedGrossCarry * (1 - form.haircutPct / 100))}
           </div>
+        </FormField>
+
+        <FormField label="Current Account Balance" hint="Current fund account balance (optional)">
+          <Input
+            type="number"
+            min={0}
+            prefix="$"
+            placeholder="0"
+            value={form.currentAccountBalance ?? ""}
+            onChange={e => {
+              const raw = e.target.value;
+              const parsed = parseFloat(raw);
+              set({ currentAccountBalance: raw === "" || isNaN(parsed) ? null : parsed });
+            }}
+          />
         </FormField>
 
         <FormField label="Notes" className="md:col-span-3">
@@ -417,6 +434,9 @@ export function CarryForm() {
                         </div>
                         <div className="text-xs text-slate-500 mt-0.5">
                           {formatCurrency(pos.totalCommittedCapital, true)} committed · TVPI {pos.currentTvpi.toFixed(2)}× · {realizationSummary}
+                          {pos.currentAccountBalance != null && (
+                            <> · Balance: {formatCurrency(pos.currentAccountBalance, true)}</>
+                          )}
                         </div>
                       </div>
                       <div className="ml-4 flex items-center gap-4">
