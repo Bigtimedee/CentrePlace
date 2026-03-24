@@ -38,7 +38,7 @@ function PctField({
   const display = value !== undefined ? (value * 100).toFixed(1) : "";
   return (
     <div>
-      <label className="block text-xs text-slate-500 mb-1">{label}</label>
+      <label className="block text-xs text-slate-600 mb-1">{label}</label>
       <div className="relative">
         <input
           type="number"
@@ -55,7 +55,7 @@ function PctField({
           }}
           className="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 pr-7"
         />
-        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-500">%</span>
+        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-600">%</span>
       </div>
     </div>
   );
@@ -74,7 +74,7 @@ function SelectField({
 }) {
   return (
     <div>
-      <label className="block text-xs text-slate-500 mb-1">{label}</label>
+      <label className="block text-xs text-slate-600 mb-1">{label}</label>
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -114,7 +114,7 @@ export function ScenarioCard(props: Props | AddButtonProps) {
     return (
       <button
         onClick={props.onAdd}
-        className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-700 bg-slate-900/50 px-5 py-4 text-sm text-slate-500 hover:border-slate-500 hover:text-slate-300 transition-colors min-w-[200px]"
+        className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-700 bg-slate-900/50 px-5 py-4 text-sm text-slate-600 hover:border-slate-500 hover:text-slate-300 transition-colors min-w-[200px]"
       >
         <Plus className="h-4 w-4" />
         Add Scenario
@@ -215,7 +215,7 @@ export function ScenarioCard(props: Props | AddButtonProps) {
           />
 
           <div>
-            <label className="block text-xs text-slate-500 mb-1">Target Age</label>
+            <label className="block text-xs text-slate-600 mb-1">Target Age</label>
             <input
               type="number"
               min={70}

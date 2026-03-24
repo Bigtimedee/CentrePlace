@@ -53,7 +53,7 @@ export function Sidebar() {
         {itemsWithSectionHeader.map((item) => (
           <div key={item.href}>
             {item.showHeader && (
-              <p className="px-3 py-2 mt-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <p className="px-3 py-2 mt-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 {item.section}
               </p>
             )}
@@ -63,7 +63,7 @@ export function Sidebar() {
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 pathname === item.href
                   ? "bg-slate-800 text-white"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               )}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />

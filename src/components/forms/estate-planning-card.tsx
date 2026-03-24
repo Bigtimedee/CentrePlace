@@ -27,7 +27,7 @@ export function EstatePlanningCard({ data }: Props) {
                 key={metric.label}
                 className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/40 border border-slate-800"
               >
-                <div className={`mt-0.5 flex-shrink-0 ${metric.isSavings ? "text-emerald-400" : "text-slate-500"}`}>
+                <div className={`mt-0.5 flex-shrink-0 ${metric.isSavings ? "text-emerald-400" : "text-slate-600"}`}>
                   {metric.isSavings
                     ? <TrendingDown className="h-4 w-4" />
                     : <Info className="h-4 w-4" />
@@ -42,12 +42,12 @@ export function EstatePlanningCard({ data }: Props) {
                       {metric.isSavings ? "-" : ""}{formatCurrency(metric.value, true)}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{metric.description}</p>
+                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{metric.description}</p>
                 </div>
               </div>
             ))}
             {planningMetrics.length === 0 && (
-              <p className="text-sm text-slate-500 text-center py-4">No planning metrics available.</p>
+              <p className="text-sm text-slate-600 text-center py-4">No planning metrics available.</p>
             )}
           </div>
         </CardBody>
@@ -67,17 +67,17 @@ export function EstatePlanningCard({ data }: Props) {
         />
         <CardBody className="p-0">
           {beneficiaries.length === 0 ? (
-            <div className="px-6 py-8 text-center text-sm text-slate-500">
+            <div className="px-6 py-8 text-center text-sm text-slate-600">
               No beneficiaries configured. Add children in the Profile section.
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-800">
-                  <th className="text-left text-xs font-medium text-slate-500 px-6 py-3">Beneficiary</th>
-                  <th className="text-center text-xs font-medium text-slate-500 px-4 py-3">Age</th>
-                  <th className="text-right text-xs font-medium text-slate-500 px-4 py-3">Share</th>
-                  <th className="text-right text-xs font-medium text-slate-500 px-6 py-3">Est. Inheritance</th>
+                  <th className="text-left text-xs font-medium text-slate-600 px-6 py-3">Beneficiary</th>
+                  <th className="text-center text-xs font-medium text-slate-600 px-4 py-3">Age</th>
+                  <th className="text-right text-xs font-medium text-slate-600 px-4 py-3">Share</th>
+                  <th className="text-right text-xs font-medium text-slate-600 px-6 py-3">Est. Inheritance</th>
                 </tr>
               </thead>
               <tbody>
@@ -93,7 +93,7 @@ export function EstatePlanningCard({ data }: Props) {
                       <td className="px-6 py-3 font-medium text-slate-200">
                         {b.name}
                         {isUnallocated && (
-                          <span className="ml-2 text-xs text-slate-500">(unallocated)</span>
+                          <span className="ml-2 text-xs text-slate-600">(unallocated)</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center text-slate-400">

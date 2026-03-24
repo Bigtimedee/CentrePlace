@@ -28,9 +28,9 @@ function Stat({
   };
   return (
     <div className="bg-slate-800/50 rounded-lg px-4 py-3">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
+      <p className="text-xs text-slate-600 mb-1">{label}</p>
       <p className={`text-lg font-semibold ${accent ? colors[accent] : "text-slate-100"}`}>{value}</p>
-      {sub && <p className="text-xs text-slate-500 mt-0.5">{sub}</p>}
+      {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -103,7 +103,7 @@ export function EstateSummaryCard({ data }: Props) {
 
         {/* Estate vs exemption bar */}
         <div className="mt-1">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+          <div className="flex items-center justify-between text-xs text-slate-600 mb-1.5">
             <span>Estate vs Federal Exemption ({formatCurrency(federalExemption, true)})</span>
             {netAboveFederal > 0 && (
               <span className="text-rose-400">{formatCurrency(netAboveFederal, true)} above threshold</span>
@@ -128,7 +128,7 @@ export function EstateSummaryCard({ data }: Props) {
               />
             )}
           </div>
-          <div className="flex items-center gap-4 mt-1.5 text-xs text-slate-500">
+          <div className="flex items-center gap-4 mt-1.5 text-xs text-slate-600">
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-600/70" />
               Exempt ({formatCurrency(Math.min(grossEstate, federalExemption), true)})

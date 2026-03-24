@@ -51,7 +51,7 @@ export function ForecastControls({
         {isLoading ? "Running…" : "Run Forecast"}
       </button>
 
-      <span className="text-xs text-slate-500">500 simulated paths · log-normal returns</span>
+      <span className="text-xs text-slate-600">500 simulated paths · log-normal returns</span>
     </div>
   );
 }

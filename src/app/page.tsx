@@ -48,7 +48,7 @@ export default async function RootPage() {
           >
             Sign in to your account
           </Link>
-          <span className="text-sm text-slate-500">Access by invitation only</span>
+          <span className="text-sm text-slate-600">Access by invitation only</span>
         </div>
       </section>
 

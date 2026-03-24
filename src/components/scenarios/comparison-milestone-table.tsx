@@ -63,8 +63,8 @@ export function ComparisonMilestoneTable({ runs }: Props) {
         <table className="w-full text-xs">
           <thead>
             <tr className="bg-slate-800/40 border-b border-slate-800">
-              <th className="text-left font-medium text-slate-500 px-4 py-2.5">Year</th>
-              <th className="text-left font-medium text-slate-500 px-4 py-2.5">Age</th>
+              <th className="text-left font-medium text-slate-600 px-4 py-2.5">Year</th>
+              <th className="text-left font-medium text-slate-600 px-4 py-2.5">Age</th>
               {runs.map(run => (
                 <th
                   key={run.scenarioId}

@@ -58,7 +58,7 @@ function CustomTooltip({ active, payload, label }: {
               .map((e, i) => (
                 <div key={i} className="text-slate-400">
                   <span style={{ color: SOURCE_CONFIG[e.source].color }}>{e.label}</span>
-                  <span className="ml-1 text-slate-500">
+                  <span className="ml-1 text-slate-600">
                     {formatCurrency(e.grossAmount, true)} gross · ~{formatCurrency(e.estimatedTax, true)} tax
                   </span>
                 </div>
@@ -71,7 +71,7 @@ function CustomTooltip({ active, payload, label }: {
           .filter(e => e.name === "Cumulative" && e.value !== 0)
           .map(entry => (
             <div key="cumulative" className="flex items-center justify-between gap-4">
-              <span className="text-slate-500">Running Total</span>
+              <span className="text-slate-600">Running Total</span>
               <span className="text-slate-300 font-semibold">{fmtK(entry.value)}</span>
             </div>
           ))}

@@ -10,7 +10,7 @@ export default function SignInPage() {
         <span className="text-xl font-semibold text-white">GPretire.com</span>
       </div>
       <SignIn />
-      <p className="mt-4 text-sm text-slate-500">
+      <p className="mt-4 text-sm text-slate-600">
         Forgot your password?{" "}
         <Link href="/forgot-password" className="text-indigo-400 hover:text-indigo-300 transition-colors">
           Reset it here

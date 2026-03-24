@@ -128,7 +128,7 @@ function PolicyForm({
             }`}
           >
             <div className="text-sm font-medium text-slate-200 mb-1">{POLICY_TYPE_LABELS[type]}</div>
-            <div className="text-xs text-slate-500 leading-snug">{POLICY_DESCRIPTIONS[type]}</div>
+            <div className="text-xs text-slate-600 leading-snug">{POLICY_DESCRIPTIONS[type]}</div>
           </button>
         ))}
       </div>
@@ -228,7 +228,7 @@ export function InsuranceForm() {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   const totalDeathBenefit = data.reduce((s, p) => s + p.deathBenefit, 0);
   const ilitBenefit = data.filter(p => p.ownershipStructure === "ilit").reduce((s, p) => s + p.deathBenefit, 0);
@@ -260,7 +260,7 @@ export function InsuranceForm() {
         )}
 
         {data.length === 0 && !adding ? (
-          <CardBody><p className="text-sm text-slate-500">No insurance policies added yet.</p></CardBody>
+          <CardBody><p className="text-sm text-slate-600">No insurance policies added yet.</p></CardBody>
         ) : (
           <div className="divide-y divide-slate-800">
             {data.map(policy => (
@@ -278,9 +278,9 @@ export function InsuranceForm() {
                   <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-3">
-                        <Shield className="h-3.5 w-3.5 text-slate-500 flex-shrink-0" />
+                        <Shield className="h-3.5 w-3.5 text-slate-600 flex-shrink-0" />
                         <span className="text-sm font-medium text-slate-200">{policy.policyName}</span>
-                        <span className="text-xs text-slate-500">{POLICY_TYPE_LABELS[policy.policyType]}</span>
+                        <span className="text-xs text-slate-600">{POLICY_TYPE_LABELS[policy.policyType]}</span>
                         {policy.ownershipStructure === "ilit" && (
                           <span className="text-xs text-indigo-400 font-medium">ILIT</span>
                         )}
@@ -288,7 +288,7 @@ export function InsuranceForm() {
                           <span className="text-xs text-amber-400">estate tax</span>
                         )}
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5 ml-5">
+                      <div className="text-xs text-slate-600 mt-0.5 ml-5">
                         {formatCurrency(policy.annualPremium)}/yr premium · {policy.premiumYearsRemaining} yrs remaining
                         {policy.currentCashValue ? ` · ${formatCurrency(policy.currentCashValue ?? 0, true)} cash value` : ""}
                       </div>
@@ -296,7 +296,7 @@ export function InsuranceForm() {
                     <div className="ml-4 flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-sm font-semibold text-slate-200">{formatCurrency(policy.deathBenefit, true)}</div>
-                        <div className="text-xs text-slate-500">death benefit</div>
+                        <div className="text-xs text-slate-600">death benefit</div>
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="sm" onClick={() => setEditingId(policy.id)}><Pencil className="h-3.5 w-3.5" /></Button>

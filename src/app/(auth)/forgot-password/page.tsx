@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
               </svg>
             </div>
             <p className="text-slate-300 text-sm mb-1">Reset code sent</p>
-            <p className="text-slate-500 text-xs mb-6">Check your inbox at <strong className="text-slate-400">{email}</strong></p>
+            <p className="text-slate-600 text-xs mb-6">Check your inbox at <strong className="text-slate-400">{email}</strong></p>
             <Link
               href="/reset-password"
               className="inline-block rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
           </form>
         )}
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-slate-600">
           Remember your password?{" "}
           <Link href="/sign-in" className="text-indigo-400 hover:text-indigo-300 transition-colors">
             Sign in

@@ -71,7 +71,7 @@ export function CapitalBucketsChart({ quarters }: Props) {
     <div>
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-slate-100">Capital Composition</h3>
-        <p className="text-xs text-slate-500 mt-0.5">How your capital is allocated across asset buckets</p>
+        <p className="text-xs text-slate-600 mt-0.5">How your capital is allocated across asset buckets</p>
       </div>
 
       <ResponsiveContainer width="100%" height={280}>

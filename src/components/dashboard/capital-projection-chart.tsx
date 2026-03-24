@@ -71,7 +71,7 @@ export function CapitalProjectionChart({ result }: Props) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-100">Capital Projection</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Total capital vs required to reach FI</p>
+          <p className="text-xs text-slate-600 mt-0.5">Total capital vs required to reach FI</p>
         </div>
         {fiYear && (
           <div className="flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/50 border border-emerald-800 rounded-full px-3 py-1">

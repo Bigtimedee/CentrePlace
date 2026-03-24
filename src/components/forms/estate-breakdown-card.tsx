@@ -59,10 +59,10 @@ export function EstateBreakdownCard({ data }: Props) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-800">
-              <th className="text-left text-xs font-medium text-slate-500 px-6 py-3 w-1/2">Asset</th>
-              <th className="text-right text-xs font-medium text-slate-500 px-4 py-3">Estate Value</th>
-              <th className="text-center text-xs font-medium text-slate-500 px-4 py-3">In Estate</th>
-              <th className="text-left text-xs font-medium text-slate-500 px-4 py-3 hidden lg:table-cell">Notes</th>
+              <th className="text-left text-xs font-medium text-slate-600 px-6 py-3 w-1/2">Asset</th>
+              <th className="text-right text-xs font-medium text-slate-600 px-4 py-3">Estate Value</th>
+              <th className="text-center text-xs font-medium text-slate-600 px-4 py-3">In Estate</th>
+              <th className="text-left text-xs font-medium text-slate-600 px-4 py-3 hidden lg:table-cell">Notes</th>
             </tr>
           </thead>
           <tbody>
@@ -93,7 +93,7 @@ export function EstateBreakdownCard({ data }: Props) {
                       <td className="px-4 py-3 text-right font-mono text-slate-300">
                         {item.inEstate
                           ? formatCurrency(item.estateValue, true)
-                          : <span className="text-slate-500 italic">excluded</span>
+                          : <span className="text-slate-600 italic">excluded</span>
                         }
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -102,7 +102,7 @@ export function EstateBreakdownCard({ data }: Props) {
                           : <XCircle className="h-4 w-4 text-slate-600 mx-auto" />
                         }
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-500 hidden lg:table-cell max-w-xs">
+                      <td className="px-4 py-3 text-xs text-slate-600 hidden lg:table-cell max-w-xs">
                         {item.notes}
                       </td>
                     </tr>
@@ -111,7 +111,7 @@ export function EstateBreakdownCard({ data }: Props) {
                   {/* Subtotal row */}
                   {items.length > 1 && (
                     <tr key={`${cat}-subtotal`} className="border-t border-slate-800/60 bg-slate-800/10">
-                      <td className="px-6 py-2 text-xs text-slate-500 pl-8">
+                      <td className="px-6 py-2 text-xs text-slate-600 pl-8">
                         {meta.label} subtotal
                       </td>
                       <td className="px-4 py-2 text-right font-mono text-xs text-slate-400 font-semibold">
@@ -146,7 +146,7 @@ export function EstateBreakdownCard({ data }: Props) {
                 <td className="px-4 py-3 text-center">
                   <XCircle className="h-4 w-4 text-slate-600 mx-auto" />
                 </td>
-                <td className="px-4 py-3 hidden lg:table-cell text-xs text-slate-500">
+                <td className="px-4 py-3 hidden lg:table-cell text-xs text-slate-600">
                   Held in ILIT trust — outside taxable estate
                 </td>
               </tr>

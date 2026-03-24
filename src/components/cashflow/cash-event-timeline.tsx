@@ -28,7 +28,7 @@ export function CashEventTimeline({ significantQuarters, activeSources }: Props)
 
   if (visible.length === 0) {
     return (
-      <div className="flex items-center justify-center py-6 text-slate-500 text-xs text-center">
+      <div className="flex items-center justify-center py-6 text-slate-600 text-xs text-center">
         No major cash events in the selected sources. Add carry, LP investments, or real estate sale projections.
       </div>
     );
@@ -63,7 +63,7 @@ export function CashEventTimeline({ significantQuarters, activeSources }: Props)
               <div className="text-sm font-bold text-slate-100">
                 {formatCurrency(totalNet, true)}
               </div>
-              <div className="text-xs text-slate-500 mt-0.5">
+              <div className="text-xs text-slate-600 mt-0.5">
                 ~{formatCurrency(totalTax, true)} est. tax
               </div>
               <div className="mt-2 space-y-0.5">
@@ -73,7 +73,7 @@ export function CashEventTimeline({ significantQuarters, activeSources }: Props)
                       {SOURCE_CONFIG[e.source].label}
                     </span>
                     {" "}
-                    <span className="text-slate-500">{e.label}</span>
+                    <span className="text-slate-600">{e.label}</span>
                   </div>
                 ))}
                 {namedEvents.length > 3 && (

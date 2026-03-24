@@ -38,7 +38,7 @@ export function FiProbabilityChart({ result }: Props) {
     <div>
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-slate-100">Cumulative FI Probability</h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-slate-600 mt-0.5">
           Fraction of simulated paths that have reached FI by each year
         </p>
       </div>

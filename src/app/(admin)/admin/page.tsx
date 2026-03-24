@@ -16,7 +16,7 @@ export default function AdminPage() {
             <Users className="w-5 h-5 text-indigo-400" />
           </div>
           <h2 className="text-slate-100 font-medium mb-1 group-hover:text-white">User Management</h2>
-          <p className="text-slate-500 text-sm">View, invite, suspend, and remove users.</p>
+          <p className="text-slate-600 text-sm">View, invite, suspend, and remove users.</p>
         </Link>
 
         <Link
@@ -27,7 +27,7 @@ export default function AdminPage() {
             <Mail className="w-5 h-5 text-green-400" />
           </div>
           <h2 className="text-slate-100 font-medium mb-1 group-hover:text-white">Invite User</h2>
-          <p className="text-slate-500 text-sm">Send an email invitation to a new user.</p>
+          <p className="text-slate-600 text-sm">Send an email invitation to a new user.</p>
         </Link>
       </div>
     </div>

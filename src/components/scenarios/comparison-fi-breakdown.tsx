@@ -34,7 +34,7 @@ function closestFIQuarter(run: ScenarioRun) {
 function LabelRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex justify-between items-baseline gap-4 py-1.5 border-b border-slate-800/60 last:border-b-0">
-      <span className="text-xs text-slate-500 shrink-0">{label}</span>
+      <span className="text-xs text-slate-600 shrink-0">{label}</span>
       <span className="text-xs font-mono text-slate-200 text-right">{children}</span>
     </div>
   );
@@ -78,7 +78,7 @@ function ScenarioBreakdown({ run }: { run: ScenarioRun }) {
           {formatCurrency(summary.permanentAnnualIncome, true)}) ÷{" "}
           {returnRate > 0 ? `${(returnRate * 100).toFixed(1)}%` : "N/A"}
         </p>
-        <p className="text-xs text-slate-500 leading-relaxed">
+        <p className="text-xs text-slate-600 leading-relaxed">
           Net annual need: {formatCurrency(netNeed, true)} ÷{" "}
           {returnRate > 0 ? `${(returnRate * 100).toFixed(1)}%` : "—"} ={" "}
           {formatCurrency(summary.requiredCapitalToday, true)} required
@@ -158,7 +158,7 @@ export function ComparisonFIBreakdown({ runs }: Props) {
       >
         <div>
           <p className="text-sm font-semibold text-slate-100">FI Formula Breakdown</p>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-600 mt-0.5">
             See the math behind each scenario — how Required Capital is computed and where your
             capital stands today
           </p>

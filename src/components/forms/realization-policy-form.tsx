@@ -113,7 +113,7 @@ export function RealizationPolicyForm() {
 
       {!enabled && (
         <CardBody>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-600">
             No reinvestment policy set. Carry and LP proceeds will be added to your general investment pool.
           </p>
         </CardBody>
@@ -130,7 +130,7 @@ export function RealizationPolicyForm() {
                 </span>
               )}
               {allocOk && (
-                <span className="text-slate-500">
+                <span className="text-slate-600">
                   Cash remainder: {cashPct.toFixed(1)}% (0% return)
                 </span>
               )}

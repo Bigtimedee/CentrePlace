@@ -30,7 +30,7 @@ export function IncomeForm() {
     }
   }, [data]);
 
-  if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   return (
     <Card>

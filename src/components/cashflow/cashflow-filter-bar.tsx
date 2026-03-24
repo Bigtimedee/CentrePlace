@@ -23,7 +23,7 @@ export function CashflowFilterBar({ activeSources, onToggle, viewMode, onToggleV
   return (
     <div className="flex items-center justify-between gap-3 flex-wrap">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs text-slate-500 font-medium">Show:</span>
+        <span className="text-xs text-slate-600 font-medium">Show:</span>
         {SOURCES.map(src => {
           const config = SOURCE_CONFIG[src];
           const isActive = activeSources.has(src);
@@ -34,7 +34,7 @@ export function CashflowFilterBar({ activeSources, onToggle, viewMode, onToggleV
               className={`text-xs font-medium border rounded-full px-3 py-1 transition-colors ${
                 isActive
                   ? config.activeClass
-                  : "bg-slate-900 border-slate-700 text-slate-500 hover:border-slate-600 hover:text-slate-400"
+                  : "bg-slate-900 border-slate-700 text-slate-600 hover:border-slate-600 hover:text-slate-400"
               }`}
             >
               <span

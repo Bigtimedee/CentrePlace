@@ -300,7 +300,7 @@ export function CryptoHoldingsForm() {
   const totalValue = data.reduce((s, h) => s + h.currentValue, 0);
 
   if (isLoading) {
-    return <div className="text-slate-500 text-sm p-8 animate-pulse">Loading…</div>;
+    return <div className="text-slate-600 text-sm p-8 animate-pulse">Loading…</div>;
   }
 
   return (
@@ -345,7 +345,7 @@ export function CryptoHoldingsForm() {
       {/* Empty state */}
       {data.length === 0 && !adding ? (
         <CardBody>
-          <p className="text-sm text-slate-500">No crypto holdings added yet.</p>
+          <p className="text-sm text-slate-600">No crypto holdings added yet.</p>
         </CardBody>
       ) : (
         <div className="divide-y divide-slate-800">
@@ -372,12 +372,12 @@ export function CryptoHoldingsForm() {
                     </div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {holding.quantityCoins > 0 && (
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-600">
                           {holding.quantityCoins} coins
                         </span>
                       )}
                       {holding.expectedSaleYear != null && (
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-600">
                           Sale: {holding.expectedSaleYear}
                         </span>
                       )}

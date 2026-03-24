@@ -37,15 +37,15 @@ function CustomTooltip({ active, payload, label }: {
       <p className="text-slate-400 mb-2 font-medium">Year {label}</p>
       <div className="space-y-1">
         <div className="flex justify-between gap-4">
-          <span className="text-slate-500">Conversion Room</span>
+          <span className="text-slate-600">Conversion Room</span>
           <span className="text-slate-100 font-semibold">{fmtK(d.value)}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-slate-500">Marginal Rate</span>
+          <span className="text-slate-600">Marginal Rate</span>
           <span className="text-slate-100 font-semibold">{formatPct(d.payload.marginalOrdinaryRate)}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-slate-500">Est. Tax Cost</span>
+          <span className="text-slate-600">Est. Tax Cost</span>
           <span className="text-slate-100 font-semibold">{fmtK(d.payload.estimatedRothTaxCost)}</span>
         </div>
       </div>
@@ -75,7 +75,7 @@ export function RothConversionLadder({ projections }: Props) {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-100">Roth Conversion Ladder</h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-600 mt-0.5">
             Available headroom before hitting the 25% ordinary bracket — first 15 years
           </p>
         </div>
@@ -111,7 +111,7 @@ export function RothConversionLadder({ projections }: Props) {
         </BarChart>
       </ResponsiveContainer>
 
-      <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
+      <div className="flex items-center gap-4 mt-3 text-xs text-slate-600">
         <span className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
           10–15% bracket (convert now)

@@ -93,14 +93,14 @@ export function ActionItemCard({ item, expanded = false, onToggle }: ActionItemC
           <div className="flex-shrink-0 text-right">
             <p className="text-base font-bold text-white tabular-nums">{impactStr}</p>
             {item.dollarImpactLabel && (
-              <p className="text-xs text-slate-500 leading-tight">{item.dollarImpactLabel}</p>
+              <p className="text-xs text-slate-600 leading-tight">{item.dollarImpactLabel}</p>
             )}
           </div>
         )}
 
         {/* Chevron */}
         <svg
-          className={`flex-shrink-0 mt-0.5 h-4 w-4 text-slate-500 transition-transform ${expanded ? "rotate-180" : ""}`}
+          className={`flex-shrink-0 mt-0.5 h-4 w-4 text-slate-600 transition-transform ${expanded ? "rotate-180" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -115,13 +115,13 @@ export function ActionItemCard({ item, expanded = false, onToggle }: ActionItemC
         <div className="px-5 pb-5 pt-0 ml-6 border-t border-slate-800">
           {/* Rationale */}
           <div className="mt-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Why this matters</p>
+            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Why this matters</p>
             <p className="text-sm text-slate-300 leading-relaxed">{item.rationale}</p>
           </div>
 
           {/* Action */}
           <div className="mt-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Next step</p>
+            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Next step</p>
             <p className="text-sm text-slate-200 leading-relaxed">{item.action}</p>
           </div>
 
@@ -133,7 +133,7 @@ export function ActionItemCard({ item, expanded = false, onToggle }: ActionItemC
                   key={f.label}
                   className="rounded-lg bg-slate-800/60 border border-slate-700/50 px-3 py-2 text-center min-w-[80px]"
                 >
-                  <p className="text-xs text-slate-500">{f.label}</p>
+                  <p className="text-xs text-slate-600">{f.label}</p>
                   <p className="text-sm font-semibold text-white mt-0.5 tabular-nums">{f.value}</p>
                 </div>
               ))}

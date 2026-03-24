@@ -84,7 +84,7 @@ export function TaxEventTable({ projections }: Props) {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-100">Discrete Tax Events</h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-600 mt-0.5">
             {allEvents.length} event{allEvents.length !== 1 ? "s" : ""} across carry, LP, and real estate realizations
             {totalEventTax > 0 && ` · ~${formatCurrency(totalEventTax, true)} total estimated tax`}
           </p>
@@ -92,7 +92,7 @@ export function TaxEventTable({ projections }: Props) {
       </div>
 
       {allEvents.length === 0 ? (
-        <p className="text-sm text-slate-500 text-center py-6">
+        <p className="text-sm text-slate-600 text-center py-6">
           No discrete tax events. Add carry positions, LP distributions, or real estate sales to see them here.
         </p>
       ) : (
@@ -101,27 +101,27 @@ export function TaxEventTable({ projections }: Props) {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-slate-800">
-                  <th className="text-left text-slate-500 font-medium pb-2 pr-3">Year</th>
-                  <th className="text-left text-slate-500 font-medium pb-2 pr-3">Age</th>
-                  <th className="text-left text-slate-500 font-medium pb-2 pr-3">Type</th>
-                  <th className="text-left text-slate-500 font-medium pb-2 pr-3">Source</th>
-                  <th className="text-right text-slate-500 font-medium pb-2 pr-3">Character</th>
-                  <th className="text-right text-slate-500 font-medium pb-2 pr-3">Amount</th>
-                  <th className="text-right text-slate-500 font-medium pb-2">Est. Tax</th>
+                  <th className="text-left text-slate-600 font-medium pb-2 pr-3">Year</th>
+                  <th className="text-left text-slate-600 font-medium pb-2 pr-3">Age</th>
+                  <th className="text-left text-slate-600 font-medium pb-2 pr-3">Type</th>
+                  <th className="text-left text-slate-600 font-medium pb-2 pr-3">Source</th>
+                  <th className="text-right text-slate-600 font-medium pb-2 pr-3">Character</th>
+                  <th className="text-right text-slate-600 font-medium pb-2 pr-3">Amount</th>
+                  <th className="text-right text-slate-600 font-medium pb-2">Est. Tax</th>
                 </tr>
               </thead>
               <tbody>
                 {displayed.map((e, i) => (
                   <tr key={i} className={i % 2 === 0 ? "bg-slate-800/20" : ""}>
                     <td className="py-1.5 pr-3 text-slate-300 font-medium">{e.year}</td>
-                    <td className="py-1.5 pr-3 text-slate-500">{e.age}</td>
+                    <td className="py-1.5 pr-3 text-slate-600">{e.age}</td>
                     <td className="py-1.5 pr-3">
                       <span className={`border rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_BADGE[e.type]}`}>
                         {e.type}
                       </span>
                     </td>
                     <td className="py-1.5 pr-3 text-slate-400 max-w-[160px] truncate">{e.source}</td>
-                    <td className="py-1.5 pr-3 text-right text-slate-500">{e.taxCharacter ?? "—"}</td>
+                    <td className="py-1.5 pr-3 text-right text-slate-600">{e.taxCharacter ?? "—"}</td>
                     <td className="py-1.5 pr-3 text-right text-slate-300 font-mono">
                       {formatCurrency(e.grossAmount, true)}
                     </td>

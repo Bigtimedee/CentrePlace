@@ -25,9 +25,9 @@ function MetricTile({
   };
   return (
     <div className="bg-slate-800/50 rounded-lg px-4 py-3">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
+      <p className="text-xs text-slate-600 mb-1">{label}</p>
       <p className={`text-lg font-semibold ${accent ? colors[accent] : "text-slate-100"}`}>{value}</p>
-      {sub && <p className="text-xs text-slate-500 mt-0.5">{sub}</p>}
+      {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -43,7 +43,7 @@ export function FISummaryCard() {
       <Card>
         <CardHeader title="Financial Independence Status" />
         <CardBody>
-          <div className="h-24 flex items-center justify-center text-slate-500 text-sm">
+          <div className="h-24 flex items-center justify-center text-slate-600 text-sm">
             Running simulation…
           </div>
         </CardBody>
@@ -118,7 +118,7 @@ export function FISummaryCard() {
 
         {/* FI date */}
         <div className="flex items-center gap-3 py-3 border-t border-slate-800">
-          <Calendar className="h-4 w-4 text-slate-500 flex-shrink-0" />
+          <Calendar className="h-4 w-4 text-slate-600 flex-shrink-0" />
           {fiDate ? (
             <span className="text-sm text-slate-300">
               Projected FI date:{" "}
@@ -126,7 +126,7 @@ export function FISummaryCard() {
                 {fiDate.quarter} {fiDate.year}
               </span>
               {fiAge && (
-                <span className="text-slate-500 ml-2">
+                <span className="text-slate-600 ml-2">
                   (age {fiAge} · {fiAge - currentAge > 0 ? `${fiAge - currentAge} years away` : "now"})
                 </span>
               )}
@@ -140,7 +140,7 @@ export function FISummaryCard() {
 
         {/* Progress bar */}
         <div className="mt-3">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+          <div className="flex items-center justify-between text-xs text-slate-600 mb-1.5">
             <span>FI Progress</span>
             <span>{formatPct(pctFunded)}</span>
           </div>

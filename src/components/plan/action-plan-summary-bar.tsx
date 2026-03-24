@@ -35,9 +35,9 @@ function MetricTile({
 }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
-      <p className="text-xs font-medium text-slate-500 mb-1">{label}</p>
+      <p className="text-xs font-medium text-slate-600 mb-1">{label}</p>
       <p className={`text-2xl font-bold tabular-nums ${accent ?? "text-white"}`}>{value}</p>
-      {sub && <p className="text-xs text-slate-500 mt-0.5">{sub}</p>}
+      {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -49,7 +49,7 @@ function FIProgressBar({ pctFunded, isFI }: { pctFunded: number; isFI: boolean }
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-medium text-slate-500">FI Progress</p>
+        <p className="text-xs font-medium text-slate-600">FI Progress</p>
         <span className={`text-sm font-bold tabular-nums ${isFI ? "text-emerald-400" : "text-white"}`}>
           {pct}%
         </span>
@@ -60,7 +60,7 @@ function FIProgressBar({ pctFunded, isFI }: { pctFunded: number; isFI: boolean }
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
-      <p className="text-xs text-slate-500 mt-1.5">
+      <p className="text-xs text-slate-600 mt-1.5">
         {isFI ? "Financial independence achieved" : `${pct}% of target capital funded`}
       </p>
     </div>

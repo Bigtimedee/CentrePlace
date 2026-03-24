@@ -133,7 +133,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
           className="grid gap-0 rounded-t-xl overflow-hidden border border-b-0 border-slate-800"
           style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)` }}
         >
-          <div className="bg-slate-800/30 px-4 py-2.5 text-xs font-medium text-slate-500 border-r border-slate-800">
+          <div className="bg-slate-800/30 px-4 py-2.5 text-xs font-medium text-slate-600 border-r border-slate-800">
             Metric
           </div>
           {runs.map(run => (
@@ -159,7 +159,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
               style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)` }}
             >
               {/* Label */}
-              <div className="px-4 py-2.5 text-xs text-slate-500 border-r border-slate-800 font-medium flex items-center gap-1.5">
+              <div className="px-4 py-2.5 text-xs text-slate-600 border-r border-slate-800 font-medium flex items-center gap-1.5">
                 {metric.label}
                 {metric.info && (
                   <button
@@ -214,7 +214,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
             <p className="font-mono text-xs text-indigo-300">
               Permanent Income = Σ (Gross Rental Income − Operating Expenses) × Ownership %
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-600 mt-1">
               Only properties typed as <span className="text-slate-300">Rental</span> or{" "}
               <span className="text-slate-300">Commercial</span> in your Real Estate section
               are included. Primary residences and vacation properties are excluded.
@@ -251,7 +251,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
             </ul>
           </div>
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-600">
             Tip: Only include income you expect to continue indefinitely after you stop
             working. If you plan to sell a property before or shortly after FI, exclude it
             or set its income to $0 — the sale proceeds will already appear in your capital

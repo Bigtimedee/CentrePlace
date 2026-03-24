@@ -25,7 +25,7 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
   };
 
   if (invitations.length === 0) {
-    return <p className="text-slate-500 text-sm">No pending invitations.</p>;
+    return <p className="text-slate-600 text-sm">No pending invitations.</p>;
   }
 
   return (

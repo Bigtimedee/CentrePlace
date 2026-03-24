@@ -479,7 +479,7 @@ function GrantDetailPanel({
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Vesting Schedule
-            <span className="ml-2 text-slate-500 font-normal normal-case">
+            <span className="ml-2 text-slate-600 font-normal normal-case">
               {totalVested}/{grant.totalShares} shares scheduled
             </span>
           </span>
@@ -509,7 +509,7 @@ function GrantDetailPanel({
         )}
 
         {grant.vestingEvents.length === 0 && !addingVest ? (
-          <p className="text-xs text-slate-500 italic">No vesting events added yet.</p>
+          <p className="text-xs text-slate-600 italic">No vesting events added yet.</p>
         ) : (
           <div className="space-y-1">
             {grant.vestingEvents
@@ -540,7 +540,7 @@ function GrantDetailPanel({
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
             Share Lots
-            <span className="ml-2 text-slate-500 font-normal normal-case">
+            <span className="ml-2 text-slate-600 font-normal normal-case">
               {grant.shareLots.reduce((s, l) => s + l.shares, 0).toLocaleString()} shares tracked
             </span>
           </span>
@@ -573,7 +573,7 @@ function GrantDetailPanel({
         )}
 
         {grant.shareLots.length === 0 && !addingLot ? (
-          <p className="text-xs text-slate-500 italic">No share lots added yet.</p>
+          <p className="text-xs text-slate-600 italic">No share lots added yet.</p>
         ) : (
           <div className="space-y-1">
             {grant.shareLots
@@ -639,7 +639,7 @@ export function EquityCompensationForm() {
     });
   };
 
-  if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   const totalProjectedValue = data.reduce((sum, g) => {
     return sum + g.totalShares * g.currentFmv;
@@ -679,7 +679,7 @@ export function EquityCompensationForm() {
 
         {data.length === 0 && !adding ? (
           <CardBody>
-            <p className="text-sm text-slate-500">No equity grants added yet.</p>
+            <p className="text-sm text-slate-600">No equity grants added yet.</p>
           </CardBody>
         ) : (
           <div className="divide-y divide-slate-800">
@@ -711,7 +711,7 @@ export function EquityCompensationForm() {
                           <button
                             type="button"
                             onClick={() => toggleExpanded(grant.id)}
-                            className="text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0"
+                            className="text-slate-600 hover:text-slate-300 transition-colors flex-shrink-0"
                             aria-label={isExpanded ? "Collapse" : "Expand"}
                           >
                             {isExpanded ? (
@@ -729,7 +729,7 @@ export function EquityCompensationForm() {
                                 {GRANT_TYPE_LABELS[grantType]}
                               </span>
                             </div>
-                            <div className="text-xs text-slate-500 mt-0.5">
+                            <div className="text-xs text-slate-600 mt-0.5">
                               {grant.totalShares.toLocaleString()} shares · FMV {formatCurrency(grant.currentFmv)} · Growth {Math.round(grant.fmvGrowthRate * 100 * 10) / 10}%/yr
                               {grant.strikePrice !== null && (
                                 <> · Strike {formatCurrency(grant.strikePrice)}</>
@@ -745,7 +745,7 @@ export function EquityCompensationForm() {
                             <div className="text-sm font-semibold text-emerald-400">
                               {formatCurrency(intrinsicValue, true)}
                             </div>
-                            <div className="text-xs text-slate-500">intrinsic value</div>
+                            <div className="text-xs text-slate-600">intrinsic value</div>
                           </div>
                           <div className="flex gap-1">
                             <Button

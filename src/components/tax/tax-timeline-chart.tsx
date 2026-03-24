@@ -69,7 +69,7 @@ export function TaxTimelineChart({ projections }: Props) {
     <div>
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-slate-100">Projected Annual Tax Liability</h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-slate-600 mt-0.5">
           Federal + state tax by component across the 40-year window · amber dashes = carry realization years
         </p>
       </div>

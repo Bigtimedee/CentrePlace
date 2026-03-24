@@ -29,30 +29,30 @@ export function CarrySensitivityPanel({ data, isLoading }: Props) {
     <div>
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-slate-100">Carry Sensitivity</h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-slate-600 mt-0.5">
           How your FI date and peak tax year shift across 5 carry outcome scenarios
         </p>
       </div>
 
       {isLoading && (
-        <div className="flex items-center justify-center h-32 text-slate-500 text-xs">
+        <div className="flex items-center justify-center h-32 text-slate-600 text-xs">
           Running scenarios…
         </div>
       )}
 
       {!isLoading && (!data || data.baseCarryGross === 0) && (
-        <div className="flex items-center justify-center h-32 text-slate-500 text-xs text-center px-4">
+        <div className="flex items-center justify-center h-32 text-slate-600 text-xs text-center px-4">
           No carry positions entered. Add carry positions on the Carry page to see sensitivity analysis.
         </div>
       )}
 
       {!isLoading && data && data.baseCarryGross > 0 && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-3">
+          <div className="flex items-center justify-between text-xs text-slate-600 mb-3">
             <span>Total gross carry: {formatCurrency(data.baseCarryGross, true)}</span>
           </div>
 
-          <div className="grid grid-cols-5 gap-1 text-xs text-slate-500 font-medium mb-1 px-1">
+          <div className="grid grid-cols-5 gap-1 text-xs text-slate-600 font-medium mb-1 px-1">
             <span className="col-span-2">Scenario</span>
             <span className="text-right">Net Carry</span>
             <span className="text-right">FI Year</span>

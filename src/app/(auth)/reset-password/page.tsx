@@ -99,7 +99,7 @@ export default function ResetPasswordPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-slate-600">
           Need a new code?{" "}
           <Link href="/forgot-password" className="text-indigo-400 hover:text-indigo-300 transition-colors">
             Send again

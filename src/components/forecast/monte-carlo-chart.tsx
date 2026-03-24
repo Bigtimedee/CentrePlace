@@ -112,9 +112,9 @@ export function MonteCarloChart({ result }: Props) {
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div>
           <h3 className="text-sm font-semibold text-slate-100">Capital Fan — 500 Simulated Paths</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Shaded bands show P10–P90 range; line is median path</p>
+          <p className="text-xs text-slate-600 mt-0.5">Shaded bands show P10–P90 range; line is median path</p>
         </div>
-        <div className="flex flex-wrap gap-4 text-xs text-slate-500">
+        <div className="flex flex-wrap gap-4 text-xs text-slate-600">
           <span className="flex items-center gap-1.5">
             <span className="inline-block w-3 h-2 rounded" style={{ background: "#6366f1", opacity: 0.5 }} />
             P25–P75

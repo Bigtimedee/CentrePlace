@@ -32,7 +32,7 @@ export function UserTable({ users }: { users: UserRow[] }) {
   };
 
   if (users.length === 0) {
-    return <p className="text-slate-500 text-sm">No users found.</p>;
+    return <p className="text-slate-600 text-sm">No users found.</p>;
   }
 
   return (
@@ -61,7 +61,7 @@ export function UserTable({ users }: { users: UserRow[] }) {
               >
                 <td className="px-4 py-3">
                   <div className="text-slate-100 font-medium">{name}</div>
-                  <div className="text-slate-500 text-xs">{user.email}</div>
+                  <div className="text-slate-600 text-xs">{user.email}</div>
                   {user.role === "admin" && (
                     <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-xs bg-indigo-900/50 text-indigo-400 border border-indigo-800/50">
                       admin

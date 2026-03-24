@@ -146,7 +146,7 @@ export default function SignUpPage() {
 
             <div className="relative flex items-center gap-3">
               <div className="flex-1 border-t border-slate-700" />
-              <span className="text-xs text-slate-500">or</span>
+              <span className="text-xs text-slate-600">or</span>
               <div className="flex-1 border-t border-slate-700" />
             </div>
 
@@ -226,7 +226,7 @@ export default function SignUpPage() {
             <button
               type="button"
               onClick={() => { setPhase("choose"); setError(""); }}
-              className="w-full text-sm text-slate-500 hover:text-slate-400 transition-colors"
+              className="w-full text-sm text-slate-600 hover:text-slate-400 transition-colors"
             >
               ← Back
             </button>
@@ -234,7 +234,7 @@ export default function SignUpPage() {
         )}
 
         {phase !== "no-ticket" && (
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-600">
             Already have an account?{" "}
             <Link href="/sign-in" className="text-indigo-400 hover:text-indigo-300 transition-colors">
               Sign in

@@ -52,7 +52,7 @@ export function ActionItemList({ items, activeCategory }: ActionItemListProps) {
           <section key={urgency}>
             <div className="mb-3">
               <h3 className="text-sm font-semibold text-white">{heading}</h3>
-              <p className="text-xs text-slate-500 mt-0.5">{subheading}</p>
+              <p className="text-xs text-slate-600 mt-0.5">{subheading}</p>
             </div>
             <div className="space-y-2">
               {sectionItems.map(item => (

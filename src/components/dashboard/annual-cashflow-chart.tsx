@@ -88,7 +88,7 @@ export function AnnualCashflowChart({ quarters }: Props) {
     <div>
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-slate-100">Annual Cash Flow</h3>
-        <p className="text-xs text-slate-500 mt-0.5">Income, spending, and taxes by year</p>
+        <p className="text-xs text-slate-600 mt-0.5">Income, spending, and taxes by year</p>
       </div>
 
       <ResponsiveContainer width="100%" height={280}>

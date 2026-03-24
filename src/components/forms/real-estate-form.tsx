@@ -248,7 +248,7 @@ export function RealEstateForm() {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   async function handleAdd(f: PropertyForm) {
     const [result] = await addProperty.mutateAsync({
@@ -368,7 +368,7 @@ export function RealEstateForm() {
         )}
 
         {data.length === 0 && !adding ? (
-          <CardBody><p className="text-sm text-slate-500">No properties added yet.</p></CardBody>
+          <CardBody><p className="text-sm text-slate-600">No properties added yet.</p></CardBody>
         ) : (
           <div className="divide-y divide-slate-800">
             {data.map(prop => (
@@ -387,11 +387,11 @@ export function RealEstateForm() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-3">
                         <span className="text-sm font-medium text-slate-200">{prop.propertyName}</span>
-                        <span className="text-xs text-slate-500">{PROPERTY_TYPE_LABELS[prop.propertyType]}</span>
+                        <span className="text-xs text-slate-600">{PROPERTY_TYPE_LABELS[prop.propertyType]}</span>
                         {prop.is1031Exchange && <span className="text-xs text-indigo-400">1031</span>}
-                        {prop.mortgage && <span className="text-xs text-slate-500">mortgage</span>}
+                        {prop.mortgage && <span className="text-xs text-slate-600">mortgage</span>}
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
+                      <div className="text-xs text-slate-600 mt-0.5">
                         Purchased {prop.purchaseYear} · {(prop.appreciationRate * 100).toFixed(1)}% appreciation
                         {prop.annualRentalIncome ? ` · ${formatCurrency(prop.annualRentalIncome, true)}/yr rental` : ""}
                         {prop.projectedSaleYear ? ` · Sale ${prop.projectedSaleYear}` : ""}
@@ -400,7 +400,7 @@ export function RealEstateForm() {
                     <div className="ml-4 flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-sm font-semibold text-slate-200">{formatCurrency(prop.currentValue, true)}</div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-slate-600">
                           {prop.mortgage ? `${formatCurrency(prop.currentValue - prop.mortgage.outstandingBalance, true)} equity` : "no mortgage"}
                         </div>
                       </div>

@@ -81,7 +81,7 @@ function RecommendationRow({ rec }: { rec: EstateRecommendation }) {
             )}
           </div>
           {!expanded && (
-            <p className="text-xs text-slate-500 mt-1 line-clamp-2">{rec.description}</p>
+            <p className="text-xs text-slate-600 mt-1 line-clamp-2">{rec.description}</p>
           )}
         </div>
 
@@ -99,7 +99,7 @@ function RecommendationRow({ rec }: { rec: EstateRecommendation }) {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
               {rec.supportingFigures.map(fig => (
                 <div key={fig.label} className="bg-slate-800/50 rounded-lg px-3 py-2">
-                  <p className="text-xs text-slate-500">{fig.label}</p>
+                  <p className="text-xs text-slate-600">{fig.label}</p>
                   <p className="text-sm font-semibold font-mono text-slate-200 mt-0.5">{fig.value}</p>
                 </div>
               ))}
@@ -145,7 +145,7 @@ export function EstateOptimizationsCard({ recommendations }: Props) {
       />
       <CardBody>
         {recommendations.length === 0 ? (
-          <p className="text-sm text-slate-500 text-center py-4">
+          <p className="text-sm text-slate-600 text-center py-4">
             No optimization recommendations at this time. Your estate appears well-structured.
           </p>
         ) : (

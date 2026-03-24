@@ -20,7 +20,7 @@ export function SimulationDashboard() {
     return (
       <Card>
         <CardBody>
-          <div className="h-48 flex flex-col items-center justify-center gap-2 text-slate-500">
+          <div className="h-48 flex flex-col items-center justify-center gap-2 text-slate-600">
             <RefreshCw className="h-5 w-5 animate-spin" />
             <span className="text-sm">Running 40-year simulation…</span>
           </div>
@@ -90,7 +90,7 @@ export function SimulationDashboard() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-300 transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`h-3 w-3 ${isFetching ? "animate-spin" : ""}`} />
           Refresh projection

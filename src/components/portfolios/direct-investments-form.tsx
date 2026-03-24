@@ -372,7 +372,7 @@ export function DirectInvestmentsForm() {
   }
 
   if (isLoading) {
-    return <div className="text-slate-500 text-sm p-8 animate-pulse">Loading…</div>;
+    return <div className="text-slate-600 text-sm p-8 animate-pulse">Loading…</div>;
   }
 
   return (
@@ -427,7 +427,7 @@ export function DirectInvestmentsForm() {
       {/* Empty state */}
       {data.length === 0 && !adding ? (
         <CardBody>
-          <p className="text-sm text-slate-500">No direct investments added yet.</p>
+          <p className="text-sm text-slate-600">No direct investments added yet.</p>
         </CardBody>
       ) : (
         <div className="divide-y divide-slate-800">
@@ -450,7 +450,7 @@ export function DirectInvestmentsForm() {
                         {inv.securityName}
                       </span>
                       {inv.stage && (
-                        <span className="text-xs text-slate-500">{inv.stage}</span>
+                        <span className="text-xs text-slate-600">{inv.stage}</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -460,15 +460,15 @@ export function DirectInvestmentsForm() {
                         {ASSET_CLASS_LABELS[inv.assetClass] ?? inv.assetClass}
                       </span>
                       {inv.industry && (
-                        <span className="text-xs text-slate-500">{inv.industry}</span>
+                        <span className="text-xs text-slate-600">{inv.industry}</span>
                       )}
                       {inv.ownershipPct != null && (
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-600">
                           {inv.ownershipPct}% ownership
                         </span>
                       )}
                       {inv.expectedExitYear != null && (
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-600">
                           Exit: {inv.expectedExitYear}
                         </span>
                       )}

@@ -124,7 +124,7 @@ function AccountForm({
               </span>
             )}
             {allocationOk && (
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-600">
                 Blended return: {blendedReturn.toFixed(1)}%
               </span>
             )}
@@ -162,11 +162,11 @@ function AccountForm({
       <div>
         <div className="flex items-center justify-between mb-3">
           <h4 className="text-sm font-medium text-slate-300">Income Yield</h4>
-          <span className="text-xs text-slate-500">
+          <span className="text-xs text-slate-600">
             Appreciation rate: {appreciationDisplay.toFixed(2)}% (blended − yield)
           </span>
         </div>
-        <p className="text-xs text-slate-500 mb-3">
+        <p className="text-xs text-slate-600 mb-3">
           Annual yield as % of balance. Leave all at 0 for tax-deferred accounts (IRA, 401k). Yield splits taxable income from capital appreciation.
         </p>
         <div className="grid grid-cols-3 gap-4">
@@ -225,7 +225,7 @@ export function PortfoliosForm() {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   const totalBalance = data.reduce((s, a) => s + a.currentBalance, 0);
 
@@ -256,7 +256,7 @@ export function PortfoliosForm() {
         )}
 
         {data.length === 0 && !adding ? (
-          <CardBody><p className="text-sm text-slate-500">No investment accounts added yet.</p></CardBody>
+          <CardBody><p className="text-sm text-slate-600">No investment accounts added yet.</p></CardBody>
         ) : (
           <div className="divide-y divide-slate-800">
             {data.map(acct => (
@@ -275,9 +275,9 @@ export function PortfoliosForm() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-3">
                         <span className="text-sm font-medium text-slate-200">{acct.accountName}</span>
-                        <span className="text-xs text-slate-500">{ACCOUNT_TYPE_LABELS[acct.accountType]}</span>
+                        <span className="text-xs text-slate-600">{ACCOUNT_TYPE_LABELS[acct.accountType]}</span>
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
+                      <div className="text-xs text-slate-600 mt-0.5">
                         {Math.round(acct.equityPct * 100)}% eq / {Math.round(acct.bondPct * 100)}% bd / {Math.round(acct.altPct * 100)}% alt
                         {acct.annualContribution > 0 && ` · +${formatCurrency(acct.annualContribution, true)}/yr`}
                       </div>
@@ -285,7 +285,7 @@ export function PortfoliosForm() {
                     <div className="ml-4 flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-sm font-semibold text-slate-200">{formatCurrency(acct.currentBalance, true)}</div>
-                        <div className="text-xs text-slate-500">balance</div>
+                        <div className="text-xs text-slate-600">balance</div>
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="sm" onClick={() => setEditingId(acct.id)}><Pencil className="h-3.5 w-3.5" /></Button>

@@ -113,7 +113,7 @@ function RealizationSchedule({
         <span />
       </div>
       {tranches.length === 0 && (
-        <p className="text-xs text-slate-500 italic">No tranches — carry will not be modeled in simulation.</p>
+        <p className="text-xs text-slate-600 italic">No tranches — carry will not be modeled in simulation.</p>
       )}
       {tranches.map(t => (
         <div key={t.localId} className="flex items-center gap-2">
@@ -145,7 +145,7 @@ function RealizationSchedule({
           <button
             type="button"
             onClick={() => onDelete(t.localId)}
-            className="text-slate-500 hover:text-red-400 transition-colors"
+            className="text-slate-600 hover:text-red-400 transition-colors"
             aria-label="Remove tranche"
           >
             <X className="h-4 w-4" />
@@ -301,7 +301,7 @@ export function CarryForm() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   const totalNetCarry = data.reduce(
     (sum, p) => sum + p.expectedGrossCarry * (1 - p.haircutPct), 0
@@ -399,7 +399,7 @@ export function CarryForm() {
         )}
 
         {data.length === 0 && !adding ? (
-          <CardBody><p className="text-sm text-slate-500">No carry positions added yet.</p></CardBody>
+          <CardBody><p className="text-sm text-slate-600">No carry positions added yet.</p></CardBody>
         ) : (
           <div className="divide-y divide-slate-800">
             {data.map(pos => {
@@ -430,9 +430,9 @@ export function CarryForm() {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-baseline gap-3">
                           <span className="text-sm font-medium text-slate-200">{pos.fundName}</span>
-                          <span className="text-xs text-slate-500">{pos.vintageYear} vintage · {formatPct(pos.carryPct)} carry</span>
+                          <span className="text-xs text-slate-600">{pos.vintageYear} vintage · {formatPct(pos.carryPct)} carry</span>
                         </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
+                        <div className="text-xs text-slate-600 mt-0.5">
                           {formatCurrency(pos.totalCommittedCapital, true)} committed · TVPI {pos.currentTvpi.toFixed(2)}× · {realizationSummary}
                           {pos.currentAccountBalance != null && (
                             <> · Balance: {formatCurrency(pos.currentAccountBalance, true)}</>
@@ -442,7 +442,7 @@ export function CarryForm() {
                       <div className="ml-4 flex items-center gap-4">
                         <div className="text-right">
                           <div className="text-sm font-semibold text-emerald-400">{formatCurrency(pos.expectedGrossCarry * (1 - pos.haircutPct), true)}</div>
-                          <div className="text-xs text-slate-500">net carry</div>
+                          <div className="text-xs text-slate-600">net carry</div>
                         </div>
                         <div className="flex gap-1">
                           <Button variant="ghost" size="sm" onClick={() => setEditingId(pos.id)}><Pencil className="h-3.5 w-3.5" /></Button>

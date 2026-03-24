@@ -166,7 +166,7 @@ export function ExpendituresForm() {
   const totalRecurring = recurring.reduce((s, e) => s + e.annualAmount, 0);
   const totalOneTime = oneTime.reduce((s, e) => s + e.amount, 0);
 
-  if (rLoading || oLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (rLoading || oLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -202,7 +202,7 @@ export function ExpendituresForm() {
         )}
 
         {recurring.length === 0 && !addingRecurring ? (
-          <CardBody><p className="text-sm text-slate-500">No recurring expenses added yet.</p></CardBody>
+          <CardBody><p className="text-sm text-slate-600">No recurring expenses added yet.</p></CardBody>
         ) : (
           <>
             {recurring.length > 0 && (
@@ -227,7 +227,7 @@ export function ExpendituresForm() {
                       <div className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-800/30">
                         <div className="min-w-0 flex-1">
                           <span className="text-sm text-slate-200">{exp.description}</span>
-                          <span className="text-xs text-slate-500 ml-3">{CATEGORY_LABELS[exp.category]} · {(exp.growthRate * 100).toFixed(1)}%/yr growth</span>
+                          <span className="text-xs text-slate-600 ml-3">{CATEGORY_LABELS[exp.category]} · {(exp.growthRate * 100).toFixed(1)}%/yr growth</span>
                           {exp.isPlaidSynced && <span className="text-xs text-indigo-400 ml-2">Plaid</span>}
                         </div>
                         <div className="ml-4 flex items-center gap-4">
@@ -281,7 +281,7 @@ export function ExpendituresForm() {
         )}
 
         {oneTime.length === 0 && !addingOneTime ? (
-          <CardBody><p className="text-sm text-slate-500">No one-time expenses added yet.</p></CardBody>
+          <CardBody><p className="text-sm text-slate-600">No one-time expenses added yet.</p></CardBody>
         ) : (
           <>
             {oneTime.length > 0 && (
@@ -307,7 +307,7 @@ export function ExpendituresForm() {
                       <div className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-800/30">
                         <div className="min-w-0 flex-1">
                           <span className="text-sm text-slate-200">{exp.description}</span>
-                          <span className="text-xs text-slate-500 ml-3">{CATEGORY_LABELS[exp.category]} · {exp.projectedYear} {exp.projectedQuarter}</span>
+                          <span className="text-xs text-slate-600 ml-3">{CATEGORY_LABELS[exp.category]} · {exp.projectedYear} {exp.projectedQuarter}</span>
                         </div>
                         <div className="ml-4 flex items-center gap-4">
                           <span className="text-sm font-semibold text-slate-200">{formatCurrency(exp.amount)}</span>

@@ -106,7 +106,7 @@ export function ComparisonProjectionChart({ runs }: Props) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-100">Capital Projection</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Total capital across scenarios</p>
+          <p className="text-xs text-slate-600 mt-0.5">Total capital across scenarios</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap justify-end">
           {runs.map(run => (

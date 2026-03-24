@@ -38,7 +38,7 @@ export function AnnualSummaryTable({ result }: Props) {
     <div>
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-slate-100">Milestone Snapshots</h3>
-        <p className="text-xs text-slate-500 mt-0.5">Key years — Q4 balance sheet</p>
+        <p className="text-xs text-slate-600 mt-0.5">Key years — Q4 balance sheet</p>
       </div>
 
       <div className="overflow-x-auto">
@@ -46,7 +46,7 @@ export function AnnualSummaryTable({ result }: Props) {
           <thead>
             <tr className="border-b border-slate-800">
               {["Year", "Age", "Total Capital", "Required", "% Funded", "Inv. Capital", "RE Equity", "Annual Tax", "FI"].map(h => (
-                <th key={h} className="pb-2 pr-4 text-left font-medium text-slate-500 last:pr-0">{h}</th>
+                <th key={h} className="pb-2 pr-4 text-left font-medium text-slate-600 last:pr-0">{h}</th>
               ))}
             </tr>
           </thead>

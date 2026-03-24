@@ -95,14 +95,14 @@ function LPFundForm({
           <div>
             <h4 className="text-sm font-medium text-slate-300">Expected Distributions</h4>
             {totalDists > 0 && (
-              <p className="text-xs text-slate-500 mt-0.5">Total: {formatCurrency(totalDists, true)}</p>
+              <p className="text-xs text-slate-600 mt-0.5">Total: {formatCurrency(totalDists, true)}</p>
             )}
           </div>
         </div>
 
         {form.expectedDistributions.length > 0 && (
           <div className="mb-3 rounded-md border border-slate-700 divide-y divide-slate-700 text-xs">
-            <div className="grid grid-cols-5 px-3 py-2 text-slate-500 font-medium">
+            <div className="grid grid-cols-5 px-3 py-2 text-slate-600 font-medium">
               <span>Year</span><span>Qtr</span><span>Amount</span><span>Tax type</span><span></span>
             </div>
             {form.expectedDistributions.map((d, i) => (
@@ -166,7 +166,7 @@ export function LPInvestmentsForm() {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  if (isLoading) return <div className="text-slate-500 text-sm p-8">Loading...</div>;
+  if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
   return (
     <Card>
@@ -194,7 +194,7 @@ export function LPInvestmentsForm() {
       )}
 
       {data.length === 0 && !adding ? (
-        <CardBody><p className="text-sm text-slate-500">No LP investments added yet.</p></CardBody>
+        <CardBody><p className="text-sm text-slate-600">No LP investments added yet.</p></CardBody>
       ) : (
         <div className="divide-y divide-slate-800">
           {data.map(fund => (
@@ -213,9 +213,9 @@ export function LPInvestmentsForm() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-3">
                       <span className="text-sm font-medium text-slate-200">{fund.fundName}</span>
-                      <span className="text-xs text-slate-500">{fund.vintageYear} vintage</span>
+                      <span className="text-xs text-slate-600">{fund.vintageYear} vintage</span>
                     </div>
-                    <div className="text-xs text-slate-500 mt-0.5">
+                    <div className="text-xs text-slate-600 mt-0.5">
                       {formatCurrency(fund.commitmentAmount, true)} committed · NAV {formatCurrency(fund.currentNav, true)} · {((fund.expectedDistributions ?? []) as LPDistribution[]).length} distribution events
                     </div>
                   </div>
@@ -224,7 +224,7 @@ export function LPInvestmentsForm() {
                       <div className="text-sm font-semibold text-emerald-400">
                         {formatCurrency(((fund.expectedDistributions ?? []) as LPDistribution[]).reduce((s, d) => s + d.amount, 0), true)}
                       </div>
-                      <div className="text-xs text-slate-500">total distributions</div>
+                      <div className="text-xs text-slate-600">total distributions</div>
                     </div>
                     <div className="flex gap-1">
                       <Button variant="ghost" size="sm" onClick={() => setEditingId(fund.id)}><Pencil className="h-3.5 w-3.5" /></Button>

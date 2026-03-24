@@ -48,7 +48,7 @@ export function WithdrawalPlanCard() {
       <Card>
         <CardHeader title="Withdrawal Strategy" description="Optimal sequencing for your retirement income" />
         <CardBody>
-          <div className="h-24 flex items-center justify-center text-slate-500 text-sm">Computing…</div>
+          <div className="h-24 flex items-center justify-center text-slate-600 text-sm">Computing…</div>
         </CardBody>
       </Card>
     );
@@ -73,7 +73,7 @@ export function WithdrawalPlanCard() {
       <Card>
         <CardHeader title="Withdrawal Strategy" description="Optimal sequencing for your retirement income" />
         <CardBody>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-600">
             No accounts added yet. Add investment accounts, insurance policies, and expenditures to see your
             optimized withdrawal plan.
           </p>
@@ -92,22 +92,22 @@ export function WithdrawalPlanCard() {
       {/* Summary strip */}
       <div className="grid grid-cols-3 divide-x divide-slate-800 border-b border-slate-800">
         <div className="px-5 py-3">
-          <p className="text-xs text-slate-500">Annual need</p>
+          <p className="text-xs text-slate-600">Annual need</p>
           <p className="text-sm font-semibold text-slate-100 mt-0.5">
             {formatCurrency(plan.metNeed + plan.unmetNeed)}
           </p>
         </div>
         <div className="px-5 py-3">
-          <p className="text-xs text-slate-500">Total tax</p>
+          <p className="text-xs text-slate-600">Total tax</p>
           <p className="text-sm font-semibold text-rose-400 mt-0.5">{formatCurrency(plan.totalTax)}</p>
-          <p className="text-xs text-slate-500">{formatPct(plan.effectiveTaxRate)} rate</p>
+          <p className="text-xs text-slate-600">{formatPct(plan.effectiveTaxRate)} rate</p>
         </div>
         <div className="px-5 py-3">
-          <p className="text-xs text-slate-500">Tax savings</p>
+          <p className="text-xs text-slate-600">Tax savings</p>
           <p className="text-sm font-semibold text-emerald-400 mt-0.5">
             {plan.taxSavings > 0 ? `+${formatCurrency(plan.taxSavings)}` : formatCurrency(0)}
           </p>
-          <p className="text-xs text-slate-500">vs all-traditional</p>
+          <p className="text-xs text-slate-600">vs all-traditional</p>
         </div>
       </div>
 
@@ -131,7 +131,7 @@ export function WithdrawalPlanCard() {
                   <SourceBadge type={step.sourceType} />
                   <span className="text-sm text-slate-300 truncate">{step.label}</span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">{step.notes}</p>
+                <p className="text-xs text-slate-600 mt-0.5 truncate">{step.notes}</p>
               </div>
 
               {/* Amounts */}
@@ -143,7 +143,7 @@ export function WithdrawalPlanCard() {
                 <ArrowRight className="h-3.5 w-3.5 text-slate-600" />
                 <div>
                   <p className="text-sm font-semibold text-slate-100">{formatCurrency(step.netAmount)}</p>
-                  <p className="text-xs text-slate-500">net</p>
+                  <p className="text-xs text-slate-600">net</p>
                 </div>
               </div>
             </div>
@@ -153,7 +153,7 @@ export function WithdrawalPlanCard() {
 
       {/* Footer */}
       <div className="px-5 py-3 border-t border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+        <div className="flex items-center gap-1.5 text-xs text-slate-600">
           <Banknote className="h-3.5 w-3.5" />
           Cost basis assumed 50% for taxable accounts · RMD age 73+
         </div>

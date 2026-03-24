@@ -20,9 +20,9 @@ function MetricTile({ label, value, sub, color }: MetricTileProps) {
 
   return (
     <div className="flex-1 min-w-[160px] rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
+      <p className="text-xs text-slate-600 mb-1">{label}</p>
       <p className={`text-2xl font-semibold ${valueClass}`}>{value}</p>
-      {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
     </div>
   );
 }
