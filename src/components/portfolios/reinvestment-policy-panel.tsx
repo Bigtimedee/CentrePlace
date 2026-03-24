@@ -7,36 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/ui/form-field";
 import { AlertCircle, Lock, Sparkles } from "lucide-react";
+import {
+  allocationTargetToPolicyForm as _allocationTargetToPolicyForm,
+  REINVESTMENT_RATE_DEFAULTS,
+  type PolicyForm,
+} from "@/server/portfolios/reinvestment-policy-utils";
+
+export { allocationTargetToPolicyForm } from "@/server/portfolios/reinvestment-policy-utils";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type PolicyMode = "self-directed" | "recommended";
 
-type PolicyForm = {
-  equityPct: number;
-  equityAppreciationRate: number;
-  equityQualifiedYieldRate: number;
-  taxableFixedIncomePct: number;
-  taxableFixedIncomeRate: number;
-  taxExemptFixedIncomePct: number;
-  taxExemptFixedIncomeRate: number;
-  realEstatePct: number;
-  reAppreciationRate: number;
-  reGrossYieldRate: number;
-  reCarryingCostRate: number;
-};
-
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const RATE_DEFAULTS = {
-  equityAppreciationRate: 5.5,
-  equityQualifiedYieldRate: 1.5,
-  taxableFixedIncomeRate: 4,
-  taxExemptFixedIncomeRate: 3,
-  reAppreciationRate: 4,
-  reGrossYieldRate: 6,
-  reCarryingCostRate: 2,
-};
+const RATE_DEFAULTS = REINVESTMENT_RATE_DEFAULTS;
 
 const SELF_DIRECTED_DEFAULTS: PolicyForm = {
   equityPct: 50,
@@ -68,19 +53,8 @@ function pct(n: number) {
   return Math.round(n * 100 * 10) / 10;
 }
 
-export function allocationTargetToPolicyForm(target: {
-  equity: number;
-  bond: number;
-  alt: number;
-}): PolicyForm {
-  return {
-    equityPct: Math.round(target.equity * 100 * 10) / 10,
-    taxableFixedIncomePct: Math.round(target.bond * 0.6 * 100 * 10) / 10,
-    taxExemptFixedIncomePct: Math.round(target.bond * 0.4 * 100 * 10) / 10,
-    realEstatePct: Math.round(target.alt * 100 * 10) / 10,
-    ...RATE_DEFAULTS,
-  };
-}
+// Alias for internal use (component seeds form from recommendation)
+const allocationTargetToPolicyForm = _allocationTargetToPolicyForm;
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
