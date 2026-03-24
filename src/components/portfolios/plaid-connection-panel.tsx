@@ -37,8 +37,19 @@ const IDLE_SYNC_STATE: SyncState = {
 
 // ─── Plaid Link wrapper ───────────────────────────────────────────────────────
 
+const PLAID_TOKEN_KEY = "plaid_link_token";
+
 function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; onEnvDetected: (env: string) => void }) {
-  const [linkToken, setLinkToken] = useState<string | null>(null);
+  // Detect OAuth return: Plaid appends oauth_state_id to the redirect URI
+  const isOAuthReturn =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("oauth_state_id");
+
+  const [linkToken, setLinkToken] = useState<string | null>(() => {
+    if (isOAuthReturn && typeof window !== "undefined") {
+      return sessionStorage.getItem(PLAID_TOKEN_KEY);
+    }
+    return null;
+  });
   const [fetching, setFetching] = useState(false);
 
   const fetchToken = useCallback(async () => {
@@ -46,6 +57,7 @@ function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; 
     try {
       const res = await fetch("/api/plaid/create-link-token", { method: "POST" });
       const data = (await res.json()) as { link_token: string; plaid_env: string };
+      sessionStorage.setItem(PLAID_TOKEN_KEY, data.link_token);
       setLinkToken(data.link_token);
       onEnvDetected(data.plaid_env);
     } finally {
@@ -55,7 +67,9 @@ function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; 
 
   const { open, ready } = usePlaidLink({
     token: linkToken ?? "",
+    receivedRedirectUri: isOAuthReturn ? window.location.href : undefined,
     onSuccess: async (public_token, metadata) => {
+      sessionStorage.removeItem(PLAID_TOKEN_KEY);
       await fetch("/api/plaid/exchange-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

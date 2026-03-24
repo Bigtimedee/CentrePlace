@@ -11,12 +11,14 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const response = await plaidClient.linkTokenCreate({
     user: { client_user_id: userId },
     client_name: "GPRetire",
     products: [Products.Transactions],
     country_codes: [CountryCode.Us],
     language: "en",
+    redirect_uri: `${appUrl}/portfolios`,
   });
 
   return NextResponse.json({
