@@ -15,6 +15,13 @@
       "when": 1774367843467,
       "tag": "0001_bright_whistler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774370139259,
+      "tag": "0002_tranquil_switch",
+      "breakpoints": true
     }
   ]
 }

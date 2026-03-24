@@ -1,0 +1,1 @@
+ALTER TABLE "plaid_connections" ADD COLUMN "sync_mode" text DEFAULT 'persistent' NOT NULL;

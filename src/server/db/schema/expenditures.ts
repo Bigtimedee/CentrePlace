@@ -39,6 +39,7 @@ export const plaidConnections = pgTable("plaid_connections", {
   accessToken: text("access_token").notNull(), // encrypted at rest via Supabase
   itemId: text("item_id").notNull(),
   institutionName: text("institution_name"),
+  syncMode: text("sync_mode").notNull().default("persistent"), // "oneshot" | "persistent"
   lastSyncedAt: timestamp("last_synced_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (t) => [

@@ -4,8 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link2, Trash2, RefreshCw, Building2 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { Link2, Trash2, RefreshCw, Building2, ShieldCheck, CheckCircle2, AlertCircle } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -14,20 +13,27 @@ interface PlaidConnection {
   institutionName: string | null;
   lastSyncedAt: string | null;
   createdAt: string;
+  syncMode: "oneshot" | "persistent";
 }
 
-interface PlaidAccount {
-  connection_id: string;
-  institution_name: string | null;
-  account_id: string;
-  name: string;
-  official_name: string | null;
-  type: string;
-  subtype: string | null;
-  balance_current: number | null;
-  balance_available: number | null;
-  iso_currency_code: string | null;
+type SyncPhase = "idle" | "reviewing" | "syncing" | "done" | "error";
+
+interface SyncState {
+  phase: SyncPhase;
+  targetConnectionId: string | null;
+  result: {
+    expenditures: { created: number; skipped: number } | null;
+    accounts: { created: number; skipped: number } | null;
+  } | null;
+  errorMessage: string | null;
 }
+
+const IDLE_SYNC_STATE: SyncState = {
+  phase: "idle",
+  targetConnectionId: null,
+  result: null,
+  errorMessage: null,
+};
 
 // ─── Plaid Link wrapper ───────────────────────────────────────────────────────
 
@@ -39,7 +45,7 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
     setFetching(true);
     try {
       const res = await fetch("/api/plaid/create-link-token", { method: "POST" });
-      const data = await res.json() as { link_token: string };
+      const data = (await res.json()) as { link_token: string };
       setLinkToken(data.link_token);
     } finally {
       setFetching(false);
@@ -74,12 +80,7 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
   }, [linkToken, ready, open]);
 
   return (
-    <Button
-      onClick={handleClick}
-      disabled={fetching}
-      size="sm"
-      className="gap-2"
-    >
+    <Button onClick={handleClick} disabled={fetching} size="sm" className="gap-2">
       <Link2 className="h-4 w-4" />
       {fetching ? "Loading…" : "Connect Account"}
     </Button>
@@ -90,39 +91,20 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
 
 export function PlaidConnectionPanel() {
   const [connections, setConnections] = useState<PlaidConnection[]>([]);
-  const [accounts, setAccounts] = useState<PlaidAccount[]>([]);
-  const [loadingAccounts, setLoadingAccounts] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [syncState, setSyncState] = useState<SyncState>(IDLE_SYNC_STATE);
 
   const loadConnections = useCallback(async () => {
     const res = await fetch("/api/plaid/connections");
-    const data = await res.json() as { connections: PlaidConnection[] };
+    const data = (await res.json()) as { connections: PlaidConnection[] };
     setConnections(data.connections ?? []);
-  }, []);
-
-  const loadAccounts = useCallback(async () => {
-    setLoadingAccounts(true);
-    try {
-      const res = await fetch("/api/plaid/accounts");
-      const data = await res.json() as { accounts: PlaidAccount[] };
-      setAccounts(data.accounts ?? []);
-    } finally {
-      setLoadingAccounts(false);
-    }
   }, []);
 
   useEffect(() => {
     void loadConnections();
   }, [loadConnections]);
 
-  useEffect(() => {
-    if (connections.length > 0) {
-      void loadAccounts();
-    } else {
-      setAccounts([]);
-    }
-  }, [connections, loadAccounts]);
-
+  // ── Disconnect (legacy persistent connections, or discard without extracting) ──
   const handleDisconnect = async (id: string) => {
     setDeletingId(id);
     try {
@@ -133,114 +115,291 @@ export function PlaidConnectionPanel() {
     }
   };
 
+  // ── One-shot flow ──
+  const handleReview = (id: string) => {
+    setSyncState({ phase: "reviewing", targetConnectionId: id, result: null, errorMessage: null });
+  };
+
+  const handleExtractAndDisconnect = async () => {
+    const id = syncState.targetConnectionId;
+    if (!id) return;
+    setSyncState((s) => ({ ...s, phase: "syncing" }));
+    try {
+      const res = await fetch("/api/plaid/sync-and-disconnect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ connectionId: id }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        expenditures?: { created: number; skipped: number };
+        accounts?: { created: number; skipped: number };
+        error?: string;
+      };
+      if (!res.ok || !data.ok) {
+        setSyncState((s) => ({
+          ...s,
+          phase: "error",
+          errorMessage: data.error ?? "Something went wrong.",
+        }));
+      } else {
+        setSyncState({
+          phase: "done",
+          targetConnectionId: null,
+          result: {
+            expenditures: data.expenditures ?? null,
+            accounts: data.accounts ?? null,
+          },
+          errorMessage: null,
+        });
+      }
+    } catch {
+      setSyncState((s) => ({
+        ...s,
+        phase: "error",
+        errorMessage: "Network error. Please try again.",
+      }));
+    } finally {
+      await loadConnections();
+    }
+  };
+
+  const handleDiscardAndDisconnect = async () => {
+    const id = syncState.targetConnectionId;
+    if (!id) return;
+    setSyncState((s) => ({ ...s, phase: "syncing" }));
+    try {
+      await fetch(`/api/plaid/connections?id=${id}`, { method: "DELETE" });
+    } finally {
+      await loadConnections();
+      setSyncState(IDLE_SYNC_STATE);
+    }
+  };
+
   const handleSuccess = async () => {
     await loadConnections();
   };
 
-  // Group accounts by connection_id
-  const accountsByConnection = accounts.reduce<Record<string, PlaidAccount[]>>((acc, acct) => {
-    if (!acc[acct.connection_id]) acc[acct.connection_id] = [];
-    acc[acct.connection_id].push(acct);
-    return acc;
-  }, {});
+  const oneshotConnections = connections.filter((c) => c.syncMode === "oneshot");
+  const persistentConnections = connections.filter((c) => c.syncMode === "persistent");
 
-  const totalBalance = accounts.reduce((sum, a) => sum + (a.balance_current ?? 0), 0);
+  // ── Syncing overlay ──
+  if (syncState.phase === "syncing") {
+    return (
+      <Card>
+        <CardBody>
+          <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
+            <RefreshCw className="h-8 w-8 text-indigo-400 animate-spin" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Extracting data and disconnecting…</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                This takes about 5 seconds. Do not close this page.
+              </p>
+            </div>
+          </div>
+        </CardBody>
+      </Card>
+    );
+  }
 
-  return (
-    <Card>
-      <CardHeader
-        title="Connected Bank & Credit Card Accounts"
-        description={
-          accounts.length > 0
-            ? `${accounts.length} account${accounts.length !== 1 ? "s" : ""} · ${formatCurrency(totalBalance)} total`
-            : undefined
-        }
-        action={
-          <div className="flex items-center gap-2">
-            {connections.length > 0 && (
+  // ── Done state ──
+  if (syncState.phase === "done") {
+    const exp = syncState.result?.expenditures;
+    const acc = syncState.result?.accounts;
+    return (
+      <Card>
+        <CardBody>
+          <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
+            <CheckCircle2 className="h-8 w-8 text-green-500" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Data extracted successfully</p>
+              <p className="text-xs text-muted-foreground mt-1">Your bank connection has been removed.</p>
+            </div>
+            {(exp ?? acc) && (
+              <div className="text-xs text-muted-foreground space-y-0.5">
+                {exp && (
+                  <p>
+                    Expenses: {exp.created} added, {exp.skipped} already present
+                  </p>
+                )}
+                {acc && (
+                  <p>
+                    Accounts: {acc.created} added, {acc.skipped} already present
+                  </p>
+                )}
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSyncState(IDLE_SYNC_STATE)}
+            >
+              Done
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  // ── Error state ──
+  if (syncState.phase === "error") {
+    return (
+      <Card>
+        <CardBody>
+          <div className="flex flex-col items-center justify-center py-8 gap-4 text-center">
+            <AlertCircle className="h-8 w-8 text-destructive" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Something went wrong</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Your bank connection may have been removed. Check your connections below.
+              </p>
+              {syncState.errorMessage && (
+                <p className="text-xs text-destructive mt-1">{syncState.errorMessage}</p>
+              )}
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setSyncState(IDLE_SYNC_STATE)}>
+              Dismiss
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
+    );
+  }
+
+  // ── Reviewing state: show confirm dialog ──
+  if (syncState.phase === "reviewing" && syncState.targetConnectionId) {
+    const conn = connections.find((c) => c.id === syncState.targetConnectionId);
+    return (
+      <Card>
+        <CardHeader
+          title="Review before importing"
+          description={`${conn?.institutionName ?? "This institution"} · You can review your accounts before any data is saved.`}
+        />
+        <CardBody>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              GPRetire will read your spending history and investment accounts, build your financial
+              profile, then immediately revoke access. No transaction details, account numbers, or
+              credentials will be stored.
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={handleExtractAndDisconnect} size="sm" className="gap-2">
+                Extract Data &amp; Disconnect
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={loadAccounts}
-                disabled={loadingAccounts}
-                className="gap-2"
+                onClick={handleDiscardAndDisconnect}
+                className="gap-2 text-destructive hover:text-destructive"
               >
-                <RefreshCw className={`h-4 w-4 ${loadingAccounts ? "animate-spin" : ""}`} />
-                Refresh
+                Discard &amp; Disconnect
               </Button>
-            )}
-            <PlaidLinkButton onSuccess={handleSuccess} />
+            </div>
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setSyncState(IDLE_SYNC_STATE)}
+            >
+              ← Cancel
+            </button>
           </div>
-        }
+        </CardBody>
+      </Card>
+    );
+  }
+
+  // ── Idle state: main panel ──
+  return (
+    <Card>
+      <CardHeader
+        title="One-Time Bank Import"
+        action={<PlaidLinkButton onSuccess={handleSuccess} />}
       />
 
       {connections.length === 0 ? (
         <CardBody>
-          <p className="text-sm text-muted-foreground text-center py-6">
-            No accounts connected. Click <strong>Connect Account</strong> to link a bank or credit card.
-          </p>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-4">
+              <ShieldCheck className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-foreground mb-1">Your data is never stored</p>
+                <p className="text-sm text-muted-foreground">
+                  Connect your bank, credit card, or brokerage accounts to automatically import your
+                  spending history and account balances. GPRetire reads your data once, builds your
+                  financial profile from it, then immediately revokes access and deletes the
+                  connection. No account numbers, transaction details, or credentials are ever stored.
+                </p>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              You can review your accounts before any data is saved.
+            </p>
+          </div>
         </CardBody>
       ) : (
         <CardBody className="space-y-4">
-          {connections.map((conn) => {
-            const connAccounts = accountsByConnection[conn.id] ?? [];
-            return (
-              <div key={conn.id} className="border rounded-lg overflow-hidden">
-                {/* Institution header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-muted/40">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium text-sm">
-                      {conn.institutionName ?? "Connected Institution"}
-                    </span>
-                  </div>
+          {/* One-shot connections (new flow) */}
+          {oneshotConnections.map((conn) => (
+            <div key={conn.id} className="border rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 bg-muted/40">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-sm">
+                    {conn.institutionName ?? "Connected Institution"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleReview(conn.id)}
+                    className="h-7 px-3 text-xs gap-1"
+                  >
+                    Extract Data &amp; Disconnect
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDisconnect(conn.id)}
                     disabled={deletingId === conn.id}
-                    className="text-destructive hover:text-destructive gap-1 h-7 px-2"
+                    className="text-destructive hover:text-destructive gap-1 h-7 px-2 text-xs"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    {deletingId === conn.id ? "Removing…" : "Disconnect"}
+                    {deletingId === conn.id ? "Removing…" : "Discard"}
                   </Button>
                 </div>
-
-                {/* Accounts list */}
-                {loadingAccounts ? (
-                  <div className="px-4 py-3 text-sm text-muted-foreground">Loading accounts…</div>
-                ) : connAccounts.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-muted-foreground">No accounts found.</div>
-                ) : (
-                  <div className="divide-y">
-                    {connAccounts.map((acct) => (
-                      <div key={acct.account_id} className="flex items-center justify-between px-4 py-3">
-                        <div>
-                          <p className="text-sm font-medium">{acct.name}</p>
-                          <p className="text-xs text-muted-foreground capitalize">
-                            {acct.type}{acct.subtype ? ` · ${acct.subtype}` : ""}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold">
-                            {acct.balance_current != null
-                              ? formatCurrency(acct.balance_current)
-                              : "—"}
-                          </p>
-                          {acct.balance_available != null &&
-                            acct.balance_available !== acct.balance_current && (
-                              <p className="text-xs text-muted-foreground">
-                                {formatCurrency(acct.balance_available)} available
-                              </p>
-                            )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
-            );
-          })}
+              <div className="px-4 py-3">
+                <p className="text-xs text-muted-foreground">
+                  Ready to import. Click <strong>Extract Data &amp; Disconnect</strong> to read your
+                  data and immediately revoke access.
+                </p>
+              </div>
+            </div>
+          ))}
+
+          {/* Legacy persistent connections */}
+          {persistentConnections.map((conn) => (
+            <div key={conn.id} className="border rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 bg-muted/40">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium text-sm">
+                    {conn.institutionName ?? "Connected Institution"}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDisconnect(conn.id)}
+                  disabled={deletingId === conn.id}
+                  className="text-destructive hover:text-destructive gap-1 h-7 px-2"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  {deletingId === conn.id ? "Removing…" : "Disconnect"}
+                </Button>
+              </div>
+            </div>
+          ))}
         </CardBody>
       )}
     </Card>

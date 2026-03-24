@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { FormField } from "@/components/ui/form-field";
-import { Pencil, Trash2, PlusCircle, X, Check, Link2 } from "lucide-react";
+import { Pencil, Trash2, PlusCircle, X, Check } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { CURRENT_YEAR, QUARTERS } from "@/lib/constants";
 
@@ -171,20 +171,9 @@ export function ExpendituresForm() {
   return (
     <div className="space-y-6">
 
-      {/* Plaid connection stub */}
-      <div className="rounded-xl border border-slate-700 border-dashed bg-slate-900/50 px-6 py-4 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-300">
-            <Link2 className="h-4 w-4 text-slate-500" />
-            Plaid Bank Connection
-          </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Connect your bank accounts to auto-import 12–24 months of transaction history
-          </p>
-        </div>
-        <Button variant="secondary" size="sm" disabled>
-          Connect Bank (Phase 3b)
-        </Button>
+      {/* Plaid import — now lives on the Portfolios page */}
+      <div className="rounded-xl border border-border bg-muted/20 px-5 py-3 text-sm text-muted-foreground">
+        To import expenses from your bank, go to the <strong>Investment Portfolios</strong> page and use the One-Time Bank Import panel.
       </div>
 
       {/* Recurring expenditures */}

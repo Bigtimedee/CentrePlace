@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
       accessToken: access_token,
       itemId: item_id,
       institutionName: resolvedName,
+      syncMode: "oneshot",
     })
     .returning();
 

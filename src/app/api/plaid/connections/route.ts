@@ -20,6 +20,7 @@ export async function GET() {
       institutionName: plaidConnections.institutionName,
       lastSyncedAt: plaidConnections.lastSyncedAt,
       createdAt: plaidConnections.createdAt,
+      syncMode: plaidConnections.syncMode,
     })
     .from(plaidConnections)
     .where(eq(plaidConnections.userId, userId));
