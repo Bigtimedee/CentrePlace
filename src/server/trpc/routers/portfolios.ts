@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../index";
-import { investmentAccounts, accountStatements, accountHoldings } from "../../db/schema";
+import { investmentAccounts, accountStatements, accountHoldings, userProfiles } from "../../db/schema";
 import { eq, and } from "drizzle-orm";
 import { deleteStatementFile } from "@/lib/supabase-storage";
+import { computeAllocationRecommendation } from "../../portfolios/allocation-engine";
+import { fetchETFSuggestions } from "../../portfolios/etf-suggestions";
 
 // Separate base shape from refinement so .partial() can be used on the shape
 const accountShape = z.object({
@@ -120,5 +122,50 @@ export const portfoliosRouter = createTRPCRouter({
           eq(accountStatements.userId, ctx.userId)
         ));
       await deleteStatementFile(stmt.storagePath).catch(() => {});
+    }),
+
+  getAllocationRecommendation: protectedProcedure
+    .input(z.object({
+      fiDateYear: z.number().nullable().optional(),
+      isFI: z.boolean().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const [profile, accounts] = await Promise.all([
+        ctx.db.query.userProfiles.findFirst({
+          where: eq(userProfiles.id, ctx.userId),
+          columns: { birthYear: true },
+        }),
+        ctx.db.query.investmentAccounts.findMany({
+          where: eq(investmentAccounts.userId, ctx.userId),
+          columns: { equityPct: true, bondPct: true, altPct: true, currentBalance: true },
+        }),
+      ]);
+
+      const birthYear = profile?.birthYear ?? 1980;
+
+      return computeAllocationRecommendation({
+        birthYear,
+        currentYear: new Date().getFullYear(),
+        fiDateYear: input.fiDateYear ?? null,
+        isFI: input.isFI ?? false,
+        accounts: accounts.map(a => ({
+          equityPct: a.equityPct,
+          bondPct: a.bondPct,
+          altPct: a.altPct,
+          currentBalance: a.currentBalance,
+        })),
+      });
+    }),
+
+  getInvestmentSuggestions: protectedProcedure
+    .input(z.object({
+      underweightClasses: z.array(z.enum(["equity", "bond", "alt"])),
+    }))
+    .query(async ({ input }) => {
+      try {
+        return await fetchETFSuggestions(input.underweightClasses);
+      } catch {
+        return [];
+      }
     }),
 });

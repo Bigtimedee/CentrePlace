@@ -26,6 +26,7 @@ export const accountHoldings = pgTable("account_holdings", {
   ticker: text("ticker"),
   securityName: text("security_name").notNull(),
   assetClass: text("asset_class").notNull().default("equity"), // equity | bond | alt | cash
+  securitySubType: text("security_sub_type"), // stock | etf | mutual_fund | money_market | treasury | corporate_bond | muni_bond
   shares: real("shares"),
   pricePerShare: real("price_per_share"),
   marketValue: real("market_value").notNull(),

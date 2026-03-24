@@ -4,6 +4,7 @@ export interface ParsedHolding {
   ticker?: string;
   securityName: string;
   assetClass: "equity" | "bond" | "alt" | "cash";
+  securitySubType?: "stock" | "etf" | "mutual_fund" | "money_market" | "treasury" | "corporate_bond" | "muni_bond";
   shares?: number;
   pricePerShare?: number;
   marketValue: number;
@@ -25,6 +26,7 @@ const SYSTEM_PROMPT = `You are a financial statement parser. Extract all investm
       "ticker": "string or null",
       "securityName": "string (required)",
       "assetClass": "equity" | "bond" | "alt" | "cash",
+      "securitySubType": "stock" | "etf" | "mutual_fund" | "money_market" | "treasury" | "corporate_bond" | "muni_bond" | null,
       "shares": number or null,
       "pricePerShare": number or null,
       "marketValue": number (required, in USD),
@@ -38,6 +40,16 @@ Asset class rules:
 - bond: bonds, bond ETFs/funds, fixed income (BND, AGG, VBTLX, treasuries, etc.)
 - alt: REITs, commodities, alternatives, options, crypto
 - cash: money market, cash equivalents, stable value funds
+
+Security sub-type rules:
+- stock: individual company shares (e.g. AAPL, MSFT, TSLA)
+- etf: exchange-traded fund (e.g. SPY, VTI, QQQ, BND, AGG)
+- mutual_fund: mutual fund (e.g. VTSAX, FXAIX, SWPPX)
+- money_market: money market fund (e.g. SPAXX, VMFXX, FZDXX)
+- treasury: US government bonds, T-bills, T-notes, TIPS
+- corporate_bond: corporate bonds
+- muni_bond: municipal bonds
+- Use null if sub-type cannot be determined
 
 Return ONLY the JSON object, no explanation.`;
 

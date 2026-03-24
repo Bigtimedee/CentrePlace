@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
         ticker: h.ticker ?? null,
         securityName: h.securityName,
         assetClass: h.assetClass,
+        securitySubType: h.securitySubType ?? null,
         shares: h.shares ?? null,
         pricePerShare: h.pricePerShare ?? null,
         marketValue: h.marketValue,
