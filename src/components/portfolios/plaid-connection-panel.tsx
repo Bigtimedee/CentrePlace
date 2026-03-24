@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link2, Trash2, RefreshCw, Building2, ShieldCheck, CheckCircle2, AlertCircle } from "lucide-react";
+import { Link2, Trash2, RefreshCw, Building2, ShieldCheck, CheckCircle2, AlertCircle, FlaskConical } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ const IDLE_SYNC_STATE: SyncState = {
 
 // ─── Plaid Link wrapper ───────────────────────────────────────────────────────
 
-function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
+function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; onEnvDetected: (env: string) => void }) {
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
 
@@ -45,12 +45,13 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
     setFetching(true);
     try {
       const res = await fetch("/api/plaid/create-link-token", { method: "POST" });
-      const data = (await res.json()) as { link_token: string };
+      const data = (await res.json()) as { link_token: string; plaid_env: string };
       setLinkToken(data.link_token);
+      onEnvDetected(data.plaid_env);
     } finally {
       setFetching(false);
     }
-  }, []);
+  }, [onEnvDetected]);
 
   const { open, ready } = usePlaidLink({
     token: linkToken ?? "",
@@ -93,6 +94,7 @@ export function PlaidConnectionPanel() {
   const [connections, setConnections] = useState<PlaidConnection[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [syncState, setSyncState] = useState<SyncState>(IDLE_SYNC_STATE);
+  const [plaidEnv, setPlaidEnv] = useState<string | null>(null);
 
   const loadConnections = useCallback(async () => {
     const res = await fetch("/api/plaid/connections");
@@ -179,6 +181,10 @@ export function PlaidConnectionPanel() {
   const handleSuccess = async () => {
     await loadConnections();
   };
+
+  const handleEnvDetected = useCallback((env: string) => {
+    setPlaidEnv(env);
+  }, []);
 
   const oneshotConnections = connections.filter((c) => c.syncMode === "oneshot");
   const persistentConnections = connections.filter((c) => c.syncMode === "persistent");
@@ -314,7 +320,7 @@ export function PlaidConnectionPanel() {
     <Card>
       <CardHeader
         title="One-Time Bank Import"
-        action={<PlaidLinkButton onSuccess={handleSuccess} />}
+        action={<PlaidLinkButton onSuccess={handleSuccess} onEnvDetected={handleEnvDetected} />}
       />
 
       {connections.length === 0 ? (
@@ -335,6 +341,22 @@ export function PlaidConnectionPanel() {
             <p className="text-xs text-muted-foreground text-center">
               You can review your accounts before any data is saved.
             </p>
+
+            {plaidEnv === "sandbox" && (
+              <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <FlaskConical className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-800 mb-1">Sandbox mode — use test credentials</p>
+                  <p className="text-sm text-amber-700">
+                    When prompted for a phone number, enter{" "}
+                    <strong className="font-semibold">+1 (415) 555-0123</strong> and use OTP{" "}
+                    <strong className="font-semibold">1234</strong>. For institution login, use username{" "}
+                    <strong className="font-semibold">user_good</strong> and password{" "}
+                    <strong className="font-semibold">pass_good</strong>.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </CardBody>
       ) : (

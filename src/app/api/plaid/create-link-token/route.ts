@@ -19,5 +19,8 @@ export async function POST() {
     language: "en",
   });
 
-  return NextResponse.json({ link_token: response.data.link_token });
+  return NextResponse.json({
+    link_token: response.data.link_token,
+    plaid_env: process.env.PLAID_ENV ?? "sandbox",
+  });
 }
