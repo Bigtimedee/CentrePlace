@@ -350,7 +350,7 @@ export function PlaidConnectionPanel() {
                   <p className="text-sm text-amber-700">
                     When prompted for a phone number, enter{" "}
                     <strong className="font-semibold">+1 (415) 555-0123</strong> and use OTP{" "}
-                    <strong className="font-semibold">1234</strong>. For institution login, use username{" "}
+                    <strong className="font-semibold">123456</strong>. For institution login, use username{" "}
                     <strong className="font-semibold">user_good</strong> and password{" "}
                     <strong className="font-semibold">pass_good</strong>.
                   </p>
