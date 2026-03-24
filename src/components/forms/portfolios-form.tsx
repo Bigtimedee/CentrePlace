@@ -245,7 +245,7 @@ export function PortfoliosForm() {
         />
 
         {adding && (
-          <CardBody className="border-b border-slate-800">
+          <CardBody className="border-b border-slate-200">
             <AccountForm
               initial={EMPTY}
               onSave={f => add.mutate(toMutation(f))}
@@ -258,7 +258,7 @@ export function PortfoliosForm() {
         {data.length === 0 && !adding ? (
           <CardBody><p className="text-sm text-slate-600">No investment accounts added yet.</p></CardBody>
         ) : (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-slate-200">
             {data.map(acct => (
               <div key={acct.id}>
                 {editingId === acct.id ? (
@@ -271,10 +271,10 @@ export function PortfoliosForm() {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
+                  <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-100">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-3">
-                        <span className="text-sm font-medium text-slate-200">{acct.accountName}</span>
+                        <span className="text-sm font-medium text-slate-900">{acct.accountName}</span>
                         <span className="text-xs text-slate-600">{ACCOUNT_TYPE_LABELS[acct.accountType]}</span>
                       </div>
                       <div className="text-xs text-slate-600 mt-0.5">
@@ -284,7 +284,7 @@ export function PortfoliosForm() {
                     </div>
                     <div className="ml-4 flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-sm font-semibold text-slate-200">{formatCurrency(acct.currentBalance, true)}</div>
+                        <div className="text-sm font-semibold text-slate-900">{formatCurrency(acct.currentBalance, true)}</div>
                         <div className="text-xs text-slate-600">balance</div>
                       </div>
                       <div className="flex gap-1">
@@ -301,8 +301,8 @@ export function PortfoliosForm() {
       </Card>
 
       {data.length > 0 && (
-        <div className="text-right text-sm text-slate-400">
-          Total portfolio value: <span className="text-slate-200 font-semibold">{formatCurrency(totalBalance, true)}</span>
+        <div className="text-right text-sm text-slate-600">
+          Total portfolio value: <span className="text-slate-900 font-semibold">{formatCurrency(totalBalance, true)}</span>
         </div>
       )}
     </div>
