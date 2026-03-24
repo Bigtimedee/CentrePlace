@@ -18,16 +18,16 @@ function MetricTile({
   accent?: "green" | "amber" | "red" | "indigo";
 }) {
   const colors = {
-    green: "text-emerald-400",
-    amber: "text-amber-400",
-    red: "text-rose-400",
-    indigo: "text-indigo-400",
+    green: "text-emerald-600",
+    amber: "text-amber-600",
+    red: "text-rose-600",
+    indigo: "text-indigo-600",
   };
   return (
-    <div className="bg-slate-800/50 rounded-lg px-4 py-3">
-      <p className="text-xs text-slate-600 mb-1">{label}</p>
-      <p className={`text-lg font-semibold ${accent ? colors[accent] : "text-slate-100"}`}>{value}</p>
-      {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
+    <div className="bg-slate-50 rounded-lg px-4 py-3">
+      <p className="text-xs text-slate-500 mb-1">{label}</p>
+      <p className={`text-lg font-semibold ${accent ? colors[accent] : "text-slate-900"}`}>{value}</p>
+      {sub && <p className="text-xs text-slate-500 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -82,7 +82,7 @@ export function FISummaryCard() {
         description="Based on your complete financial picture"
         action={
           isFI ? (
-            <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-950/50 border border-emerald-800 rounded-full px-3 py-1">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
               <CheckCircle2 className="h-3.5 w-3.5" /> FI Achieved
             </span>
           ) : null
@@ -117,12 +117,12 @@ export function FISummaryCard() {
         </div>
 
         {/* FI date */}
-        <div className="flex items-center gap-3 py-3 border-t border-slate-800">
-          <Calendar className="h-4 w-4 text-slate-600 flex-shrink-0" />
+        <div className="flex items-center gap-3 py-3 border-t border-slate-200">
+          <Calendar className="h-4 w-4 text-slate-500 flex-shrink-0" />
           {fiDate ? (
-            <span className="text-sm text-slate-300">
+            <span className="text-sm text-slate-700">
               Projected FI date:{" "}
-              <span className="font-medium text-slate-100">
+              <span className="font-medium text-slate-900">
                 {fiDate.quarter} {fiDate.year}
               </span>
               {fiAge && (
@@ -132,7 +132,7 @@ export function FISummaryCard() {
               )}
             </span>
           ) : (
-            <span className="text-sm text-amber-400">
+            <span className="text-sm text-amber-600">
               FI not achieved within the 40-year projection window. Increase savings or reduce spending.
             </span>
           )}
@@ -144,7 +144,7 @@ export function FISummaryCard() {
             <span>FI Progress</span>
             <span>{formatPct(pctFunded)}</span>
           </div>
-          <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${isFI ? "bg-emerald-500" : "bg-indigo-500"}`}
               style={{ width: `${Math.round(pctFunded * 100)}%` }}

@@ -35,7 +35,7 @@ export function SimulationDashboard() {
     return (
       <Card>
         <CardBody>
-          <div className="flex items-start gap-3 text-amber-400">
+          <div className="flex items-start gap-3 text-amber-600">
             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
               {isProfileMissing ? (
@@ -90,7 +90,7 @@ export function SimulationDashboard() {
         <button
           onClick={() => refetch()}
           disabled={isFetching}
-          className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-300 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 text-xs text-slate-600 hover:text-slate-900 transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`h-3 w-3 ${isFetching ? "animate-spin" : ""}`} />
           Refresh projection
