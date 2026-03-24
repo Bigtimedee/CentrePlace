@@ -8,6 +8,13 @@
       "when": 1773715229112,
       "tag": "0000_silent_charles_xavier",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774367843467,
+      "tag": "0001_bright_whistler",
+      "breakpoints": true
     }
   ]
 }

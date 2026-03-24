@@ -37,6 +37,8 @@ export interface AnnualTaxInput {
   w2Wages?: number;
   /** City/local tax jurisdiction code (e.g. "NYC", "PHL"). */
   cityCode?: string;
+  /** ISO AMT preference item (ISO spread at exercise not included in ordinary income) */
+  isoAmtAdjustment?: number;
 }
 
 export interface AnnualTaxResult {
@@ -44,6 +46,8 @@ export interface AnnualTaxResult {
   federalLtcgTax: number;
   federalNiit: number;
   federalDepreciationRecaptureTax: number;
+  /** Alternative Minimum Tax (ISO spread). Zero when no ISO exercises in the year. */
+  federalAmt: number;
   totalFederalTax: number;
   stateIncomeTax: number;
   /** CA SDI (1.1% of W-2 wages). Zero for all other states. */
@@ -76,6 +80,7 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     year,
     w2Wages,
     cityCode,
+    isoAmtAdjustment,
   } = input;
 
   const federal = calculateFederalTax({
@@ -86,6 +91,7 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     agi,
     filingStatus,
     year,
+    isoAmtAdjustment,
   });
 
   const state = calculateStateTax({
@@ -117,6 +123,7 @@ export function calculateAnnualTax(input: AnnualTaxInput): AnnualTaxResult {
     federalLtcgTax: federal.ltcgTax,
     federalNiit: federal.niit,
     federalDepreciationRecaptureTax: federal.depreciationRecaptureTax,
+    federalAmt: federal.amt,
     totalFederalTax: federal.totalFederalTax,
     stateIncomeTax: state.stateIncomeTax,
     sdiTax: state.sdiTax,

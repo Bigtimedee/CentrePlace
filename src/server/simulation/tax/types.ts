@@ -21,6 +21,8 @@ export interface FederalTaxInput {
   agi: number;                    // Adjusted gross income (for NIIT, phase-outs)
   filingStatus: FilingStatus;
   year: number;                   // For future-year bracket adjustments
+  /** ISO AMT preference item (ISO spread at exercise not included in ordinary income) */
+  isoAmtAdjustment?: number;
 }
 
 export interface FederalTaxResult {
@@ -28,6 +30,8 @@ export interface FederalTaxResult {
   ltcgTax: number;
   niit: number;                   // 3.8% net investment income tax
   depreciationRecaptureTax: number;
+  /** Alternative Minimum Tax owed (over and above regular tax) */
+  amt: number;
   totalFederalTax: number;
   effectiveRate: number;          // total / (ordinaryIncome + qualifiedDividends + longTermGains + unrecaptured1250Gain)
 }

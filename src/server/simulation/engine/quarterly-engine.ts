@@ -7,7 +7,7 @@
 // modeling income, spending, taxes, and detecting the FI date.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { SimulationInput, SimulationResult, QuarterResult } from "./types";
+import type { SimulationInput, SimulationResult, QuarterResult, SimEquityGrant } from "./types";
 import { calculateAnnualTax, safeHarborQuarterlyPayment } from "../tax";
 import { getRMDFactor, RMD_ELIGIBLE_ACCOUNT_TYPES, RMD_START_AGE } from "../tax/rmd";
 import {
@@ -207,6 +207,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
   let ytdOrdinaryIncome = 0;
   let ytdLtcgIncome = 0;
   let ytdW2Income = 0; // W-2 wages only — needed for CA SDI, city wage taxes, and FICA
+  let ytdIsoAmtAdjustment = 0;
 
   // ── RMD state ──
   // Track traditional account balance separately so RMD amounts shrink as distributions are taken.
@@ -477,6 +478,52 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       }
     }
 
+    // ── Equity compensation events this quarter ──
+    let equityOrdinaryIncome = 0;
+    let equityIsoAmtAdjustmentThisQuarter = 0;
+    let equityLtcgThisQuarter = 0;
+
+    for (const grant of (input.equityGrants ?? []) as SimEquityGrant[]) {
+      // FMV projection helper
+      const fmvInYear = (targetYear: number) => {
+        const yearsAhead = targetYear - startYear;
+        return grant.currentFmv * Math.pow(1 + grant.fmvGrowthRate, yearsAhead);
+      };
+
+      // Vesting events (RSU/NSO/Warrant/RSA = ordinary income; ISO = AMT preference item)
+      for (const event of grant.vestingEvents) {
+        if (event.year !== year || event.quarter !== quarterLabel) continue;
+        const fmv = event.projectedFmvAtEvent ?? fmvInYear(year);
+        const spread = fmv - (grant.strikePrice ?? 0);
+        const totalValue = event.shares * spread;
+
+        if (grant.grantType === "iso") {
+          // ISO exercise: NOT ordinary income but IS an AMT preference item
+          equityIsoAmtAdjustmentThisQuarter += Math.max(0, totalValue);
+        } else {
+          // RSU, NSO, Warrant, RSA: ordinary income at vest/exercise
+          equityOrdinaryIncome += Math.max(0, event.shares * fmv);
+        }
+        // Add the exercised/vested value as investmentCapital
+        investmentCapital += Math.max(0, totalValue);
+      }
+
+      // Share lot sales
+      for (const lot of grant.shareLots) {
+        if (lot.projectedSaleYear !== year || lot.projectedSaleQuarter !== quarterLabel) continue;
+        const saleFmv = fmvInYear(year);
+        const saleProceeds = lot.shares * saleFmv;
+        const costBasis = lot.shares * lot.costBasisPerShare;
+        const gain = Math.max(0, saleProceeds - costBasis);
+
+        // All dispositions from equity lots produce LTCG (cost basis reflects
+        // income already recognized at vest/exercise for RSU/NSO/Warrant/RSA,
+        // or zero-cost for ISO qualifying/disqualifying dispositions)
+        equityLtcgThisQuarter += gain;
+        investmentCapital += saleProceeds;
+      }
+    }
+
     // ── Tax accounting ──
     // Accumulate year-to-date taxable income
     // Yield income: ordinary yield → ordinary income; qualified yield → LTCG
@@ -486,13 +533,16 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       rentalNetIncome +
       lpOrdinary +
       ordinaryYieldIncome +
-      realizationOrdinaryYield;
+      realizationOrdinaryYield +
+      equityOrdinaryIncome;
     ytdLtcgIncome +=
       carryIncome +
       lpLtcg +
       realEstateLtcgThisQuarter +
       qualifiedYieldIncome +
-      realizationQualifiedYield;
+      realizationQualifiedYield +
+      equityLtcgThisQuarter;
+    ytdIsoAmtAdjustment += equityIsoAmtAdjustmentThisQuarter;
     // taxExemptYield is excluded from both (cash flow only)
 
     let taxPayment: number;
@@ -519,6 +569,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
         year,
         w2Wages: ytdW2Income,
         cityCode: input.profile.cityOfResidence ?? undefined,
+        isoAmtAdjustment: ytdIsoAmtAdjustment,
       });
 
       const annualTax = taxResult.totalTax;
@@ -545,6 +596,7 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       ytdOrdinaryIncome = 0;
       ytdLtcgIncome = 0;
       ytdW2Income = 0;
+      ytdIsoAmtAdjustment = 0;
     }
 
     // ── Net cash flow → investment capital (or realization capital pool) ──
@@ -670,6 +722,9 @@ export function runSimulation(input: SimulationInput): SimulationResult {
       annualFederalNiit: displayFederalNiit,
       annualStateTax: displayStateTax,
       annualFicaTax: displayFicaTax,
+      equityCompensationIncome: equityOrdinaryIncome,
+      isoAmtAdjustment: equityIsoAmtAdjustmentThisQuarter,
+      equityLtcgIncome: equityLtcgThisQuarter,
     });
   }
 

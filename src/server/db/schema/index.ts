@@ -10,4 +10,5 @@ export * from "./realization-policy";
 export * from "./holdings";
 export * from "./direct-investments";
 export * from "./crypto-holdings";
+export * from "./equity-compensation";
 export * from "./relations";

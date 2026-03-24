@@ -140,6 +140,37 @@ export interface SimOneTimeExpenditure {
   projectedQuarter: "Q1" | "Q2" | "Q3" | "Q4";
 }
 
+export type EquityGrantType = "rsu" | "iso" | "nso" | "warrant" | "rsa";
+
+export interface SimEquityVestEvent {
+  year: number;
+  quarter: "Q1" | "Q2" | "Q3" | "Q4";
+  shares: number;
+  /** FMV per share at the vesting/exercise event. If null, engine projects from currentFmv. */
+  projectedFmvAtEvent: number | null;
+}
+
+export interface SimEquityShareLot {
+  shares: number;
+  costBasisPerShare: number;
+  acquiredDate: string;
+  projectedSaleYear: number | null;
+  projectedSaleQuarter: "Q1" | "Q2" | "Q3" | "Q4" | null;
+  /** ISO qualifying disposition: held >2yr from grant date and >1yr from exercise. */
+  isIsoQualifying: boolean;
+}
+
+export interface SimEquityGrant {
+  id: string;
+  grantType: EquityGrantType;
+  companyName: string;
+  currentFmv: number;
+  fmvGrowthRate: number;
+  strikePrice: number | null;
+  vestingEvents: SimEquityVestEvent[];
+  shareLots: SimEquityShareLot[];
+}
+
 export interface SimRealizationPolicy {
   equityPct: number;
   equityAppreciationRate: number;
@@ -168,6 +199,7 @@ export interface SimulationInput {
   children: SimChildEducation[];
   /** Realization reinvestment policy — null means carry/LP flow into investmentCapital as before */
   realizationPolicy: SimRealizationPolicy | null;
+  equityGrants?: SimEquityGrant[];
   /** Override the simulation start year (defaults to current year) */
   startYear?: number;
 }
@@ -216,6 +248,12 @@ export interface QuarterResult {
   annualStateTax: number;
   /** Employee FICA: Social Security + Medicare + Additional Medicare Tax */
   annualFicaTax: number;
+  /** Ordinary income from RSU/NSO/Warrant/RSA vesting and ISO exercise (AMT preference item excluded) */
+  equityCompensationIncome: number;
+  /** ISO AMT preference item for the year (populated at Q4) */
+  isoAmtAdjustment: number;
+  /** LTCG from equity share lot sales */
+  equityLtcgIncome: number;
 }
 
 export interface SimulationResult {

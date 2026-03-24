@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
 import {
   LayoutDashboard, User, DollarSign, TrendingUp, Building2,
-  Briefcase, Home, Shield, CreditCard, Scale, BarChart3, Receipt, Waves, ListChecks, Activity, Settings
+  Briefcase, Home, Shield, CreditCard, Scale, BarChart3, Receipt, Waves, ListChecks, Activity, Settings, Award
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/carry",          label: "Carry",          icon: TrendingUp,      section: "Capital" },
   { href: "/lp-investments", label: "LP Investments", icon: Briefcase,       section: "Capital" },
   { href: "/cashflow",       label: "Liquidity",      icon: Waves,           section: "Capital" },
+  { href: "/equity-compensation", label: "Equity Comp", icon: Award,           section: "Capital" },
   { href: "/portfolios",     label: "Portfolios",     icon: BarChart3,       section: "Capital" },
   { href: "/real-estate",    label: "Real Estate",    icon: Home,            section: "Capital" },
   { href: "/insurance",      label: "Insurance",      icon: Shield,          section: "Capital" },

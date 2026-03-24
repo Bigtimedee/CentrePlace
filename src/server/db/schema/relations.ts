@@ -11,6 +11,7 @@ import { realizationPolicy } from "./realization-policy";
 import { accountStatements, accountHoldings } from "./holdings";
 import { directInvestments } from "./direct-investments";
 import { cryptoHoldings } from "./crypto-holdings";
+import { equityGrants, equityVestingEvents, equityShareLots } from "./equity-compensation";
 
 // ── userProfiles ─────────────────────────────────────────────────────────────
 export const userProfilesRelations = relations(userProfiles, ({ many, one }) => ({
@@ -35,6 +36,7 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
   accountHoldings: many(accountHoldings),
   directInvestments: many(directInvestments),
   cryptoHoldings: many(cryptoHoldings),
+  equityGrants: many(equityGrants),
 }));
 
 export const childrenRelations = relations(children, ({ one }) => ({
@@ -185,4 +187,21 @@ export const cryptoHoldingsRelations = relations(cryptoHoldings, ({ one }) => ({
     fields: [cryptoHoldings.userId],
     references: [userProfiles.id],
   }),
+}));
+
+// ── equity compensation ───────────────────────────────────────────────────────
+export const equityGrantsRelations = relations(equityGrants, ({ one, many }) => ({
+  user: one(userProfiles, { fields: [equityGrants.userId], references: [userProfiles.id] }),
+  vestingEvents: many(equityVestingEvents),
+  shareLots: many(equityShareLots),
+}));
+
+export const equityVestingEventsRelations = relations(equityVestingEvents, ({ one }) => ({
+  grant: one(equityGrants, { fields: [equityVestingEvents.grantId], references: [equityGrants.id] }),
+  user: one(userProfiles, { fields: [equityVestingEvents.userId], references: [userProfiles.id] }),
+}));
+
+export const equityShareLotsRelations = relations(equityShareLots, ({ one }) => ({
+  grant: one(equityGrants, { fields: [equityShareLots.grantId], references: [equityGrants.id] }),
+  user: one(userProfiles, { fields: [equityShareLots.userId], references: [userProfiles.id] }),
 }));

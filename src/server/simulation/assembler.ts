@@ -23,6 +23,9 @@ import {
   realizationPolicy,
   directInvestments,
   cryptoHoldings,
+  equityGrants,
+  equityVestingEvents,
+  equityShareLots,
 } from "../db/schema";
 import type {
   SimulationInput,
@@ -35,6 +38,8 @@ import type {
   SimOneTimeExpenditure,
   SimChildEducation,
   SimRealizationPolicy,
+  SimEquityGrant,
+  EquityGrantType,
 } from "./engine/types";
 import type { Context } from "../trpc/context";
 
@@ -58,6 +63,9 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     policy,
     directInvs,
     cryptoRows,
+    equityGrantRows,
+    equityVestingRows,
+    equityShareLotRows,
   ] = await Promise.all([
     ctx.db.query.userProfiles.findFirst({ where: eq(userProfiles.id, uid) }),
     ctx.db.query.children.findMany({ where: eq(children.userId, uid) }),
@@ -73,6 +81,9 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     ctx.db.query.realizationPolicy.findFirst({ where: eq(realizationPolicy.userId, uid) }),
     ctx.db.query.directInvestments.findMany({ where: eq(directInvestments.userId, uid) }),
     ctx.db.select().from(cryptoHoldings).where(eq(cryptoHoldings.userId, uid)),
+    ctx.db.select().from(equityGrants).where(eq(equityGrants.userId, uid)),
+    ctx.db.select().from(equityVestingEvents).where(eq(equityVestingEvents.userId, uid)),
+    ctx.db.select().from(equityShareLots).where(eq(equityShareLots.userId, uid)),
   ]);
 
   if (!profile) {
@@ -233,6 +244,33 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     gradSchoolYears: c.graduateSchoolYears ?? 0,
   }));
 
+  const simEquityGrants: SimEquityGrant[] = equityGrantRows.map((g) => ({
+    id: g.id,
+    grantType: g.grantType as EquityGrantType,
+    companyName: g.companyName,
+    currentFmv: g.currentFmv,
+    fmvGrowthRate: g.fmvGrowthRate,
+    strikePrice: g.strikePrice ?? null,
+    vestingEvents: equityVestingRows
+      .filter((v) => v.grantId === g.id)
+      .map((v) => ({
+        year: v.year,
+        quarter: v.quarter as "Q1" | "Q2" | "Q3" | "Q4",
+        shares: v.shares,
+        projectedFmvAtEvent: v.projectedFmvAtEvent ?? null,
+      })),
+    shareLots: equityShareLotRows
+      .filter((l) => l.grantId === g.id)
+      .map((l) => ({
+        shares: l.shares,
+        costBasisPerShare: l.costBasisPerShare,
+        acquiredDate: l.acquiredDate,
+        projectedSaleYear: l.projectedSaleYear ?? null,
+        projectedSaleQuarter: (l.projectedSaleQuarter ?? null) as "Q1" | "Q2" | "Q3" | "Q4" | null,
+        isIsoQualifying: l.isIsoQualifying === 1,
+      })),
+  }));
+
   const simPolicy: SimRealizationPolicy | null = policy
     ? {
         equityPct: policy.equityPct,
@@ -277,5 +315,6 @@ export async function assembleSimInput(ctx: ProtectedCtx): Promise<SimulationInp
     oneTimeExpenditures: simOneTime,
     children: simChildren,
     realizationPolicy: simPolicy,
+    equityGrants: simEquityGrants,
   };
 }

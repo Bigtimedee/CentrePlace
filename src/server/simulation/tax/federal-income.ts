@@ -121,6 +121,13 @@ function getBrackets(
 // Main Calculator
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── AMT Exemption Thresholds 2026 ─────────────────────────────────────────────
+const AMT_EXEMPTION_2026: Record<FilingStatus, number> = {
+  single: 85_700,
+  married_filing_jointly: 133_300,
+};
+const AMT_RATE = 0.26;
+
 export function calculateFederalTax(input: FederalTaxInput): FederalTaxResult {
   const {
     ordinaryIncome,
@@ -175,8 +182,19 @@ export function calculateFederalTax(input: FederalTaxInput): FederalTaxResult {
   const niitBase = Math.max(0, Math.min(netInvestmentIncome, agi - niitThreshold));
   const niit = niitBase * NIIT_RATE;
 
+  // ── Step 5: Alternative Minimum Tax (ISO spread) ─────────────────────────
+  // AMT applies when ISO spread creates an AMTI preference item.
+  const isoAdj = input.isoAmtAdjustment ?? 0;
+  let amt = 0;
+  if (isoAdj > 0) {
+    const amti = taxableOrdinary + isoAdj;
+    const tentativeMinimumTax = Math.max(0, amti - AMT_EXEMPTION_2026[filingStatus]) * AMT_RATE;
+    const regularTax = ordinaryTax + depreciationRecaptureTax + ltcgTax;
+    amt = Math.max(0, tentativeMinimumTax - regularTax);
+  }
+
   const totalFederalTax =
-    ordinaryTax + depreciationRecaptureTax + ltcgTax + niit;
+    ordinaryTax + depreciationRecaptureTax + ltcgTax + niit + amt;
 
   const effectiveRate =
     totalGrossIncome > 0 ? totalFederalTax / totalGrossIncome : 0;
@@ -186,6 +204,7 @@ export function calculateFederalTax(input: FederalTaxInput): FederalTaxResult {
     ltcgTax,
     niit,
     depreciationRecaptureTax,
+    amt,
     totalFederalTax,
     effectiveRate,
   };
