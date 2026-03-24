@@ -245,7 +245,7 @@ function DirectInvestmentForm({
         <button
           type="button"
           onClick={() => setShowAdvanced((v) => !v)}
-          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors"
         >
           {showAdvanced ? (
             <ChevronUp className="h-3.5 w-3.5" />
@@ -395,7 +395,7 @@ export function DirectInvestmentsForm() {
 
       {/* Inline add form */}
       {adding && (
-        <CardBody className="border-b border-slate-800">
+        <CardBody className="border-b border-slate-200">
           <DirectInvestmentForm
             initial={EMPTY}
             onSave={(f) => add.mutate(buildMutationPayload(f))}
@@ -407,8 +407,8 @@ export function DirectInvestmentsForm() {
 
       {/* Summary strip */}
       {data.length > 0 && (
-        <div className="px-6 py-3 border-b border-slate-800 flex flex-wrap items-center gap-3">
-          <span className="text-sm font-semibold text-slate-200">
+        <div className="px-6 py-3 border-b border-slate-200 flex flex-wrap items-center gap-3">
+          <span className="text-sm font-semibold text-slate-700">
             {formatCurrency(totalValue, true)} total
           </span>
           {Object.entries(byClass)
@@ -430,7 +430,7 @@ export function DirectInvestmentsForm() {
           <p className="text-sm text-slate-600">No direct investments added yet.</p>
         </CardBody>
       ) : (
-        <div className="divide-y divide-slate-800">
+        <div className="divide-y divide-slate-200">
           {data.map((inv) => (
             <div key={inv.id}>
               {editingId === inv.id ? (
@@ -443,10 +443,10 @@ export function DirectInvestmentsForm() {
                   />
                 </div>
               ) : (
-                <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
+                <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-50">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-medium text-slate-200">
+                      <span className="text-sm font-medium text-slate-900">
                         {inv.securityName}
                       </span>
                       {inv.stage && (
@@ -475,7 +475,7 @@ export function DirectInvestmentsForm() {
                     </div>
                   </div>
                   <div className="ml-4 flex items-center gap-3">
-                    <span className="text-sm font-semibold text-emerald-400">
+                    <span className="text-sm font-semibold text-emerald-600">
                       {formatCurrency(inv.currentValue)}
                     </span>
                     <div className="flex gap-1">

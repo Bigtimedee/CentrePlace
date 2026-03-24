@@ -116,10 +116,10 @@ function AccountForm({
       {/* Asset Allocation */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-medium text-slate-300">Asset Allocation</h4>
+          <h4 className="text-sm font-medium text-slate-700">Asset Allocation</h4>
           <div className="flex items-center gap-2">
             {!allocationOk && (
-              <span className="flex items-center gap-1 text-xs text-amber-400">
+              <span className="flex items-center gap-1 text-xs text-amber-600">
                 <AlertCircle className="h-3 w-3" /> Sum = {allocationSum.toFixed(1)}% (must be 100%)
               </span>
             )}
@@ -161,7 +161,7 @@ function AccountForm({
       {/* Income Yield Decomposition */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-medium text-slate-300">Income Yield</h4>
+          <h4 className="text-sm font-medium text-slate-700">Income Yield</h4>
           <span className="text-xs text-slate-600">
             Appreciation rate: {appreciationDisplay.toFixed(2)}% (blended − yield)
           </span>

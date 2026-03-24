@@ -22,7 +22,7 @@ export function FormField({ label, hint, error, children, className, required }:
       {children}
       {hint && !error && <p className="text-xs text-slate-600">{hint}</p>}
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 }
