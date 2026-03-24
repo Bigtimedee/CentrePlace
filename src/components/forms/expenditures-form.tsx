@@ -191,7 +191,7 @@ export function ExpendituresForm() {
         />
 
         {addingRecurring && (
-          <CardBody className="border-b border-slate-800">
+          <CardBody className="border-b border-slate-200">
             <RecurringRowForm
               initial={EMPTY_RECURRING}
               onSave={f => addRecurring.mutate({ ...f, growthRate: f.growthRate / 100 })}
@@ -206,7 +206,7 @@ export function ExpendituresForm() {
         ) : (
           <>
             {recurring.length > 0 && (
-              <div className="divide-y divide-slate-800">
+              <div className="divide-y divide-slate-200">
                 {recurring.map(exp => (
                   <div key={exp.id}>
                     {editingRecurringId === exp.id ? (
@@ -224,14 +224,14 @@ export function ExpendituresForm() {
                         />
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-800/30">
+                      <div className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-100">
                         <div className="min-w-0 flex-1">
-                          <span className="text-sm text-slate-200">{exp.description}</span>
+                          <span className="text-sm text-slate-700">{exp.description}</span>
                           <span className="text-xs text-slate-600 ml-3">{CATEGORY_LABELS[exp.category]} · {(exp.growthRate * 100).toFixed(1)}%/yr growth</span>
-                          {exp.isPlaidSynced && <span className="text-xs text-indigo-400 ml-2">Plaid</span>}
+                          {exp.isPlaidSynced && <span className="text-xs text-indigo-600 ml-2">Plaid</span>}
                         </div>
                         <div className="ml-4 flex items-center gap-4">
-                          <span className="text-sm font-semibold text-slate-200">{formatCurrency(exp.annualAmount)}</span>
+                          <span className="text-sm font-semibold text-slate-700">{formatCurrency(exp.annualAmount)}</span>
                           <div className="flex gap-1">
                             <Button variant="ghost" size="sm" onClick={() => setEditingRecurringId(exp.id)}><Pencil className="h-3.5 w-3.5" /></Button>
                             <Button variant="danger" size="sm" onClick={() => deleteRecurring.mutate({ id: exp.id })}><Trash2 className="h-3.5 w-3.5" /></Button>
@@ -247,9 +247,9 @@ export function ExpendituresForm() {
         )}
 
         {recurring.length > 0 && (
-          <div className="px-6 py-3 border-t border-slate-800 flex justify-end">
-            <span className="text-sm text-slate-400">
-              Total annual recurring: <span className="text-slate-200 font-semibold">{formatCurrency(totalRecurring)}</span>
+          <div className="px-6 py-3 border-t border-slate-200 flex justify-end">
+            <span className="text-sm text-slate-500">
+              Total annual recurring: <span className="text-slate-700 font-semibold">{formatCurrency(totalRecurring)}</span>
             </span>
           </div>
         )}
@@ -270,7 +270,7 @@ export function ExpendituresForm() {
         />
 
         {addingOneTime && (
-          <CardBody className="border-b border-slate-800">
+          <CardBody className="border-b border-slate-200">
             <OneTimeRowForm
               initial={EMPTY_ONETIME}
               onSave={f => addOneTime.mutate({ ...f, isChildEducation: false })}
@@ -285,7 +285,7 @@ export function ExpendituresForm() {
         ) : (
           <>
             {oneTime.length > 0 && (
-              <div className="divide-y divide-slate-800">
+              <div className="divide-y divide-slate-200">
                 {oneTime.map(exp => (
                   <div key={exp.id}>
                     {editingOneTimeId === exp.id ? (
@@ -304,13 +304,13 @@ export function ExpendituresForm() {
                         />
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-800/30">
+                      <div className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-100">
                         <div className="min-w-0 flex-1">
-                          <span className="text-sm text-slate-200">{exp.description}</span>
+                          <span className="text-sm text-slate-700">{exp.description}</span>
                           <span className="text-xs text-slate-600 ml-3">{CATEGORY_LABELS[exp.category]} · {exp.projectedYear} {exp.projectedQuarter}</span>
                         </div>
                         <div className="ml-4 flex items-center gap-4">
-                          <span className="text-sm font-semibold text-slate-200">{formatCurrency(exp.amount)}</span>
+                          <span className="text-sm font-semibold text-slate-700">{formatCurrency(exp.amount)}</span>
                           <div className="flex gap-1">
                             <Button variant="ghost" size="sm" onClick={() => setEditingOneTimeId(exp.id)}><Pencil className="h-3.5 w-3.5" /></Button>
                             <Button variant="danger" size="sm" onClick={() => deleteOneTime.mutate({ id: exp.id })}><Trash2 className="h-3.5 w-3.5" /></Button>
@@ -326,9 +326,9 @@ export function ExpendituresForm() {
         )}
 
         {oneTime.length > 0 && (
-          <div className="px-6 py-3 border-t border-slate-800 flex justify-end">
-            <span className="text-sm text-slate-400">
-              Total future events: <span className="text-slate-200 font-semibold">{formatCurrency(totalOneTime, true)}</span>
+          <div className="px-6 py-3 border-t border-slate-200 flex justify-end">
+            <span className="text-sm text-slate-500">
+              Total future events: <span className="text-slate-700 font-semibold">{formatCurrency(totalOneTime, true)}</span>
             </span>
           </div>
         )}

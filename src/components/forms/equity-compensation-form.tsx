@@ -25,11 +25,11 @@ const GRANT_TYPE_LABELS: Record<GrantType, string> = {
 };
 
 const GRANT_TYPE_COLORS: Record<GrantType, string> = {
-  rsu: "bg-blue-500/20 text-blue-300",
-  iso: "bg-emerald-500/20 text-emerald-300",
-  nso: "bg-amber-500/20 text-amber-300",
-  warrant: "bg-purple-500/20 text-purple-300",
-  rsa: "bg-orange-500/20 text-orange-300",
+  rsu: "bg-blue-50 text-blue-700",
+  iso: "bg-emerald-50 text-emerald-700",
+  nso: "bg-amber-50 text-amber-700",
+  warrant: "bg-purple-50 text-purple-700",
+  rsa: "bg-orange-50 text-orange-700",
 };
 
 const NEEDS_STRIKE: GrantType[] = ["iso", "nso", "warrant"];
@@ -415,9 +415,9 @@ function ShareLotForm({
               type="checkbox"
               checked={form.isIsoQualifying}
               onChange={(e) => set({ isIsoQualifying: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-blue-500"
+              className="h-4 w-4 rounded border-slate-300 bg-white text-blue-500"
             />
-            <span className="text-sm text-slate-300">Qualifying</span>
+            <span className="text-sm text-slate-700">Qualifying</span>
           </label>
         </FormField>
       )}
@@ -473,11 +473,11 @@ function GrantDetailPanel({
   const totalVested = grant.vestingEvents.reduce((s, v) => s + v.shares, 0);
 
   return (
-    <div className="px-6 pb-4 space-y-5 border-t border-slate-800/50 pt-4">
+    <div className="px-6 pb-4 space-y-5 border-t border-slate-200 pt-4">
       {/* Vesting Schedule */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Vesting Schedule
             <span className="ml-2 text-slate-600 font-normal normal-case">
               {totalVested}/{grant.totalShares} shares scheduled
@@ -516,11 +516,11 @@ function GrantDetailPanel({
               .slice()
               .sort((a, b) => a.year - b.year || a.quarter.localeCompare(b.quarter))
               .map((v) => (
-                <div key={v.id} className="flex items-center justify-between text-xs text-slate-300 py-1 px-2 rounded hover:bg-slate-800/40">
+                <div key={v.id} className="flex items-center justify-between text-xs text-slate-700 py-1 px-2 rounded hover:bg-slate-100">
                   <span>{v.year} {v.quarter}</span>
                   <span>{v.shares.toLocaleString()} shares</span>
                   {v.projectedFmvAtEvent !== null && (
-                    <span className="text-slate-400">{formatCurrency(v.projectedFmvAtEvent)} FMV</span>
+                    <span className="text-slate-500">{formatCurrency(v.projectedFmvAtEvent)} FMV</span>
                   )}
                   <Button
                     variant="danger"
@@ -538,7 +538,7 @@ function GrantDetailPanel({
       {/* Share Lots */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Share Lots
             <span className="ml-2 text-slate-600 font-normal normal-case">
               {grant.shareLots.reduce((s, l) => s + l.shares, 0).toLocaleString()} shares tracked
@@ -580,15 +580,15 @@ function GrantDetailPanel({
               .slice()
               .sort((a, b) => a.acquiredDate.localeCompare(b.acquiredDate))
               .map((l) => (
-                <div key={l.id} className="flex items-center justify-between text-xs text-slate-300 py-1 px-2 rounded hover:bg-slate-800/40">
+                <div key={l.id} className="flex items-center justify-between text-xs text-slate-700 py-1 px-2 rounded hover:bg-slate-100">
                   <span>{l.shares.toLocaleString()} shares</span>
                   <span>{formatCurrency(l.costBasisPerShare)} basis</span>
-                  <span className="text-slate-400">Acquired {l.acquiredDate}</span>
+                  <span className="text-slate-500">Acquired {l.acquiredDate}</span>
                   {l.projectedSaleYear !== null && (
-                    <span className="text-slate-400">Sale: {l.projectedSaleYear} {l.projectedSaleQuarter}</span>
+                    <span className="text-slate-500">Sale: {l.projectedSaleYear} {l.projectedSaleQuarter}</span>
                   )}
                   {l.isIsoQualifying === 1 && (
-                    <span className="text-emerald-400">ISO qualifying</span>
+                    <span className="text-emerald-600">ISO qualifying</span>
                   )}
                   <Button
                     variant="danger"
@@ -666,7 +666,7 @@ export function EquityCompensationForm() {
         />
 
         {adding && (
-          <CardBody className="border-b border-slate-800">
+          <CardBody className="border-b border-slate-200">
             <GrantForm
               initial={{ ...EMPTY_GRANT }}
               onSave={(f) => addGrant.mutate(grantToMutation(f))}
@@ -682,7 +682,7 @@ export function EquityCompensationForm() {
             <p className="text-sm text-slate-600">No equity grants added yet.</p>
           </CardBody>
         ) : (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-slate-200">
             {data.map((grant) => {
               const isExpanded = expandedIds.has(grant.id);
               const isEditing = editingId === grant.id;
@@ -706,12 +706,12 @@ export function EquityCompensationForm() {
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
+                      <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-100">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <button
                             type="button"
                             onClick={() => toggleExpanded(grant.id)}
-                            className="text-slate-600 hover:text-slate-300 transition-colors flex-shrink-0"
+                            className="text-slate-600 hover:text-slate-700 transition-colors flex-shrink-0"
                             aria-label={isExpanded ? "Collapse" : "Expand"}
                           >
                             {isExpanded ? (
@@ -722,7 +722,7 @@ export function EquityCompensationForm() {
                           </button>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-medium text-slate-200">
+                              <span className="text-sm font-medium text-slate-700">
                                 {grant.companyName}
                               </span>
                               <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${GRANT_TYPE_COLORS[grantType]}`}>
@@ -742,7 +742,7 @@ export function EquityCompensationForm() {
                         </div>
                         <div className="ml-4 flex items-center gap-4 flex-shrink-0">
                           <div className="text-right">
-                            <div className="text-sm font-semibold text-emerald-400">
+                            <div className="text-sm font-semibold text-emerald-600">
                               {formatCurrency(intrinsicValue, true)}
                             </div>
                             <div className="text-xs text-slate-600">intrinsic value</div>

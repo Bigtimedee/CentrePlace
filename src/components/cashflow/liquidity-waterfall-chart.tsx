@@ -40,23 +40,23 @@ function CustomTooltip({ active, payload, label }: {
   const hasMeaningfulEvent = events.some(e => e.source !== "w2" && e.source !== "rental");
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[200px] max-w-[280px]">
-      <p className="text-slate-400 mb-2 font-medium">{label}</p>
+    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[200px] max-w-[280px]">
+      <p className="text-slate-600 mb-2 font-medium">{label}</p>
       {payload
         .filter(e => e.name !== "Cumulative" && Math.abs(e.value) > 0)
         .map(entry => (
           <div key={entry.name} className="flex items-center justify-between gap-4 mb-1">
             <span style={{ color: entry.fill ?? entry.color }}>{entry.name}</span>
-            <span className="text-slate-100 font-semibold">{fmtK(entry.value)}</span>
+            <span className="text-slate-900 font-semibold">{fmtK(entry.value)}</span>
           </div>
         ))}
       {hasMeaningfulEvent && (
         <>
-          <div className="border-t border-slate-800 mt-2 pt-2 space-y-1">
+          <div className="border-t border-slate-200 mt-2 pt-2 space-y-1">
             {events
               .filter(e => e.source !== "w2" && e.source !== "rental")
               .map((e, i) => (
-                <div key={i} className="text-slate-400">
+                <div key={i} className="text-slate-600">
                   <span style={{ color: SOURCE_CONFIG[e.source].color }}>{e.label}</span>
                   <span className="ml-1 text-slate-600">
                     {formatCurrency(e.grossAmount, true)} gross · ~{formatCurrency(e.estimatedTax, true)} tax
@@ -66,13 +66,13 @@ function CustomTooltip({ active, payload, label }: {
           </div>
         </>
       )}
-      <div className="border-t border-slate-800 mt-2 pt-2">
+      <div className="border-t border-slate-200 mt-2 pt-2">
         {payload
           .filter(e => e.name === "Cumulative" && e.value !== 0)
           .map(entry => (
             <div key="cumulative" className="flex items-center justify-between gap-4">
               <span className="text-slate-600">Running Total</span>
-              <span className="text-slate-300 font-semibold">{fmtK(entry.value)}</span>
+              <span className="text-slate-700 font-semibold">{fmtK(entry.value)}</span>
             </div>
           ))}
       </div>
@@ -110,7 +110,7 @@ export function LiquidityWaterfallChart({ quarters, activeSources, viewMode }: P
     <div>
       <ResponsiveContainer width="100%" height={320}>
         <ComposedChart data={data} margin={{ top: 4, right: 52, bottom: 0, left: 16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="label"
             tick={{ fill: "#64748b", fontSize: 11 }}

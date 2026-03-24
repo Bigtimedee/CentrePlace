@@ -21,15 +21,15 @@ function Stat({
   accent?: "rose" | "emerald" | "amber" | "indigo";
 }) {
   const colors = {
-    rose: "text-rose-400",
-    emerald: "text-emerald-400",
-    amber: "text-amber-400",
-    indigo: "text-indigo-400",
+    rose: "text-rose-600",
+    emerald: "text-emerald-600",
+    amber: "text-amber-600",
+    indigo: "text-indigo-600",
   };
   return (
-    <div className="bg-slate-800/50 rounded-lg px-4 py-3">
+    <div className="bg-slate-50 rounded-lg px-4 py-3">
       <p className="text-xs text-slate-600 mb-1">{label}</p>
-      <p className={`text-lg font-semibold ${accent ? colors[accent] : "text-slate-100"}`}>{value}</p>
+      <p className={`text-lg font-semibold ${accent ? colors[accent] : "text-slate-900"}`}>{value}</p>
       {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
     </div>
   );
@@ -61,11 +61,11 @@ export function EstateSummaryCard({ data }: Props) {
         description={`${filingStatus === "married_filing_jointly" ? "MFJ" : "Single"} · ${stateCode} · ${data.currentYear}`}
         action={
           isTaxable ? (
-            <span className="flex items-center gap-1.5 text-xs font-medium text-rose-400 bg-rose-950/50 border border-rose-800 rounded-full px-3 py-1">
+            <span className="flex items-center gap-1.5 text-xs font-medium text-rose-600 bg-rose-50 border border-rose-200 rounded-full px-3 py-1">
               <AlertCircle className="h-3 w-3" /> Estate Tax Owed
             </span>
           ) : (
-            <span className="text-xs font-medium text-emerald-400 bg-emerald-950/50 border border-emerald-800 rounded-full px-3 py-1">
+            <span className="text-xs font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
               Below Federal Threshold
             </span>
           )
@@ -106,10 +106,10 @@ export function EstateSummaryCard({ data }: Props) {
           <div className="flex items-center justify-between text-xs text-slate-600 mb-1.5">
             <span>Estate vs Federal Exemption ({formatCurrency(federalExemption, true)})</span>
             {netAboveFederal > 0 && (
-              <span className="text-rose-400">{formatCurrency(netAboveFederal, true)} above threshold</span>
+              <span className="text-rose-600">{formatCurrency(netAboveFederal, true)} above threshold</span>
             )}
           </div>
-          <div className="relative h-3 bg-slate-800 rounded-full overflow-hidden">
+          <div className="relative h-3 bg-slate-200 rounded-full overflow-hidden">
             {/* Exempt portion */}
             <div
               className="absolute inset-y-0 left-0 bg-emerald-600/70 rounded-full"

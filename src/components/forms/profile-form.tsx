@@ -181,7 +181,7 @@ export function ProfileForm() {
             </Button>
           </div>
           {upsert.isSuccess && (
-            <p className="text-xs text-emerald-400 text-right mt-2">Saved</p>
+            <p className="text-xs text-emerald-600 text-right mt-2">Saved</p>
           )}
         </CardBody>
       </Card>
@@ -201,11 +201,11 @@ export function ProfileForm() {
         />
 
         {children.length > 0 && (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-slate-200">
             {children.map(child => (
               <div key={child.id} className="flex items-center justify-between px-6 py-3">
                 <div>
-                  <span className="text-sm text-slate-200 font-medium">{child.name}</span>
+                  <span className="text-sm text-slate-700 font-medium">{child.name}</span>
                   <span className="text-xs text-slate-600 ml-3">
                     b. {child.birthYear}
                     {(child.k12TuitionCost ?? 0) > 0 && ` · K-12 ${formatCurrency(child.k12TuitionCost ?? 0, true)}/yr`}
@@ -226,7 +226,7 @@ export function ProfileForm() {
         )}
 
         {showChildForm && (
-          <CardBody className="border-t border-slate-800">
+          <CardBody className="border-t border-slate-200">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <FormField label="Name" required>
                 <Input

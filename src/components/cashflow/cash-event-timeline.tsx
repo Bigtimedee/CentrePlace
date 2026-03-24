@@ -60,7 +60,7 @@ export function CashEventTimeline({ significantQuarters, activeSources }: Props)
               <div className="text-xs font-semibold mb-1" style={{ color: config.color }}>
                 {bucket.quarter} {bucket.year}
               </div>
-              <div className="text-sm font-bold text-slate-100">
+              <div className="text-sm font-bold text-slate-900">
                 {formatCurrency(totalNet, true)}
               </div>
               <div className="text-xs text-slate-600 mt-0.5">
@@ -68,7 +68,7 @@ export function CashEventTimeline({ significantQuarters, activeSources }: Props)
               </div>
               <div className="mt-2 space-y-0.5">
                 {namedEvents.slice(0, 3).map((e, i) => (
-                  <div key={i} className="text-xs text-slate-400 truncate">
+                  <div key={i} className="text-xs text-slate-600 truncate">
                     <span style={{ color: SOURCE_CONFIG[e.source].color }}>
                       {SOURCE_CONFIG[e.source].label}
                     </span>

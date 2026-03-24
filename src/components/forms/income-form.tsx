@@ -99,7 +99,7 @@ export function IncomeForm() {
             {upsert.isPending ? "Saving…" : "Save Income"}
           </Button>
         </div>
-        {upsert.isSuccess && <p className="text-xs text-emerald-400 text-right mt-2">Saved</p>}
+        {upsert.isSuccess && <p className="text-xs text-emerald-600 text-right mt-2">Saved</p>}
       </CardBody>
     </Card>
   );

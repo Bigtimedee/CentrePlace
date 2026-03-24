@@ -3,11 +3,11 @@
 import type { CashEventSource } from "@/server/simulation/cashflow/types";
 
 export const SOURCE_CONFIG: Record<CashEventSource, { label: string; color: string; activeClass: string }> = {
-  carry:           { label: "GP Carry",    color: "#f59e0b", activeClass: "bg-amber-950/60 border-amber-600 text-amber-300" },
-  lp_distribution: { label: "LP Dist.",    color: "#6366f1", activeClass: "bg-indigo-950/60 border-indigo-600 text-indigo-300" },
-  real_estate_sale:{ label: "RE Sale",     color: "#10b981", activeClass: "bg-emerald-950/60 border-emerald-600 text-emerald-300" },
-  w2:              { label: "W-2 Income",  color: "#64748b", activeClass: "bg-slate-700/60 border-slate-500 text-slate-300" },
-  rental:          { label: "Rental",      color: "#a78bfa", activeClass: "bg-violet-950/60 border-violet-600 text-violet-300" },
+  carry:           { label: "GP Carry",    color: "#f59e0b", activeClass: "bg-amber-50 border-amber-400 text-amber-700" },
+  lp_distribution: { label: "LP Dist.",    color: "#6366f1", activeClass: "bg-indigo-50 border-indigo-400 text-indigo-700" },
+  real_estate_sale:{ label: "RE Sale",     color: "#10b981", activeClass: "bg-emerald-50 border-emerald-400 text-emerald-700" },
+  w2:              { label: "W-2 Income",  color: "#64748b", activeClass: "bg-slate-100 border-slate-400 text-slate-700" },
+  rental:          { label: "Rental",      color: "#a78bfa", activeClass: "bg-violet-50 border-violet-400 text-violet-700" },
 };
 
 const SOURCES: CashEventSource[] = ["carry", "lp_distribution", "real_estate_sale", "w2", "rental"];
@@ -34,7 +34,7 @@ export function CashflowFilterBar({ activeSources, onToggle, viewMode, onToggleV
               className={`text-xs font-medium border rounded-full px-3 py-1 transition-colors ${
                 isActive
                   ? config.activeClass
-                  : "bg-slate-900 border-slate-700 text-slate-600 hover:border-slate-600 hover:text-slate-400"
+                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-600"
               }`}
             >
               <span
@@ -49,7 +49,7 @@ export function CashflowFilterBar({ activeSources, onToggle, viewMode, onToggleV
 
       <button
         onClick={onToggleViewMode}
-        className="text-xs font-medium border rounded-full px-3 py-1 transition-colors bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+        className="text-xs font-medium border rounded-full px-3 py-1 transition-colors bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-600"
       >
         View: {viewMode === "annual" ? "Annual" : "Quarterly"}
       </button>

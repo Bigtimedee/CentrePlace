@@ -15,13 +15,13 @@ function MetricTile({
   accent?: "amber" | "indigo" | "green" | "slate";
 }) {
   const colors = {
-    amber:  "text-amber-400",
-    indigo: "text-indigo-400",
-    green:  "text-emerald-400",
-    slate:  "text-slate-100",
+    amber:  "text-amber-600",
+    indigo: "text-indigo-600",
+    green:  "text-emerald-600",
+    slate:  "text-slate-900",
   };
   return (
-    <div className="bg-slate-800/50 rounded-lg px-4 py-3">
+    <div className="bg-slate-50 rounded-lg px-4 py-3">
       <p className="text-xs text-slate-600 mb-1">{label}</p>
       <p className={`text-lg font-semibold ${colors[accent ?? "slate"]}`}>{value}</p>
       {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}

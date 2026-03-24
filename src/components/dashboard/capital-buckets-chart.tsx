@@ -42,17 +42,17 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null;
   const total = payload.reduce((s, e) => s + e.value, 0);
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[180px]">
-      <p className="text-slate-400 mb-2 font-medium">Year {label}</p>
+    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[180px]">
+      <p className="text-slate-600 mb-2 font-medium">Year {label}</p>
       {[...payload].reverse().map((entry) => entry.value > 0 && (
         <div key={entry.name} className="flex items-center justify-between gap-4 mb-1">
           <span style={{ color: entry.color }}>{entry.name}</span>
-          <span className="text-slate-100 font-semibold">{fmtM(entry.value)}</span>
+          <span className="text-slate-900 font-semibold">{fmtM(entry.value)}</span>
         </div>
       ))}
-      <div className="flex items-center justify-between gap-4 pt-1.5 mt-1.5 border-t border-slate-700">
-        <span className="text-slate-400">Total</span>
-        <span className="text-slate-100 font-semibold">{fmtM(total)}</span>
+      <div className="flex items-center justify-between gap-4 pt-1.5 mt-1.5 border-t border-slate-200">
+        <span className="text-slate-600">Total</span>
+        <span className="text-slate-900 font-semibold">{fmtM(total)}</span>
       </div>
     </div>
   );
@@ -70,7 +70,7 @@ export function CapitalBucketsChart({ quarters }: Props) {
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-slate-100">Capital Composition</h3>
+        <h3 className="text-sm font-semibold text-slate-900">Capital Composition</h3>
         <p className="text-xs text-slate-600 mt-0.5">How your capital is allocated across asset buckets</p>
       </div>
 
@@ -90,7 +90,7 @@ export function CapitalBucketsChart({ quarters }: Props) {
             ))}
           </defs>
 
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="year"
             tick={{ fill: "#64748b", fontSize: 11 }}

@@ -125,7 +125,7 @@ export function RealizationPolicyForm() {
             {/* Allocation summary */}
             <div className="flex items-center gap-2 text-xs">
               {!allocOk && (
-                <span className="flex items-center gap-1 text-amber-400">
+                <span className="flex items-center gap-1 text-amber-600">
                   <AlertCircle className="h-3 w-3" /> Allocation sum {allocSum.toFixed(1)}% exceeds 100%
                 </span>
               )}
@@ -138,7 +138,7 @@ export function RealizationPolicyForm() {
 
             {/* Equity */}
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Equity (e.g. S&P 500)</h4>
+              <h4 className="text-sm font-medium text-slate-700 mb-3">Equity (e.g. S&P 500)</h4>
               <div className="grid grid-cols-3 gap-4">
                 <FormField label="Allocation">
                   <Input type="number" min={0} max={100} step={1} suffix="%" value={form.equityPct}
@@ -157,7 +157,7 @@ export function RealizationPolicyForm() {
 
             {/* Taxable fixed income */}
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Taxable Fixed Income (e.g. corporate/treasury bonds)</h4>
+              <h4 className="text-sm font-medium text-slate-700 mb-3">Taxable Fixed Income (e.g. corporate/treasury bonds)</h4>
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="Allocation">
                   <Input type="number" min={0} max={100} step={1} suffix="%" value={form.taxableFixedIncomePct}
@@ -172,7 +172,7 @@ export function RealizationPolicyForm() {
 
             {/* Tax-exempt fixed income */}
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Tax-Exempt Fixed Income (e.g. municipal bonds)</h4>
+              <h4 className="text-sm font-medium text-slate-700 mb-3">Tax-Exempt Fixed Income (e.g. municipal bonds)</h4>
               <div className="grid grid-cols-2 gap-4">
                 <FormField label="Allocation">
                   <Input type="number" min={0} max={100} step={1} suffix="%" value={form.taxExemptFixedIncomePct}
@@ -187,7 +187,7 @@ export function RealizationPolicyForm() {
 
             {/* Real estate */}
             <div>
-              <h4 className="text-sm font-medium text-slate-300 mb-3">Real Estate / Hard Assets</h4>
+              <h4 className="text-sm font-medium text-slate-700 mb-3">Real Estate / Hard Assets</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <FormField label="Allocation">
                   <Input type="number" min={0} max={100} step={1} suffix="%" value={form.realEstatePct}
@@ -214,7 +214,7 @@ export function RealizationPolicyForm() {
               </Button>
             </div>
             {upsert.isSuccess && (
-              <p className="text-xs text-emerald-400 text-right">Saved</p>
+              <p className="text-xs text-emerald-600 text-right">Saved</p>
             )}
           </div>
         </CardBody>

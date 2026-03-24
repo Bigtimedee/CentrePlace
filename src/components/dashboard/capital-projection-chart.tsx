@@ -44,12 +44,12 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[160px]">
-      <p className="text-slate-400 mb-2 font-medium">Year {label}</p>
+    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[160px]">
+      <p className="text-slate-600 mb-2 font-medium">Year {label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center justify-between gap-4 mb-1">
           <span style={{ color: entry.color }}>{entry.name}</span>
-          <span className="text-slate-100 font-semibold">{fmtM(entry.value)}</span>
+          <span className="text-slate-900 font-semibold">{fmtM(entry.value)}</span>
         </div>
       ))}
     </div>

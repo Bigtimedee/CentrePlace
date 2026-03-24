@@ -12,13 +12,13 @@ const SOURCE_META: Record<
   WithdrawalSourceType,
   { label: string; color: string; bg: string; badge: string }
 > = {
-  rmd:           { label: "RMD",         color: "text-amber-400",   bg: "bg-amber-950/30",   badge: "border-amber-800" },
-  ppli_loan:     { label: "PPLI Loan",   color: "text-emerald-400", bg: "bg-emerald-950/30", badge: "border-emerald-800" },
-  wl_loan:       { label: "WL Loan",     color: "text-emerald-400", bg: "bg-emerald-950/30", badge: "border-emerald-800" },
-  taxable_0pct:  { label: "Taxable 0%",  color: "text-sky-400",     bg: "bg-sky-950/30",     badge: "border-sky-800" },
-  roth:          { label: "Roth",        color: "text-violet-400",  bg: "bg-violet-950/30",  badge: "border-violet-800" },
-  taxable_15pct: { label: "Taxable 15%", color: "text-yellow-400",  bg: "bg-yellow-950/30",  badge: "border-yellow-800" },
-  traditional:   { label: "Traditional", color: "text-rose-400",    bg: "bg-rose-950/30",    badge: "border-rose-800" },
+  rmd:           { label: "RMD",         color: "text-amber-600",   bg: "bg-amber-50",   badge: "border-amber-200" },
+  ppli_loan:     { label: "PPLI Loan",   color: "text-emerald-600", bg: "bg-emerald-50", badge: "border-emerald-200" },
+  wl_loan:       { label: "WL Loan",     color: "text-emerald-600", bg: "bg-emerald-50", badge: "border-emerald-200" },
+  taxable_0pct:  { label: "Taxable 0%",  color: "text-sky-600",     bg: "bg-sky-50",     badge: "border-sky-200" },
+  roth:          { label: "Roth",        color: "text-violet-600",  bg: "bg-violet-50",  badge: "border-violet-200" },
+  taxable_15pct: { label: "Taxable 15%", color: "text-yellow-600",  bg: "bg-yellow-50",  badge: "border-yellow-200" },
+  traditional:   { label: "Traditional", color: "text-rose-600",    bg: "bg-rose-50",    badge: "border-rose-200" },
 };
 
 function SourceBadge({ type }: { type: WithdrawalSourceType }) {
@@ -32,9 +32,9 @@ function SourceBadge({ type }: { type: WithdrawalSourceType }) {
 
 function TaxBadge({ rate }: { rate: number }) {
   if (rate === 0) {
-    return <span className="text-xs text-emerald-400 font-medium">Tax-free</span>;
+    return <span className="text-xs text-emerald-600 font-medium">Tax-free</span>;
   }
-  return <span className="text-xs text-slate-400">{formatPct(rate)} effective</span>;
+  return <span className="text-xs text-slate-500">{formatPct(rate)} effective</span>;
 }
 
 export function WithdrawalPlanCard() {
@@ -59,7 +59,7 @@ export function WithdrawalPlanCard() {
       <Card>
         <CardHeader title="Withdrawal Strategy" description="Optimal sequencing for your retirement income" />
         <CardBody>
-          <div className="flex items-center gap-2 text-amber-400 text-sm">
+          <div className="flex items-center gap-2 text-amber-600 text-sm">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             Complete your profile and expenditures to see withdrawal recommendations.
           </div>
@@ -90,21 +90,21 @@ export function WithdrawalPlanCard() {
       />
 
       {/* Summary strip */}
-      <div className="grid grid-cols-3 divide-x divide-slate-800 border-b border-slate-800">
+      <div className="grid grid-cols-3 divide-x divide-slate-200 border-b border-slate-200">
         <div className="px-5 py-3">
           <p className="text-xs text-slate-600">Annual need</p>
-          <p className="text-sm font-semibold text-slate-100 mt-0.5">
+          <p className="text-sm font-semibold text-slate-900 mt-0.5">
             {formatCurrency(plan.metNeed + plan.unmetNeed)}
           </p>
         </div>
         <div className="px-5 py-3">
           <p className="text-xs text-slate-600">Total tax</p>
-          <p className="text-sm font-semibold text-rose-400 mt-0.5">{formatCurrency(plan.totalTax)}</p>
+          <p className="text-sm font-semibold text-rose-600 mt-0.5">{formatCurrency(plan.totalTax)}</p>
           <p className="text-xs text-slate-600">{formatPct(plan.effectiveTaxRate)} rate</p>
         </div>
         <div className="px-5 py-3">
           <p className="text-xs text-slate-600">Tax savings</p>
-          <p className="text-sm font-semibold text-emerald-400 mt-0.5">
+          <p className="text-sm font-semibold text-emerald-600 mt-0.5">
             {plan.taxSavings > 0 ? `+${formatCurrency(plan.taxSavings)}` : formatCurrency(0)}
           </p>
           <p className="text-xs text-slate-600">vs all-traditional</p>
@@ -112,24 +112,24 @@ export function WithdrawalPlanCard() {
       </div>
 
       {/* Waterfall steps */}
-      <div className="divide-y divide-slate-800/60">
+      <div className="divide-y divide-slate-200">
         {plan.steps.map((step, i) => {
           const isLast = i === plan.steps.length - 1;
           return (
-            <div key={`${step.accountId}-${step.rank}`} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-800/20">
+            <div key={`${step.accountId}-${step.rank}`} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-100">
               {/* Rank connector */}
               <div className="flex flex-col items-center gap-0.5 flex-shrink-0">
-                <div className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-slate-400">
+                <div className="w-6 h-6 rounded-full bg-slate-200 border border-slate-300 flex items-center justify-center text-xs text-slate-500">
                   {step.rank}
                 </div>
-                {!isLast && <div className="w-px h-3 bg-slate-800" />}
+                {!isLast && <div className="w-px h-3 bg-slate-200" />}
               </div>
 
               {/* Source */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <SourceBadge type={step.sourceType} />
-                  <span className="text-sm text-slate-300 truncate">{step.label}</span>
+                  <span className="text-sm text-slate-700 truncate">{step.label}</span>
                 </div>
                 <p className="text-xs text-slate-600 mt-0.5 truncate">{step.notes}</p>
               </div>
@@ -137,12 +137,12 @@ export function WithdrawalPlanCard() {
               {/* Amounts */}
               <div className="flex items-center gap-4 flex-shrink-0 text-right">
                 <div>
-                  <p className="text-sm font-medium text-slate-200">{formatCurrency(step.grossAmount)}</p>
+                  <p className="text-sm font-medium text-slate-700">{formatCurrency(step.grossAmount)}</p>
                   <TaxBadge rate={step.taxCost > 0 ? step.taxCost / step.grossAmount : 0} />
                 </div>
                 <ArrowRight className="h-3.5 w-3.5 text-slate-600" />
                 <div>
-                  <p className="text-sm font-semibold text-slate-100">{formatCurrency(step.netAmount)}</p>
+                  <p className="text-sm font-semibold text-slate-900">{formatCurrency(step.netAmount)}</p>
                   <p className="text-xs text-slate-600">net</p>
                 </div>
               </div>
@@ -152,19 +152,19 @@ export function WithdrawalPlanCard() {
       </div>
 
       {/* Footer */}
-      <div className="px-5 py-3 border-t border-slate-800 flex items-center justify-between">
+      <div className="px-5 py-3 border-t border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs text-slate-600">
           <Banknote className="h-3.5 w-3.5" />
           Cost basis assumed 50% for taxable accounts · RMD age 73+
         </div>
         {plan.rmdAmount > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-amber-400">
+          <div className="flex items-center gap-1.5 text-xs text-amber-600">
             <AlertCircle className="h-3.5 w-3.5" />
             RMD required: {formatCurrency(plan.rmdAmount)}
           </div>
         )}
         {plan.unmetNeed > 0 && (
-          <div className="flex items-center gap-1.5 text-xs text-rose-400">
+          <div className="flex items-center gap-1.5 text-xs text-rose-600">
             <TrendingDown className="h-3.5 w-3.5" />
             Unmet: {formatCurrency(plan.unmetNeed)} — add more accounts
           </div>

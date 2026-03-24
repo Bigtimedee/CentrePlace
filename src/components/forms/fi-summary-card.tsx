@@ -56,7 +56,7 @@ export function FISummaryCard() {
       <Card>
         <CardHeader title="Financial Independence Status" />
         <CardBody>
-          <div className="flex items-center gap-2 text-amber-400 text-sm">
+          <div className="flex items-center gap-2 text-amber-600 text-sm">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>
               {error?.message?.includes("Profile not found")

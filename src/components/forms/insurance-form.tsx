@@ -123,11 +123,11 @@ function PolicyForm({
             onClick={() => set({ policyType: type })}
             className={`text-left p-3 rounded-lg border transition-colors ${
               form.policyType === type
-                ? "border-indigo-500 bg-indigo-950/40"
-                : "border-slate-700 hover:border-slate-600"
+                ? "border-indigo-500 bg-indigo-50"
+                : "border-slate-200 hover:border-slate-300"
             }`}
           >
-            <div className="text-sm font-medium text-slate-200 mb-1">{POLICY_TYPE_LABELS[type]}</div>
+            <div className="text-sm font-medium text-slate-700 mb-1">{POLICY_TYPE_LABELS[type]}</div>
             <div className="text-xs text-slate-600 leading-snug">{POLICY_DESCRIPTIONS[type]}</div>
           </button>
         ))}
@@ -172,8 +172,8 @@ function PolicyForm({
       {/* Cash value / loan section — permanent only */}
       {isPermanent && (
         <>
-          <div className="border-t border-slate-800 pt-4">
-            <h4 className="text-sm font-medium text-slate-300 mb-3">Cash Value & Loans</h4>
+          <div className="border-t border-slate-200 pt-4">
+            <h4 className="text-sm font-medium text-slate-700 mb-3">Cash Value & Loans</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField label="Current Cash Value">
                 <Input type="number" min={0} prefix="$" value={form.currentCashValue} onChange={e => set({ currentCashValue: parseFloat(e.target.value) || 0 })} />
@@ -188,7 +188,7 @@ function PolicyForm({
                 <Input type="number" min={0} prefix="$" value={form.outstandingLoanBalance} onChange={e => set({ outstandingLoanBalance: parseFloat(e.target.value) || 0 })} />
               </FormField>
               <FormField label="Available to Borrow">
-                <div className="flex items-center h-9 px-3 bg-slate-800/50 border border-slate-700/50 rounded-md text-sm text-emerald-400">
+                <div className="flex items-center h-9 px-3 bg-slate-50 border border-slate-200 rounded-md text-sm text-emerald-600">
                   {formatCurrency(availableLoan)}
                 </div>
               </FormField>
@@ -249,7 +249,7 @@ export function InsuranceForm() {
         />
 
         {adding && (
-          <CardBody className="border-b border-slate-800">
+          <CardBody className="border-b border-slate-200">
             <PolicyForm
               initial={EMPTY}
               onSave={f => add.mutate(toMutation(f))}
@@ -262,7 +262,7 @@ export function InsuranceForm() {
         {data.length === 0 && !adding ? (
           <CardBody><p className="text-sm text-slate-600">No insurance policies added yet.</p></CardBody>
         ) : (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-slate-200">
             {data.map(policy => (
               <div key={policy.id}>
                 {editingId === policy.id ? (
@@ -275,17 +275,17 @@ export function InsuranceForm() {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
+                  <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-100">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-3">
                         <Shield className="h-3.5 w-3.5 text-slate-600 flex-shrink-0" />
-                        <span className="text-sm font-medium text-slate-200">{policy.policyName}</span>
+                        <span className="text-sm font-medium text-slate-700">{policy.policyName}</span>
                         <span className="text-xs text-slate-600">{POLICY_TYPE_LABELS[policy.policyType]}</span>
                         {policy.ownershipStructure === "ilit" && (
-                          <span className="text-xs text-indigo-400 font-medium">ILIT</span>
+                          <span className="text-xs text-indigo-600 font-medium">ILIT</span>
                         )}
                         {policy.isEstateTaxFunding && (
-                          <span className="text-xs text-amber-400">estate tax</span>
+                          <span className="text-xs text-amber-600">estate tax</span>
                         )}
                       </div>
                       <div className="text-xs text-slate-600 mt-0.5 ml-5">
@@ -295,7 +295,7 @@ export function InsuranceForm() {
                     </div>
                     <div className="ml-4 flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-sm font-semibold text-slate-200">{formatCurrency(policy.deathBenefit, true)}</div>
+                        <div className="text-sm font-semibold text-slate-700">{formatCurrency(policy.deathBenefit, true)}</div>
                         <div className="text-xs text-slate-600">death benefit</div>
                       </div>
                       <div className="flex gap-1">
@@ -312,10 +312,10 @@ export function InsuranceForm() {
       </Card>
 
       {data.length > 0 && (
-        <div className="flex items-center justify-end gap-6 text-sm text-slate-400">
-          <span>Total death benefit: <span className="text-slate-200 font-semibold">{formatCurrency(totalDeathBenefit, true)}</span></span>
+        <div className="flex items-center justify-end gap-6 text-sm text-slate-500">
+          <span>Total death benefit: <span className="text-slate-700 font-semibold">{formatCurrency(totalDeathBenefit, true)}</span></span>
           {ilitBenefit > 0 && (
-            <span>ILIT (excluded from estate): <span className="text-indigo-400 font-semibold">{formatCurrency(ilitBenefit, true)}</span></span>
+            <span>ILIT (excluded from estate): <span className="text-indigo-600 font-semibold">{formatCurrency(ilitBenefit, true)}</span></span>
           )}
         </div>
       )}

@@ -151,7 +151,7 @@ function PropertyFormPanel({
 
       {/* Future sale */}
       <div>
-        <h4 className="text-sm font-medium text-slate-300 mb-3">Future Sale (Optional)</h4>
+        <h4 className="text-sm font-medium text-slate-700 mb-3">Future Sale (Optional)</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField label="Projected Sale Year">
             <Input
@@ -185,7 +185,7 @@ function PropertyFormPanel({
       {/* Mortgage */}
       <div>
         <div className="flex items-center gap-3 mb-3">
-          <h4 className="text-sm font-medium text-slate-300">Mortgage</h4>
+          <h4 className="text-sm font-medium text-slate-700">Mortgage</h4>
           <Toggle
             checked={form.hasMortgage}
             onChange={v => set({ hasMortgage: v })}
@@ -219,7 +219,7 @@ function PropertyFormPanel({
             </FormField>
             {annualMortgagePayment > 0 && (
               <FormField label="Est. Annual Payment">
-                <div className="flex items-center h-9 px-3 bg-slate-800/50 border border-slate-700/50 rounded-md text-sm text-slate-400">
+                <div className="flex items-center h-9 px-3 bg-slate-50 border border-slate-200 rounded-md text-sm text-slate-600">
                   {formatCurrency(annualMortgagePayment)}
                 </div>
               </FormField>
@@ -357,7 +357,7 @@ export function RealEstateForm() {
         />
 
         {adding && (
-          <CardBody className="border-b border-slate-800">
+          <CardBody className="border-b border-slate-200">
             <PropertyFormPanel
               initial={EMPTY}
               onSave={handleAdd}
@@ -370,7 +370,7 @@ export function RealEstateForm() {
         {data.length === 0 && !adding ? (
           <CardBody><p className="text-sm text-slate-600">No properties added yet.</p></CardBody>
         ) : (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-slate-200">
             {data.map(prop => (
               <div key={prop.id}>
                 {editingId === prop.id ? (
@@ -383,12 +383,12 @@ export function RealEstateForm() {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
+                  <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-100">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-3">
-                        <span className="text-sm font-medium text-slate-200">{prop.propertyName}</span>
+                        <span className="text-sm font-medium text-slate-700">{prop.propertyName}</span>
                         <span className="text-xs text-slate-600">{PROPERTY_TYPE_LABELS[prop.propertyType]}</span>
-                        {prop.is1031Exchange && <span className="text-xs text-indigo-400">1031</span>}
+                        {prop.is1031Exchange && <span className="text-xs text-indigo-600">1031</span>}
                         {prop.mortgage && <span className="text-xs text-slate-600">mortgage</span>}
                       </div>
                       <div className="text-xs text-slate-600 mt-0.5">
@@ -399,7 +399,7 @@ export function RealEstateForm() {
                     </div>
                     <div className="ml-4 flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-sm font-semibold text-slate-200">{formatCurrency(prop.currentValue, true)}</div>
+                        <div className="text-sm font-semibold text-slate-700">{formatCurrency(prop.currentValue, true)}</div>
                         <div className="text-xs text-slate-600">
                           {prop.mortgage ? `${formatCurrency(prop.currentValue - prop.mortgage.outstandingBalance, true)} equity` : "no mortgage"}
                         </div>
@@ -418,8 +418,8 @@ export function RealEstateForm() {
       </Card>
 
       {data.length > 0 && (
-        <div className="text-right text-sm text-slate-400">
-          Total equity: <span className="text-slate-200 font-semibold">{formatCurrency(totalEquity, true)}</span>
+        <div className="text-right text-sm text-slate-600">
+          Total equity: <span className="text-slate-700 font-semibold">{formatCurrency(totalEquity, true)}</span>
         </div>
       )}
     </div>

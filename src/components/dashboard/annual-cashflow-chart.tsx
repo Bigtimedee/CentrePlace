@@ -63,12 +63,12 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[160px]">
-      <p className="text-slate-400 mb-2 font-medium">Year {label}</p>
+    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[160px]">
+      <p className="text-slate-600 mb-2 font-medium">Year {label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center justify-between gap-4 mb-1">
           <span style={{ color: entry.fill ?? entry.color }}>{entry.name}</span>
-          <span className="text-slate-100 font-semibold">{fmtK(entry.value)}</span>
+          <span className="text-slate-900 font-semibold">{fmtK(entry.value)}</span>
         </div>
       ))}
     </div>
@@ -87,13 +87,13 @@ export function AnnualCashflowChart({ quarters }: Props) {
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-slate-100">Annual Cash Flow</h3>
+        <h3 className="text-sm font-semibold text-slate-900">Annual Cash Flow</h3>
         <p className="text-xs text-slate-600 mt-0.5">Income, spending, and taxes by year</p>
       </div>
 
       <ResponsiveContainer width="100%" height={280}>
         <ComposedChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="year"
             tick={{ fill: "#64748b", fontSize: 11 }}

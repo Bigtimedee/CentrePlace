@@ -93,7 +93,7 @@ function LPFundForm({
       <div>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h4 className="text-sm font-medium text-slate-300">Expected Distributions</h4>
+            <h4 className="text-sm font-medium text-slate-700">Expected Distributions</h4>
             {totalDists > 0 && (
               <p className="text-xs text-slate-600 mt-0.5">Total: {formatCurrency(totalDists, true)}</p>
             )}
@@ -101,17 +101,17 @@ function LPFundForm({
         </div>
 
         {form.expectedDistributions.length > 0 && (
-          <div className="mb-3 rounded-md border border-slate-700 divide-y divide-slate-700 text-xs">
+          <div className="mb-3 rounded-md border border-slate-200 divide-y divide-slate-200 text-xs">
             <div className="grid grid-cols-5 px-3 py-2 text-slate-600 font-medium">
               <span>Year</span><span>Qtr</span><span>Amount</span><span>Tax type</span><span></span>
             </div>
             {form.expectedDistributions.map((d, i) => (
-              <div key={i} className="grid grid-cols-5 px-3 py-2 text-slate-300 items-center">
+              <div key={i} className="grid grid-cols-5 px-3 py-2 text-slate-700 items-center">
                 <span>{d.year}</span>
                 <span>{d.quarter}</span>
                 <span>{formatCurrency(d.amount, true)}</span>
                 <span className="capitalize">{d.taxCharacter.replace(/_/g, " ")}</span>
-                <button type="button" onClick={() => removeDist(i)} className="text-red-400 hover:text-red-300 justify-self-end">
+                <button type="button" onClick={() => removeDist(i)} className="text-red-600 hover:text-red-500 justify-self-end">
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -183,7 +183,7 @@ export function LPInvestmentsForm() {
       />
 
       {adding && (
-        <CardBody className="border-b border-slate-800">
+        <CardBody className="border-b border-slate-200">
           <LPFundForm
             initial={EMPTY}
             onSave={f => add.mutate({ ...f, notes: f.notes || undefined })}
@@ -196,7 +196,7 @@ export function LPInvestmentsForm() {
       {data.length === 0 && !adding ? (
         <CardBody><p className="text-sm text-slate-600">No LP investments added yet.</p></CardBody>
       ) : (
-        <div className="divide-y divide-slate-800">
+        <div className="divide-y divide-slate-200">
           {data.map(fund => (
             <div key={fund.id}>
               {editingId === fund.id ? (
@@ -209,10 +209,10 @@ export function LPInvestmentsForm() {
                   />
                 </div>
               ) : (
-                <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-800/30">
+                <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-100">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-3">
-                      <span className="text-sm font-medium text-slate-200">{fund.fundName}</span>
+                      <span className="text-sm font-medium text-slate-700">{fund.fundName}</span>
                       <span className="text-xs text-slate-600">{fund.vintageYear} vintage</span>
                     </div>
                     <div className="text-xs text-slate-600 mt-0.5">
@@ -221,7 +221,7 @@ export function LPInvestmentsForm() {
                   </div>
                   <div className="ml-4 flex items-center gap-4">
                     <div className="text-right">
-                      <div className="text-sm font-semibold text-emerald-400">
+                      <div className="text-sm font-semibold text-emerald-600">
                         {formatCurrency(((fund.expectedDistributions ?? []) as LPDistribution[]).reduce((s, d) => s + d.amount, 0), true)}
                       </div>
                       <div className="text-xs text-slate-600">total distributions</div>
