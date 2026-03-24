@@ -1,6 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { PortfoliosForm } from "@/components/forms/portfolios-form";
-import { RealizationPolicyForm } from "@/components/forms/realization-policy-form";
 import { NextSectionBanner } from "@/components/layout/next-section-banner";
 import { PortfolioAllocationDashboard } from "@/components/portfolios/portfolio-allocation-dashboard";
 import { HoldingsPanelsList } from "@/components/portfolios/holdings-panels-list";
@@ -21,12 +20,11 @@ export default function PortfoliosPage() {
         <HoldingsPanelsList />
         <DirectInvestmentsForm />
         <CryptoHoldingsForm />
-        <RealizationPolicyForm />
       </div>
       <NextSectionBanner
-        href="/real-estate"
-        label="Real Estate"
-        description="Properties with full amortization, rental income, and sale projections"
+        href="/reinvestment-policy"
+        label="Reinvestment Policy"
+        description="Control how carry and LP proceeds are reinvested — self-directed or guided by your allocation profile"
       />
     </div>
   );
