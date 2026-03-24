@@ -68,32 +68,32 @@ function CustomTooltip({
   const pctFI = find("pctFI");
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[180px]">
-      <p className="text-slate-400 mb-2 font-medium">Year {label}</p>
+    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[180px]">
+      <p className="text-slate-500 mb-2 font-medium">Year {label}</p>
       <div className="space-y-1">
         <div className="flex justify-between gap-4">
-          <span className="text-slate-400">P90</span>
-          <span className="text-slate-100">{fmtM(p90)}</span>
+          <span className="text-slate-500">P90</span>
+          <span className="text-slate-900">{fmtM(p90)}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-slate-400">P75</span>
-          <span className="text-slate-100">{fmtM(p75)}</span>
+          <span className="text-slate-500">P75</span>
+          <span className="text-slate-900">{fmtM(p75)}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-indigo-400 font-medium">P50</span>
-          <span className="text-indigo-300 font-medium">{fmtM(p50)}</span>
+          <span className="text-indigo-600 font-medium">P50</span>
+          <span className="text-indigo-600 font-medium">{fmtM(p50)}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-slate-400">P25</span>
-          <span className="text-slate-100">{fmtM(p25)}</span>
+          <span className="text-slate-500">P25</span>
+          <span className="text-slate-900">{fmtM(p25)}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-slate-400">P10</span>
-          <span className="text-slate-100">{fmtM(p10)}</span>
+          <span className="text-slate-500">P10</span>
+          <span className="text-slate-900">{fmtM(p10)}</span>
         </div>
-        <div className="flex justify-between gap-4 pt-1 border-t border-slate-700">
+        <div className="flex justify-between gap-4 pt-1 border-t border-slate-200">
           <span className="text-emerald-500">FI paths</span>
-          <span className="text-emerald-400">{Math.round(pctFI * 100)}%</span>
+          <span className="text-emerald-600">{Math.round(pctFI * 100)}%</span>
         </div>
       </div>
     </div>
@@ -111,7 +111,7 @@ export function MonteCarloChart({ result }: Props) {
     <div>
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">Capital Fan — 500 Simulated Paths</h3>
+          <h3 className="text-sm font-semibold text-slate-900">Capital Fan — 500 Simulated Paths</h3>
           <p className="text-xs text-slate-600 mt-0.5">Shaded bands show P10–P90 range; line is median path</p>
         </div>
         <div className="flex flex-wrap gap-4 text-xs text-slate-600">
@@ -128,7 +128,7 @@ export function MonteCarloChart({ result }: Props) {
             Base case
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-4 border-t-2 border-amber-400 border-dashed" />
+            <span className="inline-block w-4 border-t-2 border-amber-600 border-dashed" />
             Required
           </span>
         </div>
@@ -136,7 +136,7 @@ export function MonteCarloChart({ result }: Props) {
 
       <ResponsiveContainer width="100%" height={340}>
         <ComposedChart data={data} margin={{ top: 4, right: 16, bottom: 0, left: 16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="year"
             tick={{ fill: "#64748b", fontSize: 11 }}

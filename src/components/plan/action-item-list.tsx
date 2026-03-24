@@ -36,7 +36,7 @@ export function ActionItemList({ items, activeCategory }: ActionItemListProps) {
 
   if (filtered.length === 0) {
     return (
-      <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-10 text-center text-sm text-slate-400">
+      <div className="rounded-xl border border-slate-200 bg-white px-6 py-10 text-center text-sm text-slate-500">
         No action items in this category this year.
       </div>
     );
@@ -51,7 +51,7 @@ export function ActionItemList({ items, activeCategory }: ActionItemListProps) {
         return (
           <section key={urgency}>
             <div className="mb-3">
-              <h3 className="text-sm font-semibold text-white">{heading}</h3>
+              <h3 className="text-sm font-semibold text-slate-900">{heading}</h3>
               <p className="text-xs text-slate-600 mt-0.5">{subheading}</p>
             </div>
             <div className="space-y-2">

@@ -68,7 +68,7 @@ export function ForecastCenter() {
 
       {/* Error state */}
       {error && (
-        <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-10 text-center text-sm text-slate-400">
+        <div className="rounded-xl border border-slate-200 bg-white px-6 py-10 text-center text-sm text-slate-500">
           {isProfileMissing ? (
             <>
               <p className="mb-3">Complete your profile before running the forecast.</p>
@@ -88,7 +88,7 @@ export function ForecastCenter() {
       {/* Loading state */}
       {isLoading && !error && (
         <div className="flex items-center justify-center py-16 text-slate-600 text-sm">
-          <svg className="animate-spin h-5 w-5 mr-3 text-indigo-400" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-5 w-5 mr-3 text-indigo-600" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
           </svg>
@@ -121,9 +121,9 @@ export function ForecastCenter() {
 
       {/* Idle state */}
       {!runParams && !error && !isLoading && (
-        <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-12 text-center text-sm text-slate-600">
+        <div className="rounded-xl border border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-600">
           Configure your volatility assumptions above and click{" "}
-          <strong className="text-slate-400">Run Forecast</strong> to generate 500 simulated market paths.
+          <strong className="text-slate-500">Run Forecast</strong> to generate 500 simulated market paths.
         </div>
       )}
     </div>

@@ -58,11 +58,11 @@ export function ComparisonMilestoneTable({ runs }: Props) {
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-slate-100 mb-4">Milestone Snapshots</h3>
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
+      <h3 className="text-sm font-semibold text-slate-900 mb-4">Milestone Snapshots</h3>
+      <div className="overflow-x-auto rounded-xl border border-slate-200">
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-slate-800/40 border-b border-slate-800">
+            <tr className="bg-slate-100 border-b border-slate-200">
               <th className="text-left font-medium text-slate-600 px-4 py-2.5">Year</th>
               <th className="text-left font-medium text-slate-600 px-4 py-2.5">Age</th>
               {runs.map(run => (
@@ -82,19 +82,19 @@ export function ComparisonMilestoneTable({ runs }: Props) {
               return (
                 <tr
                   key={row.year}
-                  className={`border-b border-slate-800/60 last:border-b-0 transition-colors ${
-                    anyFI ? "bg-emerald-950/10" : "hover:bg-slate-800/20"
+                  className={`border-b border-slate-200 last:border-b-0 transition-colors ${
+                    anyFI ? "bg-emerald-50" : "hover:bg-slate-100"
                   }`}
                 >
-                  <td className="px-4 py-2.5 font-medium text-slate-300">{row.year}</td>
-                  <td className="px-4 py-2.5 text-slate-400">{row.age}</td>
+                  <td className="px-4 py-2.5 font-medium text-slate-600">{row.year}</td>
+                  <td className="px-4 py-2.5 text-slate-500">{row.age}</td>
                   {row.byScenario.map((s, i) => (
                     <td
                       key={i}
                       className="px-4 py-2.5 text-right font-mono font-semibold"
                       style={s.isFI ? { color: runs[i].color } : undefined}
                     >
-                      <span className={s.isFI ? "" : "text-slate-300"}>
+                      <span className={s.isFI ? "" : "text-slate-600"}>
                         {formatCurrency(s.capital, true)}
                       </span>
                       {s.isFI && (

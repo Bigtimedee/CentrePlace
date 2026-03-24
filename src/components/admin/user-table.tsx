@@ -36,14 +36,14 @@ export function UserTable({ users }: { users: UserRow[] }) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 overflow-hidden">
+    <div className="rounded-xl border border-slate-200 overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-slate-700 bg-slate-900">
-            <th className="text-left px-4 py-3 text-slate-400 font-medium">User</th>
-            <th className="text-left px-4 py-3 text-slate-400 font-medium">Joined</th>
-            <th className="text-left px-4 py-3 text-slate-400 font-medium">Status</th>
-            <th className="text-right px-4 py-3 text-slate-400 font-medium">Actions</th>
+          <tr className="border-b border-slate-200 bg-white">
+            <th className="text-left px-4 py-3 text-slate-500 font-medium">User</th>
+            <th className="text-left px-4 py-3 text-slate-500 font-medium">Joined</th>
+            <th className="text-left px-4 py-3 text-slate-500 font-medium">Status</th>
+            <th className="text-right px-4 py-3 text-slate-500 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -57,25 +57,25 @@ export function UserTable({ users }: { users: UserRow[] }) {
             return (
               <tr
                 key={user.id}
-                className={`border-b border-slate-800 ${i % 2 === 0 ? "bg-slate-950" : "bg-slate-900/50"}`}
+                className={`border-b border-slate-200 ${i % 2 === 0 ? "bg-slate-50" : "bg-white"}`}
               >
                 <td className="px-4 py-3">
-                  <div className="text-slate-100 font-medium">{name}</div>
+                  <div className="text-slate-900 font-medium">{name}</div>
                   <div className="text-slate-600 text-xs">{user.email}</div>
                   {user.role === "admin" && (
-                    <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-xs bg-indigo-900/50 text-indigo-400 border border-indigo-800/50">
+                    <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-xs bg-indigo-50 text-indigo-600 border border-indigo-200">
                       admin
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-slate-400">{joined}</td>
+                <td className="px-4 py-3 text-slate-500">{joined}</td>
                 <td className="px-4 py-3">
                   {user.banned ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-red-900/30 text-red-400 border border-red-800/40">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-red-50 text-red-600 border border-red-200">
                       Suspended
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-green-900/30 text-green-400 border border-green-800/40">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-600 border border-emerald-200">
                       Active
                     </span>
                   )}
@@ -87,7 +87,7 @@ export function UserTable({ users }: { users: UserRow[] }) {
                         <button
                           onClick={() => action(user.id, "PATCH", { banned: !user.banned })}
                           disabled={isLoading}
-                          className="px-2.5 py-1 rounded text-xs font-medium text-slate-300 border border-slate-700 hover:border-slate-500 hover:text-white disabled:opacity-40 transition-colors"
+                          className="px-2.5 py-1 rounded text-xs font-medium text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-900 disabled:opacity-40 transition-colors"
                         >
                           {isLoading ? "…" : user.banned ? "Unsuspend" : "Suspend"}
                         </button>
@@ -98,7 +98,7 @@ export function UserTable({ users }: { users: UserRow[] }) {
                             }
                           }}
                           disabled={isLoading}
-                          className="px-2.5 py-1 rounded text-xs font-medium text-red-400 border border-red-900/50 hover:border-red-700 hover:text-red-300 disabled:opacity-40 transition-colors"
+                          className="px-2.5 py-1 rounded text-xs font-medium text-red-600 border border-red-200 hover:border-red-300 hover:text-red-700 disabled:opacity-40 transition-colors"
                         >
                           Delete
                         </button>

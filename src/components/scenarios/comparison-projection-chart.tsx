@@ -70,8 +70,8 @@ function CustomTooltip({
   const capitalEntries = payload.filter(p => String(p.dataKey).endsWith("_capital"));
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[180px]">
-      <p className="text-slate-400 mb-2 font-medium">Year {label}</p>
+    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[180px]">
+      <p className="text-slate-500 mb-2 font-medium">Year {label}</p>
       {capitalEntries.map(entry => {
         const scenarioId = String(entry.dataKey).replace("_capital", "");
         const run = runs.find(r => r.scenarioId === scenarioId);
@@ -84,7 +84,7 @@ function CustomTooltip({
               />
               <span style={{ color: run?.color }}>{run?.name ?? scenarioId}</span>
             </span>
-            <span className="text-slate-100 font-semibold">{fmtM(entry.value)}</span>
+            <span className="text-slate-900 font-semibold">{fmtM(entry.value)}</span>
           </div>
         );
       })}
@@ -105,12 +105,12 @@ export function ComparisonProjectionChart({ runs }: Props) {
     <div>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">Capital Projection</h3>
+          <h3 className="text-sm font-semibold text-slate-900">Capital Projection</h3>
           <p className="text-xs text-slate-600 mt-0.5">Total capital across scenarios</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap justify-end">
           {runs.map(run => (
-            <div key={run.scenarioId} className="flex items-center gap-1.5 text-xs text-slate-400">
+            <div key={run.scenarioId} className="flex items-center gap-1.5 text-xs text-slate-500">
               <span
                 className="inline-block w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: run.color }}
@@ -137,7 +137,7 @@ export function ComparisonProjectionChart({ runs }: Props) {
             ))}
           </defs>
 
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
 
           <XAxis
             dataKey="year"

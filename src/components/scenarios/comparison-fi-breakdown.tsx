@@ -33,16 +33,16 @@ function closestFIQuarter(run: ScenarioRun) {
 
 function LabelRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex justify-between items-baseline gap-4 py-1.5 border-b border-slate-800/60 last:border-b-0">
+    <div className="flex justify-between items-baseline gap-4 py-1.5 border-b border-slate-200 last:border-b-0">
       <span className="text-xs text-slate-600 shrink-0">{label}</span>
-      <span className="text-xs font-mono text-slate-200 text-right">{children}</span>
+      <span className="text-xs font-mono text-slate-700 text-right">{children}</span>
     </div>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mt-4 mb-1">
+    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-4 mb-1">
       {children}
     </p>
   );
@@ -62,17 +62,17 @@ function ScenarioBreakdown({ run }: { run: ScenarioRun }) {
   const best = closestFIQuarter(run);
 
   return (
-    <div className="flex-1 min-w-0 border border-slate-800 rounded-xl p-4 bg-slate-900/50">
+    <div className="flex-1 min-w-0 border border-slate-200 rounded-xl p-4 bg-slate-50">
       {/* Scenario name */}
       <p className="text-xs font-bold mb-3" style={{ color: run.color }}>{run.name}</p>
 
       {/* FI Perpetuity Formula */}
       <SectionTitle>FI Formula (Perpetuity)</SectionTitle>
-      <div className="rounded-lg bg-slate-800/60 border border-slate-700/50 px-3 py-2.5 mb-1 space-y-1">
-        <p className="text-xs text-slate-400 leading-relaxed">
+      <div className="rounded-lg bg-slate-100 border border-slate-200 px-3 py-2.5 mb-1 space-y-1">
+        <p className="text-xs text-slate-500 leading-relaxed">
           Required Capital = (Annual Spending − Permanent Income) ÷ Return Rate
         </p>
-        <p className="text-xs font-mono text-indigo-300 leading-relaxed">
+        <p className="text-xs font-mono text-indigo-600 leading-relaxed">
           {formatCurrency(summary.requiredCapitalToday, true)} = (
           {formatCurrency(summary.projectedAnnualSpending, true)} −{" "}
           {formatCurrency(summary.permanentAnnualIncome, true)}) ÷{" "}
@@ -101,7 +101,7 @@ function ScenarioBreakdown({ run }: { run: ScenarioRun }) {
         <LabelRow label="Realization Pool">{formatCurrency(q0.realizationCapital, true)}</LabelRow>
       )}
       <LabelRow label="Total Capital">
-        <span className="text-slate-100 font-bold">{formatCurrency(summary.totalCapitalToday, true)}</span>
+        <span className="text-slate-900 font-bold">{formatCurrency(summary.totalCapitalToday, true)}</span>
       </LabelRow>
 
       {/* Gap */}
@@ -110,8 +110,8 @@ function ScenarioBreakdown({ run }: { run: ScenarioRun }) {
       <LabelRow label="Capital Today">{formatCurrency(summary.totalCapitalToday, true)}</LabelRow>
       <LabelRow label="Gap">
         {summary.gapToFI <= 0
-          ? <span className="text-emerald-400 font-bold">Already FI ✓</span>
-          : <span className="text-rose-400 font-bold">{formatCurrency(summary.gapToFI, true)} short</span>
+          ? <span className="text-emerald-600 font-bold">Already FI ✓</span>
+          : <span className="text-rose-600 font-bold">{formatCurrency(summary.gapToFI, true)} short</span>
         }
       </LabelRow>
       <LabelRow label="% Funded">{formatPct(Math.min(1, pctFunded))}</LabelRow>
@@ -120,7 +120,7 @@ function ScenarioBreakdown({ run }: { run: ScenarioRun }) {
       {!run.result.fiDate && best && (
         <>
           <SectionTitle>Closest Approach Within 40 Years</SectionTitle>
-          <div className="rounded-lg bg-amber-900/20 border border-amber-700/40 px-3 py-2.5 text-xs text-amber-300 space-y-1 leading-relaxed">
+          <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-xs text-amber-600 space-y-1 leading-relaxed">
             <p>
               FI is not achieved within the 40-year window. At these assumptions, the required
               capital ({formatCurrency(summary.requiredCapitalToday, true)}) exceeds what the
@@ -133,7 +133,7 @@ function ScenarioBreakdown({ run }: { run: ScenarioRun }) {
               {formatCurrency(summary.requiredCapitalToday, true)} ={" "}
               {formatPct(best.totalCapital / summary.requiredCapitalToday)} funded
             </p>
-            <p className="text-amber-400/80">
+            <p className="text-amber-600">
               To achieve FI under these assumptions: reduce annual spending, increase savings rate,
               or accept a higher carry realization (lower haircut).
             </p>
@@ -150,37 +150,37 @@ export function ComparisonFIBreakdown({ runs }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900">
+    <div className="rounded-xl border border-slate-200 bg-white">
       {/* Header / toggle */}
       <button
         onClick={() => setOpen(v => !v)}
         className="w-full flex items-center justify-between px-6 py-4 text-left"
       >
         <div>
-          <p className="text-sm font-semibold text-slate-100">FI Formula Breakdown</p>
+          <p className="text-sm font-semibold text-slate-900">FI Formula Breakdown</p>
           <p className="text-xs text-slate-600 mt-0.5">
             See the math behind each scenario — how Required Capital is computed and where your
             capital stands today
           </p>
         </div>
         {open
-          ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" />
-          : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />
+          ? <ChevronUp className="h-4 w-4 text-slate-500 flex-shrink-0" />
+          : <ChevronDown className="h-4 w-4 text-slate-500 flex-shrink-0" />
         }
       </button>
 
       {open && (
-        <div className="px-6 pb-6 border-t border-slate-800">
+        <div className="px-6 pb-6 border-t border-slate-200">
           {/* Legend */}
-          <div className="rounded-lg bg-slate-800/40 border border-slate-700/40 px-4 py-3 mt-4 mb-5 text-xs text-slate-400 space-y-1 leading-relaxed">
+          <div className="rounded-lg bg-slate-100 border border-slate-200 px-4 py-3 mt-4 mb-5 text-xs text-slate-500 space-y-1 leading-relaxed">
             <p>
-              <span className="text-slate-200 font-medium">How the FI target is set: </span>
+              <span className="text-slate-700 font-medium">How the FI target is set: </span>
               Financial Independence is achieved when your invested capital can generate enough
               annual return to cover your spending — indefinitely, without drawing down principal.
-              This is the <span className="text-indigo-400">perpetuity formula</span>.
+              This is the <span className="text-indigo-600">perpetuity formula</span>.
             </p>
             <p>
-              <span className="text-slate-200 font-medium">Key levers: </span>
+              <span className="text-slate-700 font-medium">Key levers: </span>
               Lower spending reduces the numerator; higher return rate increases the denominator.
               Either shrinks Required Capital. Permanent rental income is subtracted before dividing,
               so every $1 of net rental income reduces required capital by $1 ÷ Return Rate

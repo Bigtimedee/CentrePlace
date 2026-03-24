@@ -34,7 +34,7 @@ export function ActionPlanFilters({ items, active, onChange }: ActionPlanFilters
         className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
           active === "all"
             ? "bg-indigo-600 text-white"
-            : "bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700"
+            : "bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200"
         }`}
       >
         All ({items.length})
@@ -51,7 +51,7 @@ export function ActionPlanFilters({ items, active, onChange }: ActionPlanFilters
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               isActive
                 ? "bg-indigo-600 text-white"
-                : "bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700"
+                : "bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200"
             }`}
           >
             {label} ({count})

@@ -29,14 +29,14 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 overflow-hidden">
+    <div className="rounded-xl border border-slate-200 overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-slate-700 bg-slate-900">
-            <th className="text-left px-4 py-3 text-slate-400 font-medium">Email</th>
-            <th className="text-left px-4 py-3 text-slate-400 font-medium">Invited</th>
-            <th className="text-left px-4 py-3 text-slate-400 font-medium">Status</th>
-            <th className="text-right px-4 py-3 text-slate-400 font-medium">Actions</th>
+          <tr className="border-b border-slate-200 bg-white">
+            <th className="text-left px-4 py-3 text-slate-500 font-medium">Email</th>
+            <th className="text-left px-4 py-3 text-slate-500 font-medium">Invited</th>
+            <th className="text-left px-4 py-3 text-slate-500 font-medium">Status</th>
+            <th className="text-right px-4 py-3 text-slate-500 font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -49,12 +49,12 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
             return (
               <tr
                 key={inv.id}
-                className={`border-b border-slate-800 ${i % 2 === 0 ? "bg-slate-950" : "bg-slate-900/50"}`}
+                className={`border-b border-slate-200 ${i % 2 === 0 ? "bg-slate-50" : "bg-white"}`}
               >
-                <td className="px-4 py-3 text-slate-100">{inv.email}</td>
-                <td className="px-4 py-3 text-slate-400">{invited}</td>
+                <td className="px-4 py-3 text-slate-900">{inv.email}</td>
+                <td className="px-4 py-3 text-slate-500">{invited}</td>
                 <td className="px-4 py-3">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-yellow-900/30 text-yellow-400 border border-yellow-800/40">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-600 border border-amber-200">
                     Pending
                   </span>
                 </td>
@@ -63,7 +63,7 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
                     <button
                       onClick={() => revoke(inv.id, inv.email)}
                       disabled={isLoading}
-                      className="px-2.5 py-1 rounded text-xs font-medium text-red-400 border border-red-900/50 hover:border-red-700 hover:text-red-300 disabled:opacity-40 transition-colors"
+                      className="px-2.5 py-1 rounded text-xs font-medium text-red-600 border border-red-200 hover:border-red-300 hover:text-red-700 disabled:opacity-40 transition-colors"
                     >
                       {isLoading ? "…" : "Revoke"}
                     </button>

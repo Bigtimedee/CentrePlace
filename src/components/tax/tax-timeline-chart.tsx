@@ -31,12 +31,12 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[190px]">
-      <p className="text-slate-400 mb-2 font-medium">Year {label}</p>
+    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs shadow-xl min-w-[190px]">
+      <p className="text-slate-500 mb-2 font-medium">Year {label}</p>
       {payload.map((entry) => (
         <div key={entry.name} className="flex items-center justify-between gap-4 mb-1">
           <span style={{ color: entry.fill ?? entry.color }}>{entry.name}</span>
-          <span className="text-slate-100 font-semibold">
+          <span className="text-slate-900 font-semibold">
             {entry.name === "Eff. Rate" ? fmtPct(entry.value / 100) : fmtK(entry.value)}
           </span>
         </div>
@@ -68,7 +68,7 @@ export function TaxTimelineChart({ projections }: Props) {
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-slate-100">Projected Annual Tax Liability</h3>
+        <h3 className="text-sm font-semibold text-slate-900">Projected Annual Tax Liability</h3>
         <p className="text-xs text-slate-600 mt-0.5">
           Federal + state tax by component across the 40-year window · amber dashes = carry realization years
         </p>
@@ -76,7 +76,7 @@ export function TaxTimelineChart({ projections }: Props) {
 
       <ResponsiveContainer width="100%" height={300}>
         <ComposedChart data={data} margin={{ top: 4, right: 48, bottom: 0, left: 16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="year"
             tick={{ fill: "#64748b", fontSize: 11 }}

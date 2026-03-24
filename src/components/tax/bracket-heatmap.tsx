@@ -8,16 +8,16 @@ interface Props {
 }
 
 function headroomColor(headroom: number): string {
-  if (headroom > 200_000) return "text-emerald-400 bg-emerald-950/30";
-  if (headroom > 50_000)  return "text-amber-400 bg-amber-950/30";
-  if (headroom > 0)       return "text-rose-400 bg-rose-950/30";
-  return "text-slate-600 bg-slate-800/30"; // already past threshold
+  if (headroom > 200_000) return "text-emerald-600 bg-emerald-50";
+  if (headroom > 50_000)  return "text-amber-600 bg-amber-50";
+  if (headroom > 0)       return "text-rose-600 bg-rose-50";
+  return "text-slate-600 bg-slate-100"; // already past threshold
 }
 
 function rateColor(rate: number): string {
-  if (rate <= 0.15) return "text-emerald-400";
-  if (rate <= 0.25) return "text-amber-400";
-  return "text-rose-400";
+  if (rate <= 0.15) return "text-emerald-600";
+  if (rate <= 0.25) return "text-amber-600";
+  return "text-rose-600";
 }
 
 export function BracketHeatmap({ projections }: Props) {
@@ -27,7 +27,7 @@ export function BracketHeatmap({ projections }: Props) {
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-slate-100">Bracket Headroom Analysis</h3>
+        <h3 className="text-sm font-semibold text-slate-900">Bracket Headroom Analysis</h3>
         <p className="text-xs text-slate-600 mt-0.5">
           How close you are to the next tax bracket each year — first 15 years shown
         </p>
@@ -36,7 +36,7 @@ export function BracketHeatmap({ projections }: Props) {
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-slate-800">
+            <tr className="border-b border-slate-200">
               <th className="text-left text-slate-600 font-medium pb-2 pr-3">Year</th>
               <th className="text-left text-slate-600 font-medium pb-2 pr-3">Age</th>
               <th className="text-right text-slate-600 font-medium pb-2 pr-3">Marginal Ord.</th>
@@ -47,8 +47,8 @@ export function BracketHeatmap({ projections }: Props) {
           </thead>
           <tbody>
             {rows.map((p, i) => (
-              <tr key={p.year} className={i % 2 === 0 ? "bg-slate-800/20" : ""}>
-                <td className="py-1.5 pr-3 text-slate-300 font-medium">{p.year}</td>
+              <tr key={p.year} className={i % 2 === 0 ? "bg-slate-100" : ""}>
+                <td className="py-1.5 pr-3 text-slate-600 font-medium">{p.year}</td>
                 <td className="py-1.5 pr-3 text-slate-600">{p.age}</td>
                 <td className={`py-1.5 pr-3 text-right font-semibold ${rateColor(p.marginalOrdinaryRate)}`}>
                   {formatPct(p.marginalOrdinaryRate)}

@@ -18,8 +18,8 @@ export function ForecastControls({
   isLoading,
 }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-4 rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
-      <label className="flex items-center gap-2 text-sm text-slate-300">
+    <div className="flex flex-wrap items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 py-4">
+      <label className="flex items-center gap-2 text-sm text-slate-600">
         <span>Return Volatility</span>
         <input
           type="number"
@@ -28,17 +28,17 @@ export function ForecastControls({
           step={1}
           value={volatility}
           onChange={e => onVolatilityChange(Number(e.target.value))}
-          className="w-16 rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-center text-sm text-white focus:border-indigo-500 focus:outline-none"
+          className="w-16 rounded-md border border-slate-200 bg-white px-2 py-1 text-center text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
         />
-        <span className="text-slate-400">%</span>
+        <span className="text-slate-500">%</span>
       </label>
 
-      <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+      <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
         <input
           type="checkbox"
           checked={varyCarry}
           onChange={e => onVaryCarryChange(e.target.checked)}
-          className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded border-slate-300 bg-white text-indigo-600 focus:ring-indigo-500"
         />
         <span>Randomise carry haircut</span>
       </label>

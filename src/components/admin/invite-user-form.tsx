@@ -30,9 +30,9 @@ export function InviteUserForm() {
   };
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-900 p-6 max-w-md">
-      <h2 className="text-slate-100 font-medium mb-4 flex items-center gap-2">
-        <Mail className="w-4 h-4 text-indigo-400" />
+    <div className="rounded-xl border border-slate-200 bg-white p-6 max-w-md">
+      <h2 className="text-slate-900 font-medium mb-4 flex items-center gap-2">
+        <Mail className="w-4 h-4 text-indigo-600" />
         Invite a new user
       </h2>
       <form onSubmit={handleSubmit} className="flex gap-3">
@@ -42,7 +42,7 @@ export function InviteUserForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="user@example.com"
-          className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+          className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
         />
         <button
           type="submit"
@@ -53,7 +53,7 @@ export function InviteUserForm() {
         </button>
       </form>
       {message && (
-        <p className={`mt-3 text-sm ${message.type === "success" ? "text-green-400" : "text-red-400"}`}>
+        <p className={`mt-3 text-sm ${message.type === "success" ? "text-emerald-600" : "text-red-600"}`}>
           {message.text}
         </p>
       )}

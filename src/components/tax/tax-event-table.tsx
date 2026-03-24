@@ -63,9 +63,9 @@ function flattenEvents(projections: AnnualTaxProjection[]): TaxEvent[] {
 }
 
 const TYPE_BADGE: Record<TaxEvent["type"], string> = {
-  "Carry":          "bg-amber-950/50 text-amber-400 border-amber-800",
-  "LP Distribution":"bg-indigo-950/50 text-indigo-400 border-indigo-800",
-  "RE Sale":        "bg-emerald-950/50 text-emerald-400 border-emerald-800",
+  "Carry":          "bg-amber-50 text-amber-600 border-amber-200",
+  "LP Distribution":"bg-indigo-50 text-indigo-600 border-indigo-200",
+  "RE Sale":        "bg-emerald-50 text-emerald-600 border-emerald-200",
 };
 
 interface Props {
@@ -83,7 +83,7 @@ export function TaxEventTable({ projections }: Props) {
     <div>
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-sm font-semibold text-slate-100">Discrete Tax Events</h3>
+          <h3 className="text-sm font-semibold text-slate-900">Discrete Tax Events</h3>
           <p className="text-xs text-slate-600 mt-0.5">
             {allEvents.length} event{allEvents.length !== 1 ? "s" : ""} across carry, LP, and real estate realizations
             {totalEventTax > 0 && ` · ~${formatCurrency(totalEventTax, true)} total estimated tax`}
@@ -100,7 +100,7 @@ export function TaxEventTable({ projections }: Props) {
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-800">
+                <tr className="border-b border-slate-200">
                   <th className="text-left text-slate-600 font-medium pb-2 pr-3">Year</th>
                   <th className="text-left text-slate-600 font-medium pb-2 pr-3">Age</th>
                   <th className="text-left text-slate-600 font-medium pb-2 pr-3">Type</th>
@@ -112,20 +112,20 @@ export function TaxEventTable({ projections }: Props) {
               </thead>
               <tbody>
                 {displayed.map((e, i) => (
-                  <tr key={i} className={i % 2 === 0 ? "bg-slate-800/20" : ""}>
-                    <td className="py-1.5 pr-3 text-slate-300 font-medium">{e.year}</td>
+                  <tr key={i} className={i % 2 === 0 ? "bg-slate-100" : ""}>
+                    <td className="py-1.5 pr-3 text-slate-600 font-medium">{e.year}</td>
                     <td className="py-1.5 pr-3 text-slate-600">{e.age}</td>
                     <td className="py-1.5 pr-3">
                       <span className={`border rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_BADGE[e.type]}`}>
                         {e.type}
                       </span>
                     </td>
-                    <td className="py-1.5 pr-3 text-slate-400 max-w-[160px] truncate">{e.source}</td>
+                    <td className="py-1.5 pr-3 text-slate-500 max-w-[160px] truncate">{e.source}</td>
                     <td className="py-1.5 pr-3 text-right text-slate-600">{e.taxCharacter ?? "—"}</td>
-                    <td className="py-1.5 pr-3 text-right text-slate-300 font-mono">
+                    <td className="py-1.5 pr-3 text-right text-slate-600 font-mono">
                       {formatCurrency(e.grossAmount, true)}
                     </td>
-                    <td className="py-1.5 text-right text-rose-400 font-semibold font-mono">
+                    <td className="py-1.5 text-right text-rose-600 font-semibold font-mono">
                       ~{formatCurrency(e.estimatedTax, true)}
                     </td>
                   </tr>
@@ -137,7 +137,7 @@ export function TaxEventTable({ projections }: Props) {
           {allEvents.length > 10 && (
             <button
               onClick={() => setShowAll(v => !v)}
-              className="mt-3 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="mt-3 text-xs text-indigo-600 hover:text-indigo-500 transition-colors"
             >
               {showAll ? "Show fewer" : `Show all ${allEvents.length} events`}
             </button>

@@ -234,7 +234,7 @@ function GrantForm({
       </div>
 
       {serverError && (
-        <p className="text-sm text-red-400">{serverError}</p>
+        <p className="text-sm text-red-600">{serverError}</p>
       )}
 
       <div className="flex gap-2 justify-end">
@@ -318,7 +318,7 @@ function VestingEventForm({
         />
       </FormField>
       {serverError && (
-        <p className="text-sm text-red-400 w-full">{serverError}</p>
+        <p className="text-sm text-red-600 w-full">{serverError}</p>
       )}
       <div className="flex gap-2">
         <Button variant="ghost" size="sm" onClick={onCancel}>
@@ -422,7 +422,7 @@ function ShareLotForm({
         </FormField>
       )}
       {serverError && (
-        <p className="text-sm text-red-400 w-full">{serverError}</p>
+        <p className="text-sm text-red-600 w-full">{serverError}</p>
       )}
       <div className="flex gap-2">
         <Button variant="ghost" size="sm" onClick={onCancel}>

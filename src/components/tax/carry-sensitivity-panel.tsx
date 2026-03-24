@@ -17,18 +17,18 @@ const REALIZATION_LABELS: Record<number, string> = {
 };
 
 const REALIZATION_COLORS: Record<number, string> = {
-  0:    "bg-rose-950/50 border-rose-800 text-rose-400",
-  0.25: "bg-amber-950/50 border-amber-800 text-amber-400",
-  0.5:  "bg-slate-800/50 border-slate-700 text-slate-400",
-  0.75: "bg-indigo-950/50 border-indigo-800 text-indigo-400",
-  1:    "bg-emerald-950/50 border-emerald-800 text-emerald-400",
+  0:    "bg-rose-50 border-rose-200 text-rose-600",
+  0.25: "bg-amber-50 border-amber-200 text-amber-600",
+  0.5:  "bg-slate-50 border-slate-200 text-slate-500",
+  0.75: "bg-indigo-50 border-indigo-200 text-indigo-600",
+  1:    "bg-emerald-50 border-emerald-200 text-emerald-600",
 };
 
 export function CarrySensitivityPanel({ data, isLoading }: Props) {
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-slate-100">Carry Sensitivity</h3>
+        <h3 className="text-sm font-semibold text-slate-900">Carry Sensitivity</h3>
         <p className="text-xs text-slate-600 mt-0.5">
           How your FI date and peak tax year shift across 5 carry outcome scenarios
         </p>
@@ -62,7 +62,7 @@ export function CarrySensitivityPanel({ data, isLoading }: Props) {
           {data.points.map(pt => {
             const labelKey = pt.realizationPct;
             const label = REALIZATION_LABELS[labelKey] ?? `${Math.round(pt.realizationPct * 100)}%`;
-            const colorClass = REALIZATION_COLORS[labelKey] ?? "bg-slate-800/50 border-slate-700 text-slate-400";
+            const colorClass = REALIZATION_COLORS[labelKey] ?? "bg-slate-50 border-slate-200 text-slate-500";
 
             return (
               <div key={pt.realizationPct} className={`border rounded-lg px-3 py-2 ${colorClass}`}>

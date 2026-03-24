@@ -126,20 +126,20 @@ export function ComparisonMetricsGrid({ runs }: Props) {
   return (
     <>
       <div>
-        <h3 className="text-sm font-semibold text-slate-100 mb-4">Side-by-Side Metrics</h3>
+        <h3 className="text-sm font-semibold text-slate-900 mb-4">Side-by-Side Metrics</h3>
 
         {/* Column headers */}
         <div
-          className="grid gap-0 rounded-t-xl overflow-hidden border border-b-0 border-slate-800"
+          className="grid gap-0 rounded-t-xl overflow-hidden border border-b-0 border-slate-200"
           style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)` }}
         >
-          <div className="bg-slate-800/30 px-4 py-2.5 text-xs font-medium text-slate-600 border-r border-slate-800">
+          <div className="bg-slate-100 px-4 py-2.5 text-xs font-medium text-slate-600 border-r border-slate-200">
             Metric
           </div>
           {runs.map(run => (
             <div
               key={run.scenarioId}
-              className="bg-slate-800/30 px-4 py-2.5 text-center border-r border-slate-800 last:border-r-0"
+              className="bg-slate-100 px-4 py-2.5 text-center border-r border-slate-200 last:border-r-0"
             >
               <span className="text-xs font-semibold" style={{ color: run.color }}>
                 {run.name}
@@ -149,22 +149,22 @@ export function ComparisonMetricsGrid({ runs }: Props) {
         </div>
 
         {/* Metric rows */}
-        <div className="rounded-b-xl overflow-hidden border border-slate-800">
+        <div className="rounded-b-xl overflow-hidden border border-slate-200">
           {METRICS.map((metric, i) => (
             <div
               key={metric.label}
-              className={`grid gap-0 border-b border-slate-800 last:border-b-0 ${
-                i % 2 === 0 ? "bg-slate-900" : "bg-slate-800/20"
+              className={`grid gap-0 border-b border-slate-200 last:border-b-0 ${
+                i % 2 === 0 ? "bg-white" : "bg-slate-100"
               }`}
               style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)` }}
             >
               {/* Label */}
-              <div className="px-4 py-2.5 text-xs text-slate-600 border-r border-slate-800 font-medium flex items-center gap-1.5">
+              <div className="px-4 py-2.5 text-xs text-slate-600 border-r border-slate-200 font-medium flex items-center gap-1.5">
                 {metric.label}
                 {metric.info && (
                   <button
                     onClick={() => setShowPermanentIncomeInfo(true)}
-                    className="flex-shrink-0 rounded-full text-slate-600 hover:text-indigo-400 transition-colors"
+                    className="flex-shrink-0 rounded-full text-slate-600 hover:text-indigo-600 transition-colors"
                     aria-label="What is Permanent Income?"
                   >
                     <Info className="h-3.5 w-3.5" />
@@ -177,15 +177,15 @@ export function ComparisonMetricsGrid({ runs }: Props) {
                 const accent = metric.accentFn ? metric.accentFn(run, runs) : "neutral";
                 const textColor =
                   accent === "positive"
-                    ? "text-emerald-400"
+                    ? "text-emerald-600"
                     : accent === "negative"
-                    ? "text-rose-400"
-                    : "text-slate-200";
+                    ? "text-rose-600"
+                    : "text-slate-700";
 
                 return (
                   <div
                     key={run.scenarioId}
-                    className={`px-4 py-2.5 text-center text-xs font-semibold font-mono border-r border-slate-800 last:border-r-0 ${textColor}`}
+                    className={`px-4 py-2.5 text-center text-xs font-semibold font-mono border-r border-slate-200 last:border-r-0 ${textColor}`}
                   >
                     {metric.getValue(run)}
                   </div>
@@ -203,48 +203,48 @@ export function ComparisonMetricsGrid({ runs }: Props) {
           onClose={() => setShowPermanentIncomeInfo(false)}
         >
           <p>
-            <span className="font-semibold text-slate-100">Permanent Income</span> is the
+            <span className="font-semibold text-slate-900">Permanent Income</span> is the
             total net annual income your real estate portfolio generates on a recurring,
             indefinite basis — primarily from rental properties and commercial holdings you
             own today.
           </p>
 
-          <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-3 space-y-1">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">How it&apos;s calculated</p>
-            <p className="font-mono text-xs text-indigo-300">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 space-y-1">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">How it&apos;s calculated</p>
+            <p className="font-mono text-xs text-indigo-600">
               Permanent Income = Σ (Gross Rental Income − Operating Expenses) × Ownership %
             </p>
             <p className="text-xs text-slate-600 mt-1">
-              Only properties typed as <span className="text-slate-300">Rental</span> or{" "}
-              <span className="text-slate-300">Commercial</span> in your Real Estate section
+              Only properties typed as <span className="text-slate-600">Rental</span> or{" "}
+              <span className="text-slate-600">Commercial</span> in your Real Estate section
               are included. Primary residences and vacation properties are excluded.
             </p>
           </div>
 
-          <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-3 space-y-1">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Why it matters for FI</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 space-y-1">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Why it matters for FI</p>
             <p>
               Permanent Income directly reduces how much investment capital you need to
               accumulate. The FI target is set by a perpetuity formula:
             </p>
-            <p className="font-mono text-xs text-indigo-300 mt-1">
+            <p className="font-mono text-xs text-indigo-600 mt-1">
               Required Capital = (Annual Spending − Permanent Income) ÷ Return Rate
             </p>
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="text-xs text-slate-500 mt-2">
               For example, if your annual spending is $300K, your permanent rental income is
               $50K/yr, and your assumed return rate is 7%, your required capital drops from
               $4.3M to $3.6M — a $700K reduction in the hurdle you must clear.
             </p>
           </div>
 
-          <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-3">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Where to set this up</p>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Where to set this up</p>
             <p>
-              Go to <span className="text-indigo-400 font-medium">Real Estate</span> in the
+              Go to <span className="text-indigo-600 font-medium">Real Estate</span> in the
               left navigation. For each rental or commercial property, enter:
             </p>
-            <ul className="mt-2 space-y-1 text-xs text-slate-400 list-disc list-inside">
-              <li>Property type: <span className="text-slate-300">Rental</span> or <span className="text-slate-300">Commercial</span></li>
+            <ul className="mt-2 space-y-1 text-xs text-slate-500 list-disc list-inside">
+              <li>Property type: <span className="text-slate-600">Rental</span> or <span className="text-slate-600">Commercial</span></li>
               <li>Annual gross rental income</li>
               <li>Annual operating expenses (taxes, insurance, maintenance, management fees)</li>
               <li>Your ownership percentage (100% if solely owned)</li>

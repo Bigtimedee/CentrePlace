@@ -37,7 +37,7 @@ export function FiProbabilityChart({ result }: Props) {
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-slate-100">Cumulative FI Probability</h3>
+        <h3 className="text-sm font-semibold text-slate-900">Cumulative FI Probability</h3>
         <p className="text-xs text-slate-600 mt-0.5">
           Fraction of simulated paths that have reached FI by each year
         </p>
@@ -52,7 +52,7 @@ export function FiProbabilityChart({ result }: Props) {
             </linearGradient>
           </defs>
 
-          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="year"
             tick={{ fill: "#64748b", fontSize: 11 }}
@@ -72,8 +72,8 @@ export function FiProbabilityChart({ result }: Props) {
             formatter={(value: number | undefined) => [value != null ? `${value.toFixed(1)}%` : "—", "FI probability"]}
             labelFormatter={(label) => `Year ${label}`}
             contentStyle={{
-              background: "#0f172a",
-              border: "1px solid #334155",
+              background: "#ffffff",
+              border: "1px solid #e2e8f0",
               borderRadius: 8,
               fontSize: 12,
             }}

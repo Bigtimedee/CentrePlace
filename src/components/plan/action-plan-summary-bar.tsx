@@ -34,9 +34,9 @@ function MetricTile({
   accent?: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
+    <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
       <p className="text-xs font-medium text-slate-600 mb-1">{label}</p>
-      <p className={`text-2xl font-bold tabular-nums ${accent ?? "text-white"}`}>{value}</p>
+      <p className={`text-2xl font-bold tabular-nums ${accent ?? "text-slate-900"}`}>{value}</p>
       {sub && <p className="text-xs text-slate-600 mt-0.5">{sub}</p>}
     </div>
   );
@@ -47,14 +47,14 @@ function FIProgressBar({ pctFunded, isFI }: { pctFunded: number; isFI: boolean }
   const barColor = isFI ? "bg-emerald-500" : pct >= 75 ? "bg-indigo-500" : pct >= 50 ? "bg-amber-500" : "bg-rose-500";
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
+    <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-xs font-medium text-slate-600">FI Progress</p>
-        <span className={`text-sm font-bold tabular-nums ${isFI ? "text-emerald-400" : "text-white"}`}>
+        <span className={`text-sm font-bold tabular-nums ${isFI ? "text-emerald-600" : "text-slate-900"}`}>
           {pct}%
         </span>
       </div>
-      <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+      <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${barColor}`}
           style={{ width: `${Math.min(100, pct)}%` }}
@@ -77,9 +77,9 @@ export function ActionPlanSummaryBar({ result }: ActionPlanSummaryBarProps) {
   const { totalQuantifiedDollarImpact, doThisYearCount, topCategory, fiStatus, planYear, currentAge, items } = result;
 
   const doThisYearAccent =
-    doThisYearCount === 0 ? "text-emerald-400" :
-    doThisYearCount <= 2 ? "text-amber-400" :
-    "text-rose-400";
+    doThisYearCount === 0 ? "text-emerald-600" :
+    doThisYearCount <= 2 ? "text-amber-600" :
+    "text-rose-600";
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -87,7 +87,7 @@ export function ActionPlanSummaryBar({ result }: ActionPlanSummaryBarProps) {
         label={`${planYear} Quantified Opportunity`}
         value={totalQuantifiedDollarImpact > 0 ? formatCurrency(totalQuantifiedDollarImpact) : "—"}
         sub={`across ${items.length} action item${items.length !== 1 ? "s" : ""}`}
-        accent="text-indigo-400"
+        accent="text-indigo-600"
       />
 
       <MetricTile

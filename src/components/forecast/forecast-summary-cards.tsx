@@ -11,15 +11,15 @@ interface MetricTileProps {
 
 function MetricTile({ label, value, sub, color }: MetricTileProps) {
   const valueClass = {
-    emerald: "text-emerald-400",
-    indigo: "text-indigo-400",
-    amber: "text-amber-400",
-    rose: "text-rose-400",
-    slate: "text-slate-400",
+    emerald: "text-emerald-600",
+    indigo: "text-indigo-600",
+    amber: "text-amber-600",
+    rose: "text-rose-600",
+    slate: "text-slate-500",
   }[color];
 
   return (
-    <div className="flex-1 min-w-[160px] rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
+    <div className="flex-1 min-w-[160px] rounded-xl border border-slate-200 bg-white px-5 py-4">
       <p className="text-xs text-slate-600 mb-1">{label}</p>
       <p className={`text-2xl font-semibold ${valueClass}`}>{value}</p>
       {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}

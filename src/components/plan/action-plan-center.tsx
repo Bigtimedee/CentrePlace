@@ -19,7 +19,7 @@ export function ActionPlanCenter() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20 text-slate-600 text-sm">
-        <svg className="animate-spin h-5 w-5 mr-3 text-indigo-400" fill="none" viewBox="0 0 24 24">
+        <svg className="animate-spin h-5 w-5 mr-3 text-indigo-600" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
         </svg>
@@ -31,7 +31,7 @@ export function ActionPlanCenter() {
   if (error || !data) {
     const isProfileMissing = error?.data?.code === "PRECONDITION_FAILED";
     return (
-      <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-10 text-center text-sm text-slate-400">
+      <div className="rounded-xl border border-slate-200 bg-white px-6 py-10 text-center text-sm text-slate-500">
         {isProfileMissing ? (
           <>
             <p className="mb-3">Complete your profile to generate your action plan.</p>
@@ -67,8 +67,8 @@ export function ActionPlanCenter() {
       {data.items.length > 0 ? (
         <ActionItemList items={data.items} activeCategory={activeCategory} />
       ) : (
-        <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-10 text-center text-sm text-slate-400">
-          <p className="text-lg font-semibold text-white mb-2">You&apos;re all set for {data.planYear}</p>
+        <div className="rounded-xl border border-slate-200 bg-white px-6 py-10 text-center text-sm text-slate-500">
+          <p className="text-lg font-semibold text-slate-900 mb-2">You&apos;re all set for {data.planYear}</p>
           <p>No action items were generated. Add carry positions, LP investments, or estate data to unlock personalized recommendations.</p>
         </div>
       )}
