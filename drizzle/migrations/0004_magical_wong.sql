@@ -1,0 +1,1 @@
+ALTER TABLE "mortgages" ADD CONSTRAINT "mortgages_property_id_unique" UNIQUE("property_id");

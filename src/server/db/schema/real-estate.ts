@@ -46,7 +46,7 @@ export const realEstateProperties = pgTable("real_estate_properties", {
 
 export const mortgages = pgTable("mortgages", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  propertyId: text("property_id").notNull().references(() => realEstateProperties.id, { onDelete: "cascade" }),
+  propertyId: text("property_id").notNull().unique().references(() => realEstateProperties.id, { onDelete: "cascade" }),
   outstandingBalance: real("outstanding_balance").notNull(),
   interestRate: real("interest_rate").notNull(),
   remainingTermMonths: integer("remaining_term_months").notNull(),

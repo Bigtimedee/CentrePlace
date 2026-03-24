@@ -268,13 +268,18 @@ export function RealEstateForm() {
       is1031Exchange: f.is1031Exchange,
     });
     if (f.hasMortgage && result) {
-      await upsertMortgage.mutateAsync({
-        propertyId: result.id,
-        outstandingBalance: f.mortgageBalance,
-        interestRate: f.mortgageRate / 100,
-        remainingTermMonths: f.mortgageTermMonths,
-        loanType: f.mortgageLoanType,
-      });
+      try {
+        await upsertMortgage.mutateAsync({
+          propertyId: result.id,
+          outstandingBalance: f.mortgageBalance,
+          interestRate: f.mortgageRate / 100,
+          remainingTermMonths: f.mortgageTermMonths,
+          loanType: f.mortgageLoanType,
+        });
+      } catch (err) {
+        console.error("Failed to save mortgage:", err);
+        alert("Property was saved but the mortgage could not be saved. Please edit the property and try again.");
+      }
     }
     refetch();
     setAdding(false);
@@ -300,13 +305,18 @@ export function RealEstateForm() {
     });
     // Upsert mortgage (handles both add and update via ON CONFLICT)
     if (f.hasMortgage) {
-      await upsertMortgage.mutateAsync({
-        propertyId: id,
-        outstandingBalance: f.mortgageBalance,
-        interestRate: f.mortgageRate / 100,
-        remainingTermMonths: f.mortgageTermMonths,
-        loanType: f.mortgageLoanType,
-      });
+      try {
+        await upsertMortgage.mutateAsync({
+          propertyId: id,
+          outstandingBalance: f.mortgageBalance,
+          interestRate: f.mortgageRate / 100,
+          remainingTermMonths: f.mortgageTermMonths,
+          loanType: f.mortgageLoanType,
+        });
+      } catch (err) {
+        console.error("Failed to save mortgage:", err);
+        alert("Property was saved but the mortgage could not be saved. Please try saving again.");
+      }
     }
     refetch();
     setEditingId(null);

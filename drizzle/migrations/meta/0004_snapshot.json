@@ -1,6 +1,6 @@
 {
-  "id": "5c91262d-5e84-4644-a8f3-27a7316b38f4",
-  "prevId": "a11baac9-2649-4302-9e48-773ef8dcda4b",
+  "id": "918806fc-4c90-4957-9790-838622b6fced",
+  "prevId": "5c91262d-5e84-4644-a8f3-27a7316b38f4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1228,7 +1228,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "mortgages_property_id_unique": {
+          "name": "mortgages_property_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "property_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
