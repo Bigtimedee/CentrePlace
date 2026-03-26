@@ -109,6 +109,9 @@ export function HoldingRecommendationsPanel() {
   const { data: storedRecs, isLoading: isQueryLoading } =
     trpc.portfolios.getRecommendations.useQuery(undefined, { staleTime: 120_000 });
 
+  const { data: allHoldings } =
+    trpc.portfolios.listAllHoldings.useQuery(undefined, { staleTime: 120_000 });
+
   const refreshPricesMutation = trpc.portfolios.refreshPrices.useMutation({
     onSuccess: (data) => {
       setLastPriceRefresh(data.refreshedAt);
@@ -183,7 +186,7 @@ export function HoldingRecommendationsPanel() {
     return a.securityName.localeCompare(b.securityName);
   });
 
-  const holdingsCount = recommendations.length;
+  const holdingsCount = allHoldings?.length ?? 0;
   const isLoading = isQueryLoading && recommendations.length === 0;
   const hasNoHoldings = !isQueryLoading && storedRecs !== undefined && storedRecs.length === 0 && freshRecs === null;
 

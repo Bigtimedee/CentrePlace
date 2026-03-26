@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../index";
 import { investmentAccounts, accountStatements, accountHoldings, holdingRecommendations, userProfiles } from "../../db/schema";
-import { eq, and, desc, isNotNull } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { deleteStatementFile } from "@/lib/supabase-storage";
 import { computeAllocationRecommendation } from "../../portfolios/allocation-engine";
@@ -315,10 +315,7 @@ export const portfoliosRouter = createTRPCRouter({
   generateRecommendations: protectedProcedure
     .mutation(async ({ ctx }) => {
       const holdings = await ctx.db.query.accountHoldings.findMany({
-        where: and(
-          eq(accountHoldings.userId, ctx.userId),
-          isNotNull(accountHoldings.accountId),
-        ),
+        where: eq(accountHoldings.userId, ctx.userId),
         columns: {
           id: true, ticker: true, securityName: true, assetClass: true,
           shares: true, currentPrice: true, currentValue: true,
