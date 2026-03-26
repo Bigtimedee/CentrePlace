@@ -327,6 +327,7 @@ export const portfoliosRouter = createTRPCRouter({
       if (holdings.length === 0) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "No confirmed holdings found." });
       }
+      const validHoldingIds = new Set(holdings.map((h) => h.id));
       let recs;
       try {
         recs = await generateHoldingRecommendations(
@@ -349,30 +350,38 @@ export const portfoliosRouter = createTRPCRouter({
           message: `Failed to generate recommendations: ${message}`,
         });
       }
-      // Build a set of valid holding IDs to guard against AI-fabricated IDs
-      const validHoldingIds = new Set(holdings.map((h) => h.id));
+      // Filter out any recs whose holdingId Claude hallucinated (not in our actual holdings)
       const validRecs = recs.filter((r) => validHoldingIds.has(r.holdingId));
 
       // Delete existing then insert fresh
-      await ctx.db.delete(holdingRecommendations)
-        .where(eq(holdingRecommendations.userId, ctx.userId));
-      if (validRecs.length > 0) {
-        await ctx.db.insert(holdingRecommendations).values(
-          validRecs.map((r) => ({
-            userId: ctx.userId,
-            holdingId: r.holdingId,
-            ticker: r.ticker ?? null,
-            securityName: r.securityName,
-            action: r.action,
-            targetAllocationNote: r.targetAllocationNote,
-            alternativeTicker: r.alternativeTicker ?? null,
-            alternativeSecurityName: r.alternativeSecurityName ?? null,
-            shortRationale: r.shortRationale,
-            fullRationale: r.fullRationale,
-            citations: r.citations,
-            urgency: r.urgency,
-          }))
-        );
+      try {
+        await ctx.db.delete(holdingRecommendations)
+          .where(eq(holdingRecommendations.userId, ctx.userId));
+        if (validRecs.length > 0) {
+          await ctx.db.insert(holdingRecommendations).values(
+            validRecs.map((r) => ({
+              userId: ctx.userId,
+              holdingId: r.holdingId,
+              ticker: r.ticker ?? null,
+              securityName: r.securityName,
+              action: r.action,
+              targetAllocationNote: r.targetAllocationNote,
+              alternativeTicker: r.alternativeTicker ?? null,
+              alternativeSecurityName: r.alternativeSecurityName ?? null,
+              shortRationale: r.shortRationale,
+              fullRationale: r.fullRationale,
+              citations: r.citations,
+              urgency: r.urgency,
+            }))
+          );
+        }
+      } catch (dbErr) {
+        const message = dbErr instanceof Error ? dbErr.message : String(dbErr);
+        console.error("[generateRecommendations] DB error:", message);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to save recommendations: ${message}`,
+        });
       }
       return validRecs;
     }),

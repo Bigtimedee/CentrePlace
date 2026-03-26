@@ -54,7 +54,18 @@ function CitationBlock({ citation }: { citation: Citation }) {
   return (
     <div className="space-y-1">
       <p>
-        <span className="text-sm font-semibold text-slate-800">{citation.bookTitle}</span>
+        {citation.sourceUrl ? (
+          <a
+            href={citation.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-blue-700 hover:underline"
+          >
+            {citation.bookTitle}
+          </a>
+        ) : (
+          <span className="text-sm font-semibold text-slate-800">{citation.bookTitle}</span>
+        )}
         <span className="text-sm text-slate-500"> — {citation.author}</span>
       </p>
       <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600 mt-0.5">
