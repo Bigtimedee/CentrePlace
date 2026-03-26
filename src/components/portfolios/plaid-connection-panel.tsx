@@ -80,10 +80,19 @@ function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; 
       });
       onSuccess();
     },
+    onExit: () => {
+      // Reset token so the next click fetches a fresh one
+      setLinkToken(null);
+      sessionStorage.removeItem(PLAID_TOKEN_KEY);
+    },
   });
 
   const handleClick = async () => {
-    if (!linkToken) {
+    if (linkToken && ready) {
+      // Token already available — open directly
+      open();
+    } else if (!linkToken) {
+      // No token yet — fetch one; useEffect will call open() once ready
       await fetchToken();
     }
   };
