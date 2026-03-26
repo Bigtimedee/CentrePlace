@@ -5,6 +5,7 @@ import { trpc } from "@/lib/trpc";
 import { StatementUploadButton, UploadResult } from "./statement-upload-button";
 import { HoldingsReviewModal } from "./holdings-review-modal";
 import { HoldingsBreakdownChart } from "./holdings-breakdown-chart";
+import { HoldingsTable } from "./holdings-table";
 
 interface Props {
   accountId: string;
@@ -37,29 +38,24 @@ export function AccountHoldingsPanel({ accountId, accountName, accounts }: Props
       )}
 
       {holdings.length === 0 ? (
-        <p className="text-sm text-gray-400 italic">
-          No holdings imported yet. Upload a statement to get started.
-        </p>
+        <div className="space-y-3">
+          <p className="text-sm text-gray-400 italic">
+            No holdings imported yet. Upload a statement or add holdings manually.
+          </p>
+          <HoldingsTable accountId={accountId} holdings={[]} onRefetch={refetch} />
+        </div>
       ) : (
         <>
           <HoldingsBreakdownChart holdings={holdings} />
-          <div className="mt-3 space-y-1 max-h-48 overflow-y-auto">
-            {holdings.map((h) => (
-              <div key={h.id} className="flex items-center justify-between text-sm">
-                <span className="text-gray-700 truncate max-w-[200px]">
-                  {h.ticker && (
-                    <span className="font-mono font-medium mr-1">{h.ticker}</span>
-                  )}
-                  {h.securityName}
-                </span>
-                <span className="text-gray-600 shrink-0 ml-2">
-                  ${h.marketValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </span>
-              </div>
-            ))}
+          <div className="mt-4">
+            <HoldingsTable
+              accountId={accountId}
+              holdings={holdings}
+              onRefetch={refetch}
+            />
           </div>
           {latestStatement?.statementDate && (
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-3 text-xs text-gray-400">
               Statement date: {latestStatement.statementDate}
               {latestStatement.brokerageName ? ` · ${latestStatement.brokerageName}` : ""}
             </p>

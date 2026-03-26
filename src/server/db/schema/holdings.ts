@@ -31,6 +31,7 @@ export const accountHoldings = pgTable("account_holdings", {
   pricePerShare: real("price_per_share"),
   marketValue: real("market_value").notNull(),
   percentOfAccount: real("percent_of_account"),
+  costBasis: decimal("cost_basis", { precision: 18, scale: 6 }),
   currentPrice: decimal("current_price", { precision: 18, scale: 6 }),
   currentValue: decimal("current_value", { precision: 18, scale: 6 }),
   priceRefreshedAt: timestamp("price_refreshed_at"),

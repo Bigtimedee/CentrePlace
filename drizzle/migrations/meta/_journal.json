@@ -50,6 +50,13 @@
       "when": 1774535263249,
       "tag": "0006_icy_dark_beast",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1774538310299,
+      "tag": "0007_add_cost_basis_to_holdings",
+      "breakpoints": true
     }
   ]
 }

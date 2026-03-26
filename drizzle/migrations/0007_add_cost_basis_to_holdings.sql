@@ -1,0 +1,1 @@
+ALTER TABLE "account_holdings" ADD COLUMN "cost_basis" numeric(18, 6);

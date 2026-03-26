@@ -172,6 +172,107 @@ export const portfoliosRouter = createTRPCRouter({
       }
     }),
 
+  // ── Holding CRUD ──────────────────────────────────────────────────────────────
+
+  addHolding: protectedProcedure
+    .input(z.object({
+      accountId: z.string(),
+      ticker: z.string().nullable().optional(),
+      securityName: z.string().min(1),
+      assetClass: z.string().default("equity"),
+      securitySubType: z.string().nullable().optional(),
+      shares: z.number().nullable().optional(),
+      pricePerShare: z.number().nullable().optional(),
+      marketValue: z.number(),
+      costBasis: z.number().nullable().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Create a synthetic "Manual Entry" statement so the NOT NULL constraint is satisfied
+      const [stmt] = await ctx.db.insert(accountStatements).values({
+        userId: ctx.userId,
+        accountId: input.accountId,
+        fileName: "Manual Entry",
+        storagePath: "manual/entry",
+        parsedAt: new Date(),
+        statementDate: new Date().toISOString().slice(0, 10),
+        brokerageName: "Manual Entry",
+      }).returning();
+      const [holding] = await ctx.db.insert(accountHoldings).values({
+        userId: ctx.userId,
+        statementId: stmt.id,
+        accountId: input.accountId,
+        ticker: input.ticker ?? null,
+        securityName: input.securityName,
+        assetClass: input.assetClass,
+        securitySubType: input.securitySubType ?? null,
+        shares: input.shares ?? null,
+        pricePerShare: input.pricePerShare ?? null,
+        marketValue: input.marketValue,
+        costBasis: input.costBasis != null ? String(input.costBasis) : null,
+      }).returning();
+      return holding;
+    }),
+
+  updateHolding: protectedProcedure
+    .input(z.object({
+      id: z.string(),
+      ticker: z.string().nullable().optional(),
+      securityName: z.string().min(1).optional(),
+      assetClass: z.string().optional(),
+      securitySubType: z.string().nullable().optional(),
+      shares: z.number().nullable().optional(),
+      pricePerShare: z.number().nullable().optional(),
+      marketValue: z.number().optional(),
+      costBasis: z.number().nullable().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const { id, costBasis, ...rest } = input;
+      const setData: Record<string, unknown> = { ...rest };
+      if (costBasis !== undefined) {
+        setData.costBasis = costBasis != null ? String(costBasis) : null;
+      }
+      await ctx.db.update(accountHoldings)
+        .set(setData)
+        .where(and(eq(accountHoldings.id, id), eq(accountHoldings.userId, ctx.userId)));
+    }),
+
+  deleteHolding: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.delete(accountHoldings)
+        .where(and(eq(accountHoldings.id, input.id), eq(accountHoldings.userId, ctx.userId)));
+    }),
+
+  refreshAccountPrices: protectedProcedure
+    .input(z.object({ accountId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const holdings = await ctx.db.query.accountHoldings.findMany({
+        where: and(
+          eq(accountHoldings.userId, ctx.userId),
+          eq(accountHoldings.accountId, input.accountId),
+        ),
+        columns: { id: true, ticker: true, shares: true },
+      });
+      const priceMap = await refreshHoldingPrices(
+        holdings.map((h) => ({
+          id: h.id,
+          ticker: h.ticker ?? null,
+          shares: h.shares != null ? String(h.shares) : null,
+        }))
+      );
+      const now = new Date();
+      for (const [holdingId, data] of priceMap) {
+        await ctx.db.update(accountHoldings)
+          .set({
+            currentPrice: String(data.currentPrice),
+            currentValue: String(data.currentValue),
+            priceRefreshedAt: now,
+          })
+          .where(and(eq(accountHoldings.id, holdingId), eq(accountHoldings.userId, ctx.userId)));
+      }
+      return { refreshedCount: priceMap.size, refreshedAt: now };
+    }),
+
   // ── Portfolio Intelligence: Price Refresh + Recommendations ──────────────────
 
   refreshPrices: protectedProcedure
