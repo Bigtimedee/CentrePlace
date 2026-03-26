@@ -201,8 +201,9 @@ export function PortfolioIntelligencePanel() {
                 may be delayed or unavailable.
               </p>
               <p className="font-medium text-slate-600">
-                This tool provides general educational information only and does not constitute personalized
-                investment advice.
+                GPRetire provides personalized investment recommendations based on your individual
+                portfolio, timeline, and financial goals. All investment decisions are made solely
+                at your own discretion and are your sole responsibility to evaluate and execute.
               </p>
             </div>
           </details>
