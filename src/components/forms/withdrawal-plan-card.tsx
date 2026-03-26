@@ -90,7 +90,7 @@ export function WithdrawalPlanCard() {
       />
 
       {/* Summary strip */}
-      <div className="grid grid-cols-3 divide-x divide-slate-200 border-b border-slate-200">
+      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y divide-slate-200 sm:divide-y-0 sm:divide-x border-b border-slate-200">
         <div className="px-5 py-3">
           <p className="text-xs text-slate-600">Annual need</p>
           <p className="text-sm font-semibold text-slate-900 mt-0.5">
@@ -135,7 +135,7 @@ export function WithdrawalPlanCard() {
               </div>
 
               {/* Amounts */}
-              <div className="flex items-center gap-4 flex-shrink-0 text-right">
+              <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 text-right">
                 <div>
                   <p className="text-sm font-medium text-slate-700">{formatCurrency(step.grossAmount)}</p>
                   <TaxBadge rate={step.taxCost > 0 ? step.taxCost / step.grossAmount : 0} />

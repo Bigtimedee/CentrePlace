@@ -132,7 +132,7 @@ function AccountForm({
             )}
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-3">
             <FormField label="Equity">
               <Input type="number" min={0} max={100} suffix="%" value={form.equityPct} onChange={e => set({ equityPct: parseFloat(e.target.value) || 0 })} />
@@ -171,7 +171,7 @@ function AccountForm({
         <p className="text-xs text-slate-600 mb-3">
           Annual yield as % of balance. Leave all at 0 for tax-deferred accounts (IRA, 401k). Yield splits taxable income from capital appreciation.
         </p>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <FormField label="Ordinary yield" hint="Bond interest, non-qual dividends">
             <Input type="number" min={0} max={15} step={0.1} suffix="%" value={form.ordinaryYieldRate} onChange={e => set({ ordinaryYieldRate: parseFloat(e.target.value) || 0 })} />
           </FormField>

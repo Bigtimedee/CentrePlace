@@ -24,7 +24,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, description, action }: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200">
+    <div className="flex items-start justify-between px-4 sm:px-6 py-4 border-b border-slate-200">
       <div>
         <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
         {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
@@ -35,5 +35,5 @@ export function CardHeader({ title, description, action }: CardHeaderProps) {
 }
 
 export function CardBody({ className, children }: CardProps) {
-  return <div className={cn("p-6", className)}>{children}</div>;
+  return <div className={cn("p-4 sm:p-6", className)}>{children}</div>;
 }

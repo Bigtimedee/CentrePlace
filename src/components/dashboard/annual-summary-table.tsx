@@ -45,8 +45,18 @@ export function AnnualSummaryTable({ result }: Props) {
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-slate-200">
-              {["Year", "Age", "Total Capital", "Required", "% Funded", "Inv. Capital", "RE Equity", "Annual Tax", "FI"].map(h => (
-                <th key={h} className="pb-2 pr-4 text-left font-medium text-slate-600 last:pr-0">{h}</th>
+              {[
+                { label: "Year",          cls: "" },
+                { label: "Age",           cls: "hidden sm:table-cell" },
+                { label: "Total Capital", cls: "" },
+                { label: "Required",      cls: "hidden sm:table-cell" },
+                { label: "% Funded",      cls: "" },
+                { label: "Inv. Capital",  cls: "hidden sm:table-cell" },
+                { label: "RE Equity",     cls: "hidden sm:table-cell" },
+                { label: "Annual Tax",    cls: "hidden sm:table-cell" },
+                { label: "FI",            cls: "" },
+              ].map(h => (
+                <th key={h.label} className={`pb-2 pr-4 text-left font-medium text-slate-600 last:pr-0 ${h.cls}`}>{h.label}</th>
               ))}
             </tr>
           </thead>
@@ -65,11 +75,11 @@ export function AnnualSummaryTable({ result }: Props) {
                   <td className={`py-2 pr-4 font-medium ${isFIRow ? "text-emerald-600" : "text-slate-700"}`}>
                     {row.year}
                   </td>
-                  <td className="py-2 pr-4 text-slate-500">{row.age}</td>
+                  <td className="py-2 pr-4 text-slate-500 hidden sm:table-cell">{row.age}</td>
                   <td className="py-2 pr-4 text-slate-900 font-semibold">
                     {formatCurrency(row.totalCapital, true)}
                   </td>
-                  <td className="py-2 pr-4 text-slate-500">
+                  <td className="py-2 pr-4 text-slate-500 hidden sm:table-cell">
                     {formatCurrency(row.requiredCapital, true)}
                   </td>
                   <td className="py-2 pr-4">
@@ -77,13 +87,13 @@ export function AnnualSummaryTable({ result }: Props) {
                       {formatPct(pct)}
                     </span>
                   </td>
-                  <td className="py-2 pr-4 text-slate-500">
+                  <td className="py-2 pr-4 text-slate-500 hidden sm:table-cell">
                     {formatCurrency(row.investmentCapital, true)}
                   </td>
-                  <td className="py-2 pr-4 text-slate-500">
+                  <td className="py-2 pr-4 text-slate-500 hidden sm:table-cell">
                     {formatCurrency(row.realEstateEquity, true)}
                   </td>
-                  <td className="py-2 pr-4 text-slate-500">
+                  <td className="py-2 pr-4 text-slate-500 hidden sm:table-cell">
                     {row.annualTotalTax > 0 ? formatCurrency(row.annualTotalTax, true) : "—"}
                   </td>
                   <td className="py-2 text-center">
