@@ -1,4 +1,5 @@
 import yahooFinance from "yahoo-finance2";
+import { isCryptoTicker, refreshCryptoPrices } from "./crypto-price-refresh";
 
 export type PriceData = {
   ticker: string;
@@ -7,12 +8,12 @@ export type PriceData = {
 };
 
 /**
- * Fetches current prices for holdings with tickers.
+ * Fetches current prices for stock holdings via Yahoo Finance.
  * Processes in batches of 10 with 200ms delay between batches.
  * Returns a Map<holdingId, PriceData>.
  * Holdings without tickers or with fetch failures are silently skipped.
  */
-export async function refreshHoldingPrices(
+async function refreshStockPrices(
   holdings: Array<{ id: string; ticker: string | null; shares: string | null }>
 ): Promise<Map<string, PriceData>> {
   const withTickers = holdings.filter(
@@ -51,5 +52,32 @@ export async function refreshHoldingPrices(
     }
   }
 
+  return result;
+}
+
+/**
+ * Fetches current prices for all holdings, routing crypto tickers to CoinGecko
+ * and equity tickers to Yahoo Finance. Both fetches run in parallel.
+ * Returns a Map<holdingId, PriceData>.
+ */
+export async function refreshHoldingPrices(
+  holdings: Array<{ id: string; ticker: string | null; shares: string | null }>
+): Promise<Map<string, PriceData>> {
+  // Split holdings into crypto and stock buckets
+  const cryptoHoldings = holdings.filter(
+    (h) => h.ticker != null && isCryptoTicker(h.ticker)
+  );
+  const stockHoldings = holdings.filter(
+    (h) => h.ticker == null || !isCryptoTicker(h.ticker)
+  );
+
+  // Fetch both in parallel
+  const [cryptoMap, stockMap] = await Promise.all([
+    refreshCryptoPrices(cryptoHoldings),
+    refreshStockPrices(stockHoldings),
+  ]);
+
+  // Merge crypto and stock results into a single map
+  const result = new Map<string, PriceData>([...stockMap, ...cryptoMap]);
   return result;
 }

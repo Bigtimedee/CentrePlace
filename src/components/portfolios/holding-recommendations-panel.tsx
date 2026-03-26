@@ -205,6 +205,9 @@ export function HoldingRecommendationsPanel() {
               Prices last refreshed: {lastPriceRefresh.toLocaleString()}
             </p>
           )}
+          <p className="text-xs text-slate-400 mt-0.5">
+            Prices sourced from Yahoo Finance (equities) and CoinGecko (crypto)
+          </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button
