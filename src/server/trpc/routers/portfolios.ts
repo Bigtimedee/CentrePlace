@@ -201,7 +201,7 @@ export const portfoliosRouter = createTRPCRouter({
         userId: ctx.userId,
         statementId: stmt.id,
         accountId: input.accountId,
-        ticker: input.ticker ?? null,
+        ticker: input.ticker?.toUpperCase() ?? null,
         securityName: input.securityName,
         assetClass: input.assetClass,
         securitySubType: input.securitySubType ?? null,
@@ -226,8 +226,11 @@ export const portfoliosRouter = createTRPCRouter({
       costBasis: z.number().nullable().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const { id, costBasis, ...rest } = input;
+      const { id, costBasis, ticker, ...rest } = input;
       const setData: Record<string, unknown> = { ...rest };
+      if (ticker !== undefined) {
+        setData.ticker = ticker?.toUpperCase() ?? null;
+      }
       if (costBasis !== undefined) {
         setData.costBasis = costBasis != null ? String(costBasis) : null;
       }

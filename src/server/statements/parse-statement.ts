@@ -23,7 +23,7 @@ const SYSTEM_PROMPT = `You are a financial statement parser. Extract all investm
   "statementDate": "YYYY-MM-DD or null",
   "holdings": [
     {
-      "ticker": "string or null",
+      "ticker": "UPPERCASE string or null (e.g. AAPL, NVDA, VTI — always uppercase)",
       "securityName": "string (required)",
       "assetClass": "equity" | "bond" | "alt" | "cash",
       "securitySubType": "stock" | "etf" | "mutual_fund" | "money_market" | "treasury" | "corporate_bond" | "muni_bond" | null,

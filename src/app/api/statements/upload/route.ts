@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         statementId: statement.id,
         userId,
         accountId: accountId || null,
-        ticker: h.ticker ?? null,
+        ticker: h.ticker?.toUpperCase() ?? null,
         securityName: h.securityName,
         assetClass: h.assetClass,
         securitySubType: h.securitySubType ?? null,

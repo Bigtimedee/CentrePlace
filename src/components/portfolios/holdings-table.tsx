@@ -215,7 +215,7 @@ function AddRow({
     if (!form.securityName.trim() || isNaN(marketValue)) return;
     addMutation.mutate({
       accountId,
-      ticker: form.ticker.trim() || null,
+      ticker: form.ticker.trim().toUpperCase() || null,
       securityName: form.securityName.trim(),
       assetClass: form.assetClass,
       shares: form.shares ? parseFloat(form.shares) : null,
@@ -327,7 +327,7 @@ export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
   const handleSaveEdit = (id: string, form: EditState) => {
     updateMutation.mutate({
       id,
-      ticker: form.ticker.trim() || null,
+      ticker: form.ticker.trim().toUpperCase() || null,
       securityName: form.securityName.trim(),
       shares: form.shares ? parseFloat(form.shares) : null,
       costBasis: form.costBasis ? parseFloat(form.costBasis) : null,

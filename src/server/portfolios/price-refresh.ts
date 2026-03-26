@@ -1,4 +1,6 @@
-import yahooFinance from "yahoo-finance2";
+import YahooFinance from "yahoo-finance2";
+
+const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
 import { isCryptoTicker, refreshCryptoPrices } from "./crypto-price-refresh";
 
 export type PriceData = {
@@ -28,7 +30,7 @@ async function refreshStockPrices(
 
     const settled = await Promise.allSettled(
       batch.map(async (h) => {
-        const quote = await yahooFinance.quote(h.ticker) as unknown as { regularMarketPrice?: number };
+        const quote = await yahooFinance.quote(h.ticker.toUpperCase()) as unknown as { regularMarketPrice?: number };
         const price = quote.regularMarketPrice;
         if (price == null) return null;
 
