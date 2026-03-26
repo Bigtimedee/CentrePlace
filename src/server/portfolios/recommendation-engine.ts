@@ -137,7 +137,7 @@ export async function generateHoldingRecommendations(
   return parsed.map((item: unknown) => {
     const rec = item as Record<string, unknown>;
     return {
-      holdingId: String(rec.holdingId ?? ""),
+      holdingId: rec.holdingId != null ? String(rec.holdingId) : null as unknown as string,
       ticker: rec.ticker != null ? String(rec.ticker) : null,
       securityName: String(rec.securityName ?? ""),
       action: rec.action as HoldingRecommendation["action"],
