@@ -9,6 +9,8 @@ import { Select } from "@/components/ui/select";
 import { FormField } from "@/components/ui/form-field";
 import { Pencil, Trash2, PlusCircle, X, Check, AlertCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { StatementUploadButton, UploadResult } from "@/components/portfolios/statement-upload-button";
+import { HoldingsReviewModal } from "@/components/portfolios/holdings-review-modal";
 
 type AccountType = "taxable" | "traditional_ira" | "roth_ira" | "traditional_401k" | "roth_401k" | "sep_ira" | "solo_401k";
 
@@ -224,6 +226,8 @@ export function PortfoliosForm() {
 
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [pending, setPending] = useState<UploadResult | null>(null);
+  const utils = trpc.useUtils();
 
   if (isLoading) return <div className="text-slate-600 text-sm p-8">Loading...</div>;
 
@@ -237,9 +241,14 @@ export function PortfoliosForm() {
           description="Taxable accounts, IRAs, 401(k)s, and other portfolios"
           action={
             !adding && (
-              <Button variant="secondary" size="sm" onClick={() => setAdding(true)}>
-                <PlusCircle className="h-3.5 w-3.5" /> Add Account
-              </Button>
+              <div className="flex items-center gap-2">
+                <StatementUploadButton
+                  onUploadComplete={(result) => setPending(result)}
+                />
+                <Button variant="secondary" size="sm" onClick={() => setAdding(true)}>
+                  <PlusCircle className="h-3.5 w-3.5" /> Add Account
+                </Button>
+              </div>
             )
           }
         />
@@ -304,6 +313,18 @@ export function PortfoliosForm() {
         <div className="text-right text-sm text-slate-600">
           Total portfolio value: <span className="text-slate-900 font-semibold">{formatCurrency(totalBalance, true)}</span>
         </div>
+      )}
+
+      {pending && (
+        <HoldingsReviewModal
+          statementId={pending.statementId}
+          brokerageName={pending.brokerageName}
+          statementDate={pending.statementDate}
+          holdings={pending.holdings}
+          accounts={data.map((a) => ({ id: a.id, accountName: a.accountName, accountType: a.accountType }))}
+          onConfirmed={() => { setPending(null); utils.portfolios.getHoldings.invalidate(); }}
+          onClose={() => setPending(null)}
+        />
       )}
     </div>
   );

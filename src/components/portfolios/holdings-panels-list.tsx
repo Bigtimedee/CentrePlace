@@ -16,11 +16,6 @@ export function HoldingsPanelsList() {
           key={acct.id}
           accountId={acct.id}
           accountName={acct.accountName}
-          accounts={accounts.map((a) => ({
-            id: a.id,
-            accountName: a.accountName,
-            accountType: a.accountType,
-          }))}
         />
       ))}
     </div>

@@ -1,22 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { StatementUploadButton, UploadResult } from "./statement-upload-button";
-import { HoldingsReviewModal } from "./holdings-review-modal";
 import { HoldingsBreakdownChart } from "./holdings-breakdown-chart";
 import { HoldingsTable } from "./holdings-table";
 
 interface Props {
   accountId: string;
   accountName: string;
-  accounts: { id: string; accountName: string; accountType: string }[];
 }
 
-export function AccountHoldingsPanel({ accountId, accountName, accounts }: Props) {
-  const [pending, setPending] = useState<UploadResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
+export function AccountHoldingsPanel({ accountId, accountName }: Props) {
   const { data: statements, refetch } = trpc.portfolios.getHoldings.useQuery({ accountId });
 
   const latestStatement = statements?.[0];
@@ -24,18 +17,9 @@ export function AccountHoldingsPanel({ accountId, accountName, accounts }: Props
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4">
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3">
         <h3 className="text-sm font-semibold text-gray-800">{accountName} — Holdings</h3>
-        <StatementUploadButton
-          accountId={accountId}
-          onUploadComplete={(result) => { setError(null); setPending(result); }}
-          onError={setError}
-        />
       </div>
-
-      {error && (
-        <p className="mb-3 rounded bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
-      )}
 
       {holdings.length === 0 ? (
         <div className="space-y-3">
@@ -61,18 +45,6 @@ export function AccountHoldingsPanel({ accountId, accountName, accounts }: Props
             </p>
           )}
         </>
-      )}
-
-      {pending && (
-        <HoldingsReviewModal
-          statementId={pending.statementId}
-          brokerageName={pending.brokerageName}
-          statementDate={pending.statementDate}
-          holdings={pending.holdings}
-          accounts={accounts}
-          onConfirmed={() => { setPending(null); refetch(); }}
-          onClose={() => { setPending(null); refetch(); }}
-        />
       )}
     </div>
   );
