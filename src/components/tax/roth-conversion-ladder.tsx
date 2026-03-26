@@ -86,7 +86,8 @@ export function RothConversionLadder({ projections }: Props) {
         )}
       </div>
 
-      <ResponsiveContainer width="100%" height={220}>
+      <div className="h-[140px] sm:h-[180px] lg:h-[220px]">
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 16 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
@@ -110,6 +111,7 @@ export function RothConversionLadder({ projections }: Props) {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      </div>
 
       <div className="flex items-center gap-4 mt-3 text-xs text-slate-600">
         <span className="flex items-center gap-1.5">

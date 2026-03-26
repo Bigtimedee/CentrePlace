@@ -91,7 +91,8 @@ export function AnnualCashflowChart({ quarters }: Props) {
         <p className="text-xs text-slate-600 mt-0.5">Income, spending, and taxes by year</p>
       </div>
 
-      <ResponsiveContainer width="100%" height={280}>
+      <div className="h-[160px] sm:h-[220px] lg:h-[280px]">
+      <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 16 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
@@ -130,6 +131,7 @@ export function AnnualCashflowChart({ quarters }: Props) {
           />
         </ComposedChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

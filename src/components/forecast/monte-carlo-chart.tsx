@@ -134,8 +134,9 @@ export function MonteCarloChart({ result }: Props) {
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={340}>
-        <ComposedChart data={data} margin={{ top: 4, right: 16, bottom: 0, left: 16 }}>
+      <div className="h-[180px] sm:h-[260px] lg:h-[340px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 8 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
             dataKey="year"
@@ -181,6 +182,7 @@ export function MonteCarloChart({ result }: Props) {
           )}
         </ComposedChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

@@ -74,7 +74,8 @@ export function TaxTimelineChart({ projections }: Props) {
         </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={300}>
+      <div className="h-[160px] sm:h-[240px] lg:h-[300px]">
+      <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 4, right: 48, bottom: 0, left: 16 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis
@@ -137,6 +138,7 @@ export function TaxTimelineChart({ projections }: Props) {
           />
         </ComposedChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

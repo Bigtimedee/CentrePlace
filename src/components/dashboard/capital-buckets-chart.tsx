@@ -74,7 +74,8 @@ export function CapitalBucketsChart({ quarters }: Props) {
         <p className="text-xs text-slate-600 mt-0.5">How your capital is allocated across asset buckets</p>
       </div>
 
-      <ResponsiveContainer width="100%" height={280}>
+      <div className="h-[160px] sm:h-[220px] lg:h-[280px]">
+      <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 16 }}>
           <defs>
             {[
@@ -150,6 +151,7 @@ export function CapitalBucketsChart({ quarters }: Props) {
           />
         </AreaChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

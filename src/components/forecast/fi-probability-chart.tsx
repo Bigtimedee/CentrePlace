@@ -43,7 +43,8 @@ export function FiProbabilityChart({ result }: Props) {
         </p>
       </div>
 
-      <ResponsiveContainer width="100%" height={200}>
+      <div className="h-[140px] sm:h-[180px] lg:h-[200px]">
+      <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 4, right: 16, bottom: 0, left: 16 }}>
           <defs>
             <linearGradient id="probGrad" x1="0" y1="0" x2="0" y2="1">
@@ -126,6 +127,7 @@ export function FiProbabilityChart({ result }: Props) {
           />
         </AreaChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

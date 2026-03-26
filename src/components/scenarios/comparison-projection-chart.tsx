@@ -126,7 +126,8 @@ export function ComparisonProjectionChart({ runs }: Props) {
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={360}>
+      <div className="h-[160px] sm:h-[260px] lg:h-[360px]">
+      <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={data} margin={{ top: 4, right: 16, bottom: 0, left: 16 }}>
           <defs>
             {runs.map(run => (
@@ -209,6 +210,7 @@ export function ComparisonProjectionChart({ runs }: Props) {
           ))}
         </ComposedChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

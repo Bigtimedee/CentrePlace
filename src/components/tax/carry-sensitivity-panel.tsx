@@ -52,7 +52,7 @@ export function CarrySensitivityPanel({ data, isLoading }: Props) {
             <span>Total gross carry: {formatCurrency(data.baseCarryGross, true)}</span>
           </div>
 
-          <div className="grid grid-cols-5 gap-1 text-xs text-slate-600 font-medium mb-1 px-1">
+          <div className="hidden sm:grid grid-cols-5 gap-1 text-xs text-slate-600 font-medium mb-1 px-1">
             <span className="col-span-2">Scenario</span>
             <span className="text-right">Net Carry</span>
             <span className="text-right">FI Year</span>
@@ -66,7 +66,8 @@ export function CarrySensitivityPanel({ data, isLoading }: Props) {
 
             return (
               <div key={pt.realizationPct} className={`border rounded-lg px-3 py-2 ${colorClass}`}>
-                <div className="grid grid-cols-5 gap-1 items-center">
+                {/* Desktop: 5-col grid */}
+                <div className="hidden sm:grid grid-cols-5 gap-1 items-center">
                   <span className="col-span-2 text-xs font-medium">{label}</span>
                   <span className="text-right text-xs font-mono">
                     {formatCurrency(pt.totalNetCarry, true)}
@@ -78,6 +79,16 @@ export function CarrySensitivityPanel({ data, isLoading }: Props) {
                   <span className="text-right text-xs font-mono">
                     {pt.peakTaxAmount > 0 ? formatCurrency(pt.peakTaxAmount, true) : "—"}
                   </span>
+                </div>
+                {/* Mobile: stacked 2-col grid */}
+                <div className="sm:hidden grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs">
+                  <span className="col-span-2 font-medium mb-1">{label}</span>
+                  <span className="text-slate-500">Net Carry</span>
+                  <span className="text-right font-mono">{formatCurrency(pt.totalNetCarry, true)}</span>
+                  <span className="text-slate-500">FI Year</span>
+                  <span className="text-right font-semibold">{pt.fiYear ?? "Never"}{pt.fiAge != null && ` (${pt.fiAge})`}</span>
+                  <span className="text-slate-500">Peak Tax</span>
+                  <span className="text-right font-mono">{pt.peakTaxAmount > 0 ? formatCurrency(pt.peakTaxAmount, true) : "—"}</span>
                 </div>
               </div>
             );
