@@ -80,10 +80,12 @@ interface EditState {
 
 function EditRow({
   holding,
+  currentPrice,
   onSave,
   onCancel,
 }: {
   holding: Holding;
+  currentPrice: number | null;
   onSave: (data: EditState) => void;
   onCancel: () => void;
 }) {
@@ -96,6 +98,14 @@ function EditRow({
 
   const set = (key: keyof EditState) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+  const sharesNum = parseFloat(form.shares);
+  const previewValue = !isNaN(sharesNum) && currentPrice != null ? sharesNum * currentPrice : null;
+  const costBasisNum = parseFloat(form.costBasis);
+  const previewRoiPct = previewValue != null && !isNaN(costBasisNum) && costBasisNum > 0
+    ? (previewValue - costBasisNum) / costBasisNum : null;
+  const previewRoiDollar = previewValue != null && !isNaN(costBasisNum)
+    ? previewValue - costBasisNum : null;
 
   return (
     <tr className="bg-indigo-50">
@@ -132,8 +142,26 @@ function EditRow({
           className="w-24 rounded border border-indigo-200 px-2 py-1 text-xs text-right focus:outline-none focus:ring-1 focus:ring-indigo-400"
         />
       </td>
-      {/* Today's Value, YTD, ROI %, ROI $ — read-only during edit */}
-      <td className="px-3 py-2 text-right text-xs text-slate-400" colSpan={4}>saved on confirm</td>
+      {/* Today's Value — live preview based on shares × stored price */}
+      <td className="px-3 py-2 text-right text-xs font-medium text-slate-700">
+        {previewValue != null ? fmtMoney(previewValue) : <span className="text-slate-400">—</span>}
+      </td>
+      {/* ROI % */}
+      <td className="px-3 py-2 text-right text-xs">
+        {previewRoiPct != null ? (
+          <span className={previewRoiPct >= 0 ? "text-green-700" : "text-red-600"}>{fmtPct(previewRoiPct)}</span>
+        ) : <span className="text-slate-400">—</span>}
+      </td>
+      {/* ROI $ */}
+      <td className="px-3 py-2 text-right text-xs">
+        {previewRoiDollar != null ? (
+          <span className={previewRoiDollar >= 0 ? "text-green-700" : "text-red-600"}>{fmtMoney(previewRoiDollar)}</span>
+        ) : <span className="text-slate-400">—</span>}
+      </td>
+      {/* Price/Share — stored price used for preview */}
+      <td className="px-3 py-2 text-right text-xs text-slate-500">
+        {currentPrice != null ? fmtMoney(currentPrice) : <span className="text-slate-400">—</span>}
+      </td>
       <td className="px-3 py-2">
         <div className="flex gap-1 justify-end">
           <button
@@ -285,15 +313,15 @@ export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
   const [adding, setAdding] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const updateMutation = trpc.portfolios.updateHolding.useMutation({
-    onSuccess: () => { setEditingId(null); onRefetch(); },
-  });
-  const deleteMutation = trpc.portfolios.deleteHolding.useMutation({
-    onSuccess: onRefetch,
-  });
   const refreshMutation = trpc.portfolios.refreshAccountPrices.useMutation({
     onSuccess: () => { setRefreshing(false); onRefetch(); },
     onError: () => setRefreshing(false),
+  });
+  const updateMutation = trpc.portfolios.updateHolding.useMutation({
+    onSuccess: () => { setEditingId(null); onRefetch(); refreshMutation.mutate({ accountId }); },
+  });
+  const deleteMutation = trpc.portfolios.deleteHolding.useMutation({
+    onSuccess: onRefetch,
   });
 
   const handleSaveEdit = (id: string, form: EditState) => {
@@ -354,6 +382,7 @@ export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
                 <EditRow
                   key={h.id}
                   holding={h}
+                  currentPrice={getPrice(h)}
                   onSave={(form) => handleSaveEdit(h.id, form)}
                   onCancel={() => setEditingId(null)}
                 />
