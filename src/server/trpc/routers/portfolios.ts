@@ -349,12 +349,16 @@ export const portfoliosRouter = createTRPCRouter({
           message: `Failed to generate recommendations: ${message}`,
         });
       }
+      // Build a set of valid holding IDs to guard against AI-fabricated IDs
+      const validHoldingIds = new Set(holdings.map((h) => h.id));
+      const validRecs = recs.filter((r) => validHoldingIds.has(r.holdingId));
+
       // Delete existing then insert fresh
       await ctx.db.delete(holdingRecommendations)
         .where(eq(holdingRecommendations.userId, ctx.userId));
-      if (recs.length > 0) {
+      if (validRecs.length > 0) {
         await ctx.db.insert(holdingRecommendations).values(
-          recs.map((r) => ({
+          validRecs.map((r) => ({
             userId: ctx.userId,
             holdingId: r.holdingId,
             ticker: r.ticker ?? null,
@@ -370,6 +374,6 @@ export const portfoliosRouter = createTRPCRouter({
           }))
         );
       }
-      return recs;
+      return validRecs;
     }),
 });
