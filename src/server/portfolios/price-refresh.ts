@@ -28,7 +28,7 @@ async function refreshStockPrices(
 
     const settled = await Promise.allSettled(
       batch.map(async (h) => {
-        const quote = await yahooFinance.quote(h.ticker);
+        const quote = await yahooFinance.quote(h.ticker) as unknown as { regularMarketPrice?: number };
         const price = quote.regularMarketPrice;
         if (price == null) return null;
 

@@ -66,7 +66,7 @@ function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; 
   }, [onEnvDetected]);
 
   const { open, ready } = usePlaidLink({
-    token: linkToken ?? "",
+    token: linkToken,
     receivedRedirectUri: isOAuthReturn ? window.location.href : undefined,
     onSuccess: async (public_token, metadata) => {
       sessionStorage.removeItem(PLAID_TOKEN_KEY);
