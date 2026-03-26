@@ -14,9 +14,9 @@ export default function PortfoliosPage() {
     <div>
       <PageHeader title="Investment Portfolios" description="Taxable accounts, IRAs, 401(k)s — with asset allocation and return assumptions" />
       <div className="mt-8 space-y-6">
+        <PlaidConnectionPanel />
         <PortfolioAllocationDashboard />
         <PortfolioIntelligencePanel />
-        <PlaidConnectionPanel />
         <PortfoliosForm />
         <HoldingsPanelsList />
         <HoldingRecommendationsPanel />
