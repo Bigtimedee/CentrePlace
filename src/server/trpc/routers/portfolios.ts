@@ -223,18 +223,28 @@ export const portfoliosRouter = createTRPCRouter({
       if (holdings.length === 0) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "No confirmed holdings found." });
       }
-      const recs = await generateHoldingRecommendations(
-        holdings.map((h) => ({
-          id: h.id,
-          ticker: h.ticker ?? null,
-          securityName: h.securityName,
-          assetClass: h.assetClass ?? null,
-          accountType: null,
-          shares: h.shares != null ? String(h.shares) : null,
-          currentPrice: h.currentPrice ?? null,
-          currentValue: h.currentValue ?? null,
-        }))
-      );
+      let recs;
+      try {
+        recs = await generateHoldingRecommendations(
+          holdings.map((h) => ({
+            id: h.id,
+            ticker: h.ticker ?? null,
+            securityName: h.securityName,
+            assetClass: h.assetClass ?? null,
+            accountType: null,
+            shares: h.shares != null ? String(h.shares) : null,
+            currentPrice: h.currentPrice ?? null,
+            currentValue: h.currentValue ?? null,
+          }))
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error("[generateRecommendations] AI error:", message);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to generate recommendations: ${message}`,
+        });
+      }
       // Delete existing then insert fresh
       await ctx.db.delete(holdingRecommendations)
         .where(eq(holdingRecommendations.userId, ctx.userId));

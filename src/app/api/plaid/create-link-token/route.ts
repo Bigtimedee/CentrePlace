@@ -12,17 +12,26 @@ export async function POST() {
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const response = await plaidClient.linkTokenCreate({
-    user: { client_user_id: userId },
-    client_name: "GPRetire",
-    products: [Products.Transactions],
-    country_codes: [CountryCode.Us],
-    language: "en",
-    redirect_uri: `${appUrl}/portfolios`,
-  });
+  try {
+    const response = await plaidClient.linkTokenCreate({
+      user: { client_user_id: userId },
+      client_name: "GPRetire",
+      products: [Products.Transactions],
+      country_codes: [CountryCode.Us],
+      language: "en",
+      redirect_uri: `${appUrl}/portfolios`,
+    });
 
-  return NextResponse.json({
-    link_token: response.data.link_token,
-    plaid_env: process.env.PLAID_ENV ?? "sandbox",
-  });
+    return NextResponse.json({
+      link_token: response.data.link_token,
+      plaid_env: process.env.PLAID_ENV ?? "sandbox",
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[create-link-token] Plaid error:", message);
+    return NextResponse.json(
+      { error: "Failed to create Plaid link token", detail: message },
+      { status: 500 }
+    );
+  }
 }
