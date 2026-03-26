@@ -68,20 +68,21 @@ export function CapitalProjectionChart({ result }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-900">Capital Projection</h3>
           <p className="text-xs text-slate-600 mt-0.5">Total capital vs required to reach FI</p>
         </div>
         {fiYear && (
-          <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1 self-start sm:self-auto">
             FI: {result.fiDate?.quarter} {fiYear} · Age {result.fiAge}
           </div>
         )}
       </div>
 
-      <ResponsiveContainer width="100%" height={340}>
-        <ComposedChart data={data} margin={{ top: 4, right: 16, bottom: 0, left: 16 }}>
+      <div className="h-[200px] sm:h-[280px] lg:h-[340px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: 8 }}>
           <defs>
             <linearGradient id="capGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
@@ -154,6 +155,7 @@ export function CapitalProjectionChart({ result }: Props) {
           />
         </ComposedChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

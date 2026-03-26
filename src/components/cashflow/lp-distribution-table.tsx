@@ -22,8 +22,40 @@ export function LPDistributionTable({ funds }: Props) {
     return a.firstDistributionYear - b.firstDistributionYear;
   });
 
+  const totalDist = funds.reduce((s, f) => s + f.totalExpectedDistributions, 0);
+
   return (
-    <div className="overflow-x-auto">
+    <>
+      {/* Mobile card view */}
+      <div className="sm:hidden space-y-3">
+        {sorted.map((f) => (
+          <div key={f.fundName} className="rounded-lg border border-slate-200 bg-white p-3 text-xs">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <span className="font-medium text-slate-700 truncate">{f.fundName}</span>
+              <span className="text-slate-500 whitespace-nowrap">{f.vintageYear}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+              <span className="text-slate-500">Total Dist.</span>
+              <span className="text-right text-indigo-600 font-semibold font-mono">{formatCurrency(f.totalExpectedDistributions, true)}</span>
+              <span className="text-slate-500">Current NAV</span>
+              <span className="text-right text-slate-700 font-mono">{formatCurrency(f.currentNav, true)}</span>
+              <span className="text-slate-500">First / Last</span>
+              <span className="text-right text-slate-500">{f.firstDistributionYear ?? "—"} – {f.lastDistributionYear ?? "—"}</span>
+              <span className="text-slate-500">Events</span>
+              <span className="text-right text-slate-600">{f.distributionCount > 0 ? `${f.distributionCount} event${f.distributionCount !== 1 ? "s" : ""}` : "None"}</span>
+            </div>
+          </div>
+        ))}
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs">
+          <div className="grid grid-cols-2 gap-x-4 font-semibold">
+            <span className="text-slate-600">Total Distributions</span>
+            <span className="text-right text-indigo-600 font-mono">{formatCurrency(totalDist, true)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden sm:block overflow-x-auto">
       <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-slate-200">
@@ -69,6 +101,7 @@ export function LPDistributionTable({ funds }: Props) {
           </tr>
         </tfoot>
       </table>
-    </div>
+      </div>
+    </>
   );
 }

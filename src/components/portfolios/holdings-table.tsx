@@ -367,12 +367,12 @@ export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
             <tr className="border-b border-gray-100 bg-slate-50 text-left">
               <th className="px-3 py-2 font-medium text-slate-600 whitespace-nowrap">Ticker</th>
               <th className="px-3 py-2 font-medium text-slate-600">Investment Name</th>
-              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap">Cost Basis</th>
-              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap"># Shares</th>
+              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap hidden sm:table-cell">Cost Basis</th>
+              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap hidden sm:table-cell"># Shares</th>
               <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap">Today's Value</th>
               <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap">ROI %</th>
-              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap">ROI $</th>
-              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap">Price/Share</th>
+              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap hidden sm:table-cell">ROI $</th>
+              <th className="px-3 py-2 font-medium text-slate-600 text-right whitespace-nowrap hidden sm:table-cell">Price/Share</th>
               <th className="px-3 py-2 w-16"></th>
             </tr>
           </thead>
@@ -407,7 +407,7 @@ export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
 
             {holdings.length > 0 && (
               <tr className="bg-slate-50 font-semibold">
-                <td className="px-3 py-2 text-slate-700" colSpan={4}>Total</td>
+                <td className="px-3 py-2 text-slate-700" colSpan={2}>Total</td>
                 <td className="px-3 py-2 text-right text-slate-800">{fmtMoney(totalValue)}</td>
                 <td className="px-3 py-2 text-right">
                   {(() => {
@@ -441,7 +441,8 @@ export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
                     );
                   })()}
                 </td>
-                <td colSpan={2} />
+                <td className="hidden sm:table-cell" />
+                <td className="hidden sm:table-cell" />
               </tr>
             )}
           </tbody>
@@ -477,12 +478,12 @@ function HoldingRow({
       <td className="px-3 py-2 text-slate-700 max-w-[220px]">
         <span className="line-clamp-2">{h.securityName}</span>
       </td>
-      <td className="px-3 py-2 text-right text-slate-600">
+      <td className="px-3 py-2 text-right text-slate-600 hidden sm:table-cell">
         {h.costBasis != null ? fmtMoney(parseFloat(h.costBasis)) : (
           <span className="text-slate-300 italic">add</span>
         )}
       </td>
-      <td className="px-3 py-2 text-right text-slate-700">
+      <td className="px-3 py-2 text-right text-slate-700 hidden sm:table-cell">
         {h.shares != null ? fmt(h.shares, h.shares % 1 === 0 ? 0 : 4) : "—"}
       </td>
       <td className="px-3 py-2 text-right font-medium text-slate-800">
@@ -500,7 +501,7 @@ function HoldingRow({
           <span className="text-slate-300">—</span>
         )}
       </td>
-      <td className="px-3 py-2 text-right">
+      <td className="px-3 py-2 text-right hidden sm:table-cell">
         {roiD != null ? (
           <span className={roiD >= 0 ? "text-green-700" : "text-red-600"}>
             {fmtMoney(roiD)}
@@ -509,11 +510,11 @@ function HoldingRow({
           <span className="text-slate-300">—</span>
         )}
       </td>
-      <td className="px-3 py-2 text-right text-slate-500">
+      <td className="px-3 py-2 text-right text-slate-500 hidden sm:table-cell">
         {price != null ? fmtMoney(price) : "—"}
       </td>
       <td className="px-3 py-2">
-        <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-1 justify-end opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button
             onClick={onEdit}
             className="rounded p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50"

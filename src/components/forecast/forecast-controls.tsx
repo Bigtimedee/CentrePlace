@@ -46,7 +46,7 @@ export function ForecastControls({
       <button
         onClick={onRun}
         disabled={isLoading}
-        className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
       >
         {isLoading ? "Running…" : "Run Forecast"}
       </button>

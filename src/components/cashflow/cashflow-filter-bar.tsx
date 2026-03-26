@@ -31,7 +31,7 @@ export function CashflowFilterBar({ activeSources, onToggle, viewMode, onToggleV
             <button
               key={src}
               onClick={() => onToggle(src)}
-              className={`text-xs font-medium border rounded-full px-3 py-1 transition-colors ${
+              className={`text-xs font-medium border rounded-full px-3 py-1.5 transition-colors min-h-[36px] ${
                 isActive
                   ? config.activeClass
                   : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-600"
