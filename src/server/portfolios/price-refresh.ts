@@ -27,10 +27,8 @@ export async function refreshHoldingPrices(
 
     const settled = await Promise.allSettled(
       batch.map(async (h) => {
-        const quote = await yahooFinance.quote(h.ticker, {
-          fields: ["regularMarketPrice"],
-        });
-        const price = quote.regularMarketPrice;
+        const quote = await yahooFinance.quote(h.ticker);
+        const price = (quote as { regularMarketPrice?: number }).regularMarketPrice;
         if (price == null) return null;
 
         const sharesNum = h.shares != null ? parseFloat(h.shares) : null;
