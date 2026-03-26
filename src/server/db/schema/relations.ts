@@ -8,7 +8,7 @@ import { lpInvestments } from "./lp-investments";
 import { realEstateProperties, mortgages } from "./real-estate";
 import { insurancePolicies } from "./insurance";
 import { realizationPolicy } from "./realization-policy";
-import { accountStatements, accountHoldings } from "./holdings";
+import { accountStatements, accountHoldings, holdingRecommendations } from "./holdings";
 import { directInvestments } from "./direct-investments";
 import { cryptoHoldings } from "./crypto-holdings";
 import { equityGrants, equityVestingEvents, equityShareLots } from "./equity-compensation";
@@ -34,6 +34,7 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
   }),
   accountStatements: many(accountStatements),
   accountHoldings: many(accountHoldings),
+  holdingRecommendations: many(holdingRecommendations),
   directInvestments: many(directInvestments),
   cryptoHoldings: many(cryptoHoldings),
   equityGrants: many(equityGrants),
@@ -99,7 +100,7 @@ export const accountStatementsRelations = relations(accountStatements, ({ one, m
   holdings: many(accountHoldings),
 }));
 
-export const accountHoldingsRelations = relations(accountHoldings, ({ one }) => ({
+export const accountHoldingsRelations = relations(accountHoldings, ({ one, many }) => ({
   statement: one(accountStatements, {
     fields: [accountHoldings.statementId],
     references: [accountStatements.id],
@@ -111,6 +112,18 @@ export const accountHoldingsRelations = relations(accountHoldings, ({ one }) => 
   account: one(investmentAccounts, {
     fields: [accountHoldings.accountId],
     references: [investmentAccounts.id],
+  }),
+  recommendations: many(holdingRecommendations),
+}));
+
+export const holdingRecommendationsRelations = relations(holdingRecommendations, ({ one }) => ({
+  holding: one(accountHoldings, {
+    fields: [holdingRecommendations.holdingId],
+    references: [accountHoldings.id],
+  }),
+  user: one(userProfiles, {
+    fields: [holdingRecommendations.userId],
+    references: [userProfiles.id],
   }),
 }));
 

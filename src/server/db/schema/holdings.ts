@@ -1,4 +1,4 @@
-import { pgTable, text, real, timestamp, integer, jsonb, index } from "drizzle-orm/pg-core";
+import { pgTable, text, real, timestamp, integer, jsonb, index, uuid, decimal } from "drizzle-orm/pg-core";
 import { userProfiles } from "./users";
 import { investmentAccounts } from "./portfolios";
 
@@ -31,9 +31,33 @@ export const accountHoldings = pgTable("account_holdings", {
   pricePerShare: real("price_per_share"),
   marketValue: real("market_value").notNull(),
   percentOfAccount: real("percent_of_account"),
+  currentPrice: decimal("current_price", { precision: 18, scale: 6 }),
+  currentValue: decimal("current_value", { precision: 18, scale: 6 }),
+  priceRefreshedAt: timestamp("price_refreshed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (t) => [
   index("account_holdings_statement_id_idx").on(t.statementId),
   index("account_holdings_user_id_idx").on(t.userId),
   index("account_holdings_account_id_idx").on(t.accountId),
+]);
+
+export const holdingRecommendations = pgTable("holding_recommendations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull().references(() => userProfiles.id, { onDelete: "cascade" }),
+  holdingId: text("holding_id").notNull().references(() => accountHoldings.id, { onDelete: "cascade" }),
+  ticker: text("ticker"),
+  securityName: text("security_name").notNull(),
+  action: text("action").notNull(), // "INCREASE"|"DECREASE"|"HOLD"|"REPLACE"|"SELL"
+  targetAllocationNote: text("target_allocation_note").notNull(),
+  alternativeTicker: text("alternative_ticker"),
+  alternativeSecurityName: text("alternative_security_name"),
+  shortRationale: text("short_rationale").notNull(),
+  fullRationale: text("full_rationale").notNull(),
+  citations: jsonb("citations").notNull().default([]),
+  urgency: text("urgency").notNull(), // "high"|"medium"|"low"
+  generatedAt: timestamp("generated_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => [
+  index("holding_recommendations_user_id_idx").on(t.userId),
+  index("holding_recommendations_holding_id_idx").on(t.holdingId),
 ]);

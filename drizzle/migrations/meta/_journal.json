@@ -43,6 +43,13 @@
       "when": 1774390000000,
       "tag": "0005_security_sub_type",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1774535263249,
+      "tag": "0006_icy_dark_beast",
+      "breakpoints": true
     }
   ]
 }
