@@ -3,10 +3,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 //
 // Federal:
-//   2026 = TCJA sunset. The TCJA doubled the basic exclusion amount through 2025.
-//   In 2026, the exemption reverts to pre-TCJA law (~$7M inflated), unless
-//   Congress acts. This engine models the sunset (i.e., lower exemption) by
-//   default, which is the conservative planning assumption.
+//   The One Big Beautiful Bill Act (OBBBA, Public Law 119-21, signed July 4, 2025)
+//   permanently increased the basic exclusion amount to $15,000,000 per person
+//   for 2026, amending IRC § 2010(c)(3)(A). The TCJA sunset did NOT occur.
+//   Married couples can use $30,000,000 combined via portability (IRC § 2010(c)).
+//   The exemption is indexed for inflation annually beginning in 2027.
+//   Source: IRS Rev. Proc. 2025; Nelson Mullins 2026 Estate and Gift Tax Update.
 //
 //   Federal estate tax rate: 40% flat on taxable estate above the exemption.
 //   The Reg. § 20.2010-1(c) anti-clawback rule protects gifts made during
@@ -24,9 +26,10 @@ import type { FilingStatus, EstateTaxInput, EstateTaxResult } from "./types";
 // Federal Estate Tax
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Post-TCJA-sunset 2026 exemption (approximate; will be inflation-adjusted).
-// Base pre-TCJA amount was $5M (2010 dollars) inflated to ~$7.18M for 2026.
-const FEDERAL_EXEMPTION_2026 = 7_180_000;
+// OBBBA (Public Law 119-21) set the 2026 exemption at $15,000,000 per person.
+// Married couples get $30,000,000 combined via portability (IRC § 2010(c)).
+// Inflation-indexed annually beginning 2027.
+const FEDERAL_EXEMPTION_2026 = 15_000_000;
 const FEDERAL_EXEMPTION_MFJ_2026 = FEDERAL_EXEMPTION_2026 * 2; // portability
 const FEDERAL_ESTATE_RATE = 0.40;
 
@@ -46,14 +49,14 @@ const STATE_ESTATE_CONFIGS: Record<string, StateEstateConfig> = {
   // ── Connecticut — Only state with a gift+estate tax ───────────────────────
   CT: {
     hasEstateTax: true,
-    exemption: 13_610_000, // CT matched federal TCJA exemption; will drop in 2026
+    exemption: 13_610_000, // CT matched federal TCJA exemption; may update post-OBBBA
     topRate: 0.12,
     brackets: [
       { upTo: 1_000_000,  rate: 0.10 },
       { upTo: 5_000_000,  rate: 0.11 },
       { upTo: Infinity,   rate: 0.12 },
     ],
-    notes: "CT exemption likely reverts to ~$3.6M at federal sunset",
+    notes: "CT exemption may increase to track federal $15M under OBBBA; confirm with CT DRS",
   },
 
   // ── Hawaii ────────────────────────────────────────────────────────────────
