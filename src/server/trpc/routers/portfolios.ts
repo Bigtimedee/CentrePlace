@@ -1,10 +1,13 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../index";
-import { investmentAccounts, accountStatements, accountHoldings, userProfiles } from "../../db/schema";
-import { eq, and } from "drizzle-orm";
+import { investmentAccounts, accountStatements, accountHoldings, holdingRecommendations, userProfiles } from "../../db/schema";
+import { eq, and, desc, isNotNull } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { deleteStatementFile } from "@/lib/supabase-storage";
 import { computeAllocationRecommendation } from "../../portfolios/allocation-engine";
 import { fetchETFSuggestions } from "../../portfolios/etf-suggestions";
+import { refreshHoldingPrices } from "../../portfolios/price-refresh";
+import { generateHoldingRecommendations } from "../../portfolios/recommendation-engine";
 
 // Separate base shape from refinement so .partial() can be used on the shape
 const accountShape = z.object({
@@ -167,5 +170,92 @@ export const portfoliosRouter = createTRPCRouter({
       } catch {
         return [];
       }
+    }),
+
+  // ── Portfolio Intelligence: Price Refresh + Recommendations ──────────────────
+
+  refreshPrices: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const holdings = await ctx.db.query.accountHoldings.findMany({
+        where: eq(accountHoldings.userId, ctx.userId),
+        columns: { id: true, ticker: true, shares: true },
+      });
+      const priceMap = await refreshHoldingPrices(
+        holdings.map((h) => ({
+          id: h.id,
+          ticker: h.ticker ?? null,
+          shares: h.shares != null ? String(h.shares) : null,
+        }))
+      );
+      const now = new Date();
+      for (const [holdingId, data] of priceMap) {
+        await ctx.db.update(accountHoldings)
+          .set({
+            currentPrice: String(data.currentPrice),
+            currentValue: String(data.currentValue),
+            priceRefreshedAt: now,
+          })
+          .where(and(eq(accountHoldings.id, holdingId), eq(accountHoldings.userId, ctx.userId)));
+      }
+      return { refreshedCount: priceMap.size, refreshedAt: now };
+    }),
+
+  getRecommendations: protectedProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.query.holdingRecommendations.findMany({
+        where: eq(holdingRecommendations.userId, ctx.userId),
+        orderBy: [desc(holdingRecommendations.generatedAt)],
+      });
+    }),
+
+  generateRecommendations: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const holdings = await ctx.db.query.accountHoldings.findMany({
+        where: and(
+          eq(accountHoldings.userId, ctx.userId),
+          isNotNull(accountHoldings.accountId),
+        ),
+        columns: {
+          id: true, ticker: true, securityName: true, assetClass: true,
+          shares: true, currentPrice: true, currentValue: true,
+        },
+      });
+      if (holdings.length === 0) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "No confirmed holdings found." });
+      }
+      const recs = await generateHoldingRecommendations(
+        holdings.map((h) => ({
+          id: h.id,
+          ticker: h.ticker ?? null,
+          securityName: h.securityName,
+          assetClass: h.assetClass ?? null,
+          accountType: null,
+          shares: h.shares != null ? String(h.shares) : null,
+          currentPrice: h.currentPrice ?? null,
+          currentValue: h.currentValue ?? null,
+        }))
+      );
+      // Delete existing then insert fresh
+      await ctx.db.delete(holdingRecommendations)
+        .where(eq(holdingRecommendations.userId, ctx.userId));
+      if (recs.length > 0) {
+        await ctx.db.insert(holdingRecommendations).values(
+          recs.map((r) => ({
+            userId: ctx.userId,
+            holdingId: r.holdingId,
+            ticker: r.ticker ?? null,
+            securityName: r.securityName,
+            action: r.action,
+            targetAllocationNote: r.targetAllocationNote,
+            alternativeTicker: r.alternativeTicker ?? null,
+            alternativeSecurityName: r.alternativeSecurityName ?? null,
+            shortRationale: r.shortRationale,
+            fullRationale: r.fullRationale,
+            citations: r.citations,
+            urgency: r.urgency,
+          }))
+        );
+      }
+      return recs;
     }),
 });
