@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TRPCClientError } from "@trpc/client";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { RecommendationCard } from "./recommendation-card";
@@ -124,8 +125,14 @@ export function HoldingRecommendationsPanel() {
       setFreshRecs(data);
       setIsGenerating(false);
     },
-    onError: () => {
-      setError("Failed to generate recommendations. Please try again.");
+    onError: (err) => {
+      const isBadRequest =
+        err instanceof TRPCClientError && err.data?.httpStatus === 400;
+      setError(
+        isBadRequest
+          ? (err.message ?? "No holdings found. Add holdings to your account first.")
+          : "Failed to generate recommendations. Please try again."
+      );
       setIsGenerating(false);
     },
   });
@@ -178,6 +185,7 @@ export function HoldingRecommendationsPanel() {
 
   const holdingsCount = recommendations.length;
   const isLoading = isQueryLoading && recommendations.length === 0;
+  const hasNoHoldings = !isQueryLoading && storedRecs !== undefined && storedRecs.length === 0 && freshRecs === null;
 
   const FILTERS: { label: string; value: FilterValue }[] = [
     { label: `All (${holdingsCount})`, value: "all" },
@@ -224,8 +232,9 @@ export function HoldingRecommendationsPanel() {
             variant="primary"
             size="sm"
             onClick={handleGenerate}
-            disabled={isGenerating || isRefreshingPrices}
+            disabled={isGenerating || isRefreshingPrices || hasNoHoldings}
             aria-label={isGenerating ? "Generating recommendations..." : "Generate recommendations"}
+            title={hasNoHoldings ? "Add holdings to your account first" : undefined}
           >
             {isGenerating && <InlineSpinner />}
             {isGenerating ? "Generating..." : "Generate Recommendations"}
@@ -293,10 +302,16 @@ export function HoldingRecommendationsPanel() {
           </svg>
           <p className="text-base font-semibold text-slate-700 mb-1">No recommendations yet</p>
           <p className="text-sm text-slate-400 max-w-sm mb-6">
-            Refresh your prices and generate recommendations to see actionable insights for your
-            portfolio.
+            {hasNoHoldings
+              ? "Add holdings to your portfolio accounts first, then generate recommendations."
+              : "Refresh your prices and generate recommendations to see actionable insights for your portfolio."}
           </p>
-          <Button variant="primary" onClick={handleGenerate} disabled={isGenerating}>
+          <Button
+            variant="primary"
+            onClick={handleGenerate}
+            disabled={isGenerating || hasNoHoldings}
+            title={hasNoHoldings ? "Add holdings to your account first" : undefined}
+          >
             {isGenerating && <InlineSpinner />}
             {isGenerating ? "Generating..." : "Generate Recommendations"}
           </Button>
