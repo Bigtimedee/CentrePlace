@@ -188,7 +188,7 @@ export function HoldingRecommendationsPanel() {
 
   const holdingsCount = allHoldings?.length ?? 0;
   const isLoading = isQueryLoading && recommendations.length === 0;
-  const hasNoHoldings = !isQueryLoading && storedRecs !== undefined && storedRecs.length === 0 && freshRecs === null;
+  const hasNoHoldings = allHoldings !== undefined && allHoldings.length === 0;
 
   const FILTERS: { label: string; value: FilterValue }[] = [
     { label: `All (${holdingsCount})`, value: "all" },
