@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { enrichHoldings } from "./data-enrichment";
 
 export type Citation = {
   bookTitle: string;
@@ -22,7 +23,16 @@ export type HoldingRecommendation = {
   urgency: "high" | "medium" | "low";
 };
 
-const SYSTEM_PROMPT = `You are a portfolio construction analyst. Analyze the provided holdings and generate actionable, evidence-based recommendations grounded in academic portfolio theory.
+const SYSTEM_PROMPT = `You are a portfolio construction analyst. Analyze the provided holdings and generate actionable, evidence-based recommendations grounded in academic portfolio theory AND live market data.
+
+Each holding in the input may include a "marketData" field with live Yahoo Finance data (expense ratios, category, fund family, 1/3/5-year returns, Morningstar rating, analyst buy/hold/sell counts, top holdings) and an "alternatives" array of similar securities with the same fields.
+
+IMPORTANT INSTRUCTIONS FOR USING LIVE DATA:
+- When marketData is present, you MUST embed real numbers in your rationales. For example: "FUND_X charges a 0.75% expense ratio vs the 0.03% charged by FUND_Y" or "FUND_X delivered 6.2% over 3 years vs the category average reflected in alternatives."
+- When alternatives are present, compare the holding directly against them using real numbers. Name the specific alternative tickers and explain why they are superior or inferior.
+- When analyst data is present (analystBuy/analystHold/analystSell), factor consensus into urgency and action.
+- If marketData is null for a holding, fall back to academic reasoning only.
+- Always cite Yahoo Finance as a source when using live data: use sourceUrl "https://finance.yahoo.com" and author "Yahoo Finance".
 
 You have access to these 10 portfolio construction principles as citation sources. Each principle includes a sourceUrl you MUST copy exactly into every citation that references it:
 
@@ -121,7 +131,9 @@ export async function generateHoldingRecommendations(
 ): Promise<HoldingRecommendation[]> {
   const client = new Anthropic();
 
-  const holdingsPayload = holdings.map((h) => ({
+  const enriched = await enrichHoldings(holdings);
+
+  const holdingsPayload = enriched.map((h) => ({
     holdingId: h.id,
     ticker: h.ticker,
     securityName: h.securityName,
@@ -130,6 +142,8 @@ export async function generateHoldingRecommendations(
     shares: h.shares,
     currentPrice: h.currentPrice,
     currentValue: h.currentValue,
+    marketData: h.marketData,
+    alternatives: h.alternatives,
   }));
 
   const response = await client.messages.create({
