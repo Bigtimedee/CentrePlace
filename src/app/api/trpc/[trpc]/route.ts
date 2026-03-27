@@ -4,7 +4,7 @@ import { appRouter } from "@/server/trpc/routers";
 import { createContext } from "@/server/trpc/context";
 
 // Allow up to 30s for simulation-heavy routes (tax, scenarios, forecast)
-export const maxDuration = 30;
+export const maxDuration = 300;
 
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
