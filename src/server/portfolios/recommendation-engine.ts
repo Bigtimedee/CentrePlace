@@ -150,10 +150,15 @@ export async function generateHoldingRecommendations(
   }
 
   let raw = textBlock.text.trim();
-  // Strip markdown code fences if present
   if (raw.startsWith("```")) {
     raw = raw.replace(/^```[a-z]*\n?/, "").replace(/\n?```$/, "").trim();
   }
+  const firstBracket = raw.indexOf("[");
+  const lastBracket = raw.lastIndexOf("]");
+  if (firstBracket === -1 || lastBracket === -1) {
+    throw new Error("Failed to parse recommendation engine response as JSON");
+  }
+  raw = raw.slice(firstBracket, lastBracket + 1);
 
   let parsed: unknown;
   try {
