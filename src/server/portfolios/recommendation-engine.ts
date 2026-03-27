@@ -168,7 +168,7 @@ export async function generateHoldingRecommendations(
   }
   const client = new Anthropic({ apiKey });
 
-  const enriched = await enrichHoldings(holdings.slice(0, 12));
+  const enriched = await enrichHoldings(holdings.slice(0, 8));
 
   const holdingsPayload = enriched.map((h) => ({
     holdingId: h.id,
@@ -186,20 +186,25 @@ export async function generateHoldingRecommendations(
     alphaVantageData: h.alphaVantageData,
   }));
 
-  const response = await client.messages.create(
-    {
-      model: "claude-sonnet-4-6",
-      max_tokens: 4096,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: `Please analyze these holdings and return a JSON array of recommendations:\n\n${JSON.stringify(holdingsPayload, null, 2)}`,
-        },
-      ],
-    },
-    { timeout: 40_000 }
-  );
+  const response = await Promise.race([
+    client.messages.create(
+      {
+        model: "claude-sonnet-4-6",
+        max_tokens: 2048,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: "user",
+            content: `Please analyze these holdings and return a JSON array of recommendations:\n\n${JSON.stringify(holdingsPayload, null, 2)}`,
+          },
+        ],
+      },
+      { timeout: 35_000 }
+    ),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 35_000)
+    ),
+  ]);
 
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") {
