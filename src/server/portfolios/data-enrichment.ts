@@ -78,9 +78,11 @@ export type EnrichedHolding<T> = T & {
 async function fetchMarketData(ticker: string): Promise<MarketData | null> {
   try {
     const summary = await Promise.race([
-      yahooFinance.quoteSummary(ticker, {
-        modules: ["summaryDetail", "fundProfile", "topHoldings", "fundPerformance", "recommendationTrend"],
-      }),
+      yahooFinance.quoteSummary(
+        ticker,
+        { modules: ["summaryDetail", "fundProfile", "topHoldings", "fundPerformance", "recommendationTrend"] },
+        { validateResult: false }
+      ),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Yahoo Finance timeout")), 10_000)
       ),
@@ -143,7 +145,7 @@ async function fetchMarketData(ticker: string): Promise<MarketData | null> {
 async function fetchAlternatives(ticker: string): Promise<Alternative[]> {
   try {
     const result = await Promise.race([
-      yahooFinance.recommendationsBySymbol(ticker),
+      yahooFinance.recommendationsBySymbol(ticker, {}, { validateResult: false }),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Yahoo Finance timeout")), 10_000)
       ),
