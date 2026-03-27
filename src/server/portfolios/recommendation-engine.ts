@@ -150,28 +150,10 @@ Respond with a valid JSON array only — no markdown fences, no commentary outsi
   "urgency": "high" | "medium" | "low"
 }`;
 
-export async function generateHoldingRecommendations(
-  holdings: Array<{
-    id: string;
-    ticker: string | null;
-    securityName: string;
-    assetClass: string | null;
-    accountType: string | null;
-    shares: string | null;
-    currentPrice: string | null;
-    currentValue: string | null;
-  }>
-): Promise<HoldingRecommendation[]> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error("ANTHROPIC_API_KEY environment variable is not set");
-  }
-  const client = new Anthropic({ apiKey });
+const BATCH_SIZE = 8;
 
-  const enriched = await enrichHoldings(holdings.slice(0, 8));
-
-  // Slim payload: only send the most signal-rich fields to keep token count low
-  const holdingsPayload = enriched.map((h) => ({
+function buildPayload(enriched: Awaited<ReturnType<typeof enrichHoldings>>) {
+  return enriched.map((h) => ({
     holdingId: h.id,
     ticker: h.ticker,
     securityName: h.securityName,
@@ -179,14 +161,12 @@ export async function generateHoldingRecommendations(
     shares: h.shares,
     currentPrice: h.currentPrice,
     currentValue: h.currentValue,
-    // Yahoo Finance — key cost + return metrics only
     expenseRatio: h.marketData?.expenseRatio ?? h.marketData?.netExpenseRatio ?? null,
     category: h.marketData?.category ?? null,
     ytdReturn: h.marketData?.ytdReturn ?? null,
     oneYearReturn: h.marketData?.oneYearReturn ?? null,
     threeYearReturn: h.marketData?.threeYearReturn ?? null,
     morningStarRating: h.marketData?.morningStarRating ?? null,
-    // Top alternative (best match only)
     topAlternative: h.alternatives?.[0]
       ? {
           ticker: h.alternatives[0].ticker,
@@ -196,7 +176,6 @@ export async function generateHoldingRecommendations(
           morningStarRating: h.alternatives[0].morningStarRating ?? null,
         }
       : null,
-    // FMP — analyst consensus + valuation
     peRatio: h.fmpData?.peRatio ?? null,
     analystStrongBuy: h.fmpData?.analystStrongBuy ?? null,
     analystBuy: h.fmpData?.analystBuy ?? null,
@@ -204,42 +183,14 @@ export async function generateHoldingRecommendations(
     analystSell: h.fmpData?.analystSell ?? null,
     analystStrongSell: h.fmpData?.analystStrongSell ?? null,
     priceTargetConsensus: h.fmpData?.priceTargetConsensus ?? null,
-    // Sentiment summary only (no headlines to save tokens)
     finnhubBullish: h.finnhubData?.bullishPercent ?? null,
     finnhubBearish: h.finnhubData?.bearishPercent ?? null,
     alphaVantageSentiment: h.alphaVantageData?.overallSentimentLabel ?? null,
   }));
+}
 
-  const response = await Promise.race([
-    client.messages.create(
-      {
-        model: "claude-sonnet-4-6",
-        max_tokens: 2048,
-        system: SYSTEM_PROMPT,
-        messages: [
-          {
-            role: "user",
-            content: `Please analyze these holdings and return a JSON array of recommendations:\n\n${JSON.stringify(holdingsPayload, null, 2)}`,
-          },
-        ],
-      },
-      { timeout: 35_000 }
-    ),
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 35_000)
-    ),
-  ]);
-
-  const textBlock = response.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("No text response from recommendation engine");
-  }
-
-  if (response.stop_reason === "max_tokens") {
-    throw new Error("Recommendation engine response was truncated (max_tokens reached)");
-  }
-
-  let raw = textBlock.text.trim();
+function parseRecommendations(text: string): HoldingRecommendation[] {
+  let raw = text.trim();
   if (raw.startsWith("```")) {
     raw = raw.replace(/^```[a-z]*\n?/, "").replace(/\n?```$/, "").trim();
   }
@@ -288,4 +239,71 @@ export async function generateHoldingRecommendations(
       urgency: rec.urgency as HoldingRecommendation["urgency"],
     };
   });
+}
+
+export async function generateHoldingRecommendations(
+  holdings: Array<{
+    id: string;
+    ticker: string | null;
+    securityName: string;
+    assetClass: string | null;
+    accountType: string | null;
+    shares: string | null;
+    currentPrice: string | null;
+    currentValue: string | null;
+  }>
+): Promise<HoldingRecommendation[]> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error("ANTHROPIC_API_KEY environment variable is not set");
+  }
+  const client = new Anthropic({ apiKey });
+
+  // Enrich all holdings in parallel (each races against a 4s timer internally)
+  const enriched = await enrichHoldings(holdings);
+
+  // Split into batches of BATCH_SIZE and call Claude in parallel — each batch
+  // stays small enough to be fast; parallel execution keeps total time flat.
+  const batches: (typeof enriched)[] = [];
+  for (let i = 0; i < enriched.length; i += BATCH_SIZE) {
+    batches.push(enriched.slice(i, i + BATCH_SIZE));
+  }
+
+  const batchResults = await Promise.all(
+    batches.map(async (batch) => {
+      const holdingsPayload = buildPayload(batch);
+
+      const response = await Promise.race([
+        client.messages.create(
+          {
+            model: "claude-sonnet-4-6",
+            max_tokens: 4096,
+            system: SYSTEM_PROMPT,
+            messages: [
+              {
+                role: "user",
+                content: `Please analyze these holdings and return a JSON array of recommendations:\n\n${JSON.stringify(holdingsPayload, null, 2)}`,
+              },
+            ],
+          },
+          { timeout: 35_000 }
+        ),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 35_000)
+        ),
+      ]);
+
+      const textBlock = response.content.find((b) => b.type === "text");
+      if (!textBlock || textBlock.type !== "text") {
+        throw new Error("No text response from recommendation engine");
+      }
+      if (response.stop_reason === "max_tokens") {
+        throw new Error("Recommendation engine response was truncated (max_tokens reached)");
+      }
+
+      return parseRecommendations(textBlock.text);
+    })
+  );
+
+  return batchResults.flat();
 }
