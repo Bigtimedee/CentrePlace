@@ -77,9 +77,14 @@ export type EnrichedHolding<T> = T & {
 
 async function fetchMarketData(ticker: string): Promise<MarketData | null> {
   try {
-    const summary = await yahooFinance.quoteSummary(ticker, {
-      modules: ["summaryDetail", "fundProfile", "topHoldings", "fundPerformance", "recommendationTrend"],
-    });
+    const summary = await Promise.race([
+      yahooFinance.quoteSummary(ticker, {
+        modules: ["summaryDetail", "fundProfile", "topHoldings", "fundPerformance", "recommendationTrend"],
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Yahoo Finance timeout")), 10_000)
+      ),
+    ]);
 
     const fp = summary.fundProfile as Record<string, unknown> | undefined;
     const perf = summary.fundPerformance as Record<string, unknown> | undefined;
@@ -137,14 +142,19 @@ async function fetchMarketData(ticker: string): Promise<MarketData | null> {
 
 async function fetchAlternatives(ticker: string): Promise<Alternative[]> {
   try {
-    const result = await yahooFinance.recommendationsBySymbol(ticker);
+    const result = await Promise.race([
+      yahooFinance.recommendationsBySymbol(ticker),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Yahoo Finance timeout")), 10_000)
+      ),
+    ]);
     const recommended = (result as { recommendedSymbols?: Array<{ symbol: string; score: number }> })
       .recommendedSymbols;
     if (!recommended || recommended.length === 0) return [];
 
-    const top5 = recommended.slice(0, 5);
+    const top3 = recommended.slice(0, 3);
     const settled = await Promise.allSettled(
-      top5.map(async ({ symbol, score }) => {
+      top3.map(async ({ symbol, score }) => {
         const data = await fetchMarketData(symbol);
         if (!data) return null;
         return { ...data, similarityScore: score };
@@ -174,9 +184,9 @@ async function fetchFmpData(ticker: string): Promise<FmpData | null> {
 
   try {
     const [ratiosRes, recommendationsRes, priceTargetRes] = await Promise.allSettled([
-      fetch(`${base}/ratios-ttm/${encodeURIComponent(ticker)}?apikey=${apiKey}`),
-      fetch(`${base}/analyst-stock-recommendations/${encodeURIComponent(ticker)}?limit=1&apikey=${apiKey}`),
-      fetch(`${base}/price-target-summary/${encodeURIComponent(ticker)}?apikey=${apiKey}`),
+      fetch(`${base}/ratios-ttm/${encodeURIComponent(ticker)}?apikey=${apiKey}`, { signal: AbortSignal.timeout(8_000) }),
+      fetch(`${base}/analyst-stock-recommendations/${encodeURIComponent(ticker)}?limit=1&apikey=${apiKey}`, { signal: AbortSignal.timeout(8_000) }),
+      fetch(`${base}/price-target-summary/${encodeURIComponent(ticker)}?apikey=${apiKey}`, { signal: AbortSignal.timeout(8_000) }),
     ]);
 
     // Financial ratios
@@ -280,9 +290,10 @@ async function fetchFinnhubData(ticker: string): Promise<FinnhubData | null> {
 
   try {
     const [sentimentRes, newsRes] = await Promise.allSettled([
-      fetch(`${base}/news-sentiment?symbol=${encodeURIComponent(ticker)}&token=${apiKey}`),
+      fetch(`${base}/news-sentiment?symbol=${encodeURIComponent(ticker)}&token=${apiKey}`, { signal: AbortSignal.timeout(8_000) }),
       fetch(
-        `${base}/company-news?symbol=${encodeURIComponent(ticker)}&from=${thirtyDaysAgo}&to=${today}&token=${apiKey}`
+        `${base}/company-news?symbol=${encodeURIComponent(ticker)}&from=${thirtyDaysAgo}&to=${today}&token=${apiKey}`,
+        { signal: AbortSignal.timeout(8_000) }
       ),
     ]);
 
@@ -334,7 +345,7 @@ async function fetchAlphaVantageData(ticker: string): Promise<AlphaVantageData |
 
   try {
     const url = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers=${encodeURIComponent(ticker)}&limit=5&sort=RELEVANCE&apikey=${apiKey}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: AbortSignal.timeout(8_000) });
     if (!res.ok) return null;
 
     const json = (await res.json()) as Record<string, unknown>;
