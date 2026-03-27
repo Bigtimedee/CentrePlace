@@ -170,20 +170,44 @@ export async function generateHoldingRecommendations(
 
   const enriched = await enrichHoldings(holdings.slice(0, 8));
 
+  // Slim payload: only send the most signal-rich fields to keep token count low
   const holdingsPayload = enriched.map((h) => ({
     holdingId: h.id,
     ticker: h.ticker,
     securityName: h.securityName,
     assetClass: h.assetClass,
-    accountType: h.accountType,
     shares: h.shares,
     currentPrice: h.currentPrice,
     currentValue: h.currentValue,
-    marketData: h.marketData,
-    alternatives: h.alternatives,
-    fmpData: h.fmpData,
-    finnhubData: h.finnhubData,
-    alphaVantageData: h.alphaVantageData,
+    // Yahoo Finance — key cost + return metrics only
+    expenseRatio: h.marketData?.expenseRatio ?? h.marketData?.netExpenseRatio ?? null,
+    category: h.marketData?.category ?? null,
+    ytdReturn: h.marketData?.ytdReturn ?? null,
+    oneYearReturn: h.marketData?.oneYearReturn ?? null,
+    threeYearReturn: h.marketData?.threeYearReturn ?? null,
+    morningStarRating: h.marketData?.morningStarRating ?? null,
+    // Top alternative (best match only)
+    topAlternative: h.alternatives?.[0]
+      ? {
+          ticker: h.alternatives[0].ticker,
+          securityName: h.alternatives[0].securityName,
+          expenseRatio: h.alternatives[0].expenseRatio ?? h.alternatives[0].netExpenseRatio ?? null,
+          oneYearReturn: h.alternatives[0].oneYearReturn ?? null,
+          morningStarRating: h.alternatives[0].morningStarRating ?? null,
+        }
+      : null,
+    // FMP — analyst consensus + valuation
+    peRatio: h.fmpData?.peRatio ?? null,
+    analystStrongBuy: h.fmpData?.analystStrongBuy ?? null,
+    analystBuy: h.fmpData?.analystBuy ?? null,
+    analystHold: h.fmpData?.analystHold ?? null,
+    analystSell: h.fmpData?.analystSell ?? null,
+    analystStrongSell: h.fmpData?.analystStrongSell ?? null,
+    priceTargetConsensus: h.fmpData?.priceTargetConsensus ?? null,
+    // Sentiment summary only (no headlines to save tokens)
+    finnhubBullish: h.finnhubData?.bullishPercent ?? null,
+    finnhubBearish: h.finnhubData?.bearishPercent ?? null,
+    alphaVantageSentiment: h.alphaVantageData?.overallSentimentLabel ?? null,
   }));
 
   const response = await Promise.race([
