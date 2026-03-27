@@ -82,7 +82,7 @@ async function fetchMarketData(ticker: string): Promise<MarketData | null> {
         ticker,
         { modules: ["summaryDetail", "fundProfile", "topHoldings", "fundPerformance", "recommendationTrend"] },
         { validateResult: false }
-      ),
+      ) as Promise<Record<string, unknown>>,
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error("Yahoo Finance timeout")), 10_000)
       ),
