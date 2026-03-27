@@ -186,17 +186,20 @@ export async function generateHoldingRecommendations(
     alphaVantageData: h.alphaVantageData,
   }));
 
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 8192,
-    system: SYSTEM_PROMPT,
-    messages: [
-      {
-        role: "user",
-        content: `Please analyze these holdings and return a JSON array of recommendations:\n\n${JSON.stringify(holdingsPayload, null, 2)}`,
-      },
-    ],
-  });
+  const response = await client.messages.create(
+    {
+      model: "claude-sonnet-4-6",
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: [
+        {
+          role: "user",
+          content: `Please analyze these holdings and return a JSON array of recommendations:\n\n${JSON.stringify(holdingsPayload, null, 2)}`,
+        },
+      ],
+    },
+    { timeout: 40_000 }
+  );
 
   const textBlock = response.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") {

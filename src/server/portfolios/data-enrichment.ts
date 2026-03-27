@@ -411,14 +411,19 @@ export async function enrichHoldings<
 
   const settled = await Promise.allSettled(
     withTickers.map(async (h) => {
-      const [marketData, alternatives, fmpData, finnhubData, alphaVantageData] =
-        await Promise.all([
+      const enriched = await Promise.race([
+        Promise.all([
           fetchMarketData(h.ticker),
           fetchAlternatives(h.ticker),
           fetchFmpData(h.ticker),
           fetchFinnhubData(h.ticker),
           fetchAlphaVantageData(h.ticker),
-        ]);
+        ]),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Enrichment timeout")), 12_000)
+        ),
+      ]);
+      const [marketData, alternatives, fmpData, finnhubData, alphaVantageData] = enriched;
       return { ticker: h.ticker, marketData, alternatives, fmpData, finnhubData, alphaVantageData };
     })
   );
