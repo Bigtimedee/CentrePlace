@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { enrichHoldings } from "./data-enrichment";
+import { enrichHoldings, type EnrichedHolding } from "./data-enrichment";
 
 export type Citation = {
   bookTitle: string;
@@ -152,7 +152,7 @@ Respond with a valid JSON array only — no markdown fences, no commentary outsi
 
 const BATCH_SIZE = 8;
 
-function buildPayload(enriched: Awaited<ReturnType<typeof enrichHoldings>>) {
+function buildPayload(enriched: Array<EnrichedHolding<{ id: string; ticker: string | null; securityName: string; assetClass: string | null; accountType: string | null; shares: string | null; currentPrice: string | null; currentValue: string | null }>>) {
   return enriched.map((h) => ({
     holdingId: h.id,
     ticker: h.ticker,
