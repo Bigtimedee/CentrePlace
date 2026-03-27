@@ -12,6 +12,7 @@ import { accountStatements, accountHoldings, holdingRecommendations } from "./ho
 import { directInvestments } from "./direct-investments";
 import { cryptoHoldings } from "./crypto-holdings";
 import { equityGrants, equityVestingEvents, equityShareLots } from "./equity-compensation";
+import { agentAnalysisJobs } from "./agent-analysis";
 
 // ── userProfiles ─────────────────────────────────────────────────────────────
 export const userProfilesRelations = relations(userProfiles, ({ many, one }) => ({
@@ -38,6 +39,7 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
   directInvestments: many(directInvestments),
   cryptoHoldings: many(cryptoHoldings),
   equityGrants: many(equityGrants),
+  agentAnalysisJobs: many(agentAnalysisJobs),
 }));
 
 export const childrenRelations = relations(children, ({ one }) => ({
@@ -217,4 +219,12 @@ export const equityVestingEventsRelations = relations(equityVestingEvents, ({ on
 export const equityShareLotsRelations = relations(equityShareLots, ({ one }) => ({
   grant: one(equityGrants, { fields: [equityShareLots.grantId], references: [equityGrants.id] }),
   user: one(userProfiles, { fields: [equityShareLots.userId], references: [userProfiles.id] }),
+}));
+
+// ── agent analysis jobs ───────────────────────────────────────────────────────
+export const agentAnalysisJobsRelations = relations(agentAnalysisJobs, ({ one }) => ({
+  user: one(userProfiles, {
+    fields: [agentAnalysisJobs.userId],
+    references: [userProfiles.id],
+  }),
 }));
