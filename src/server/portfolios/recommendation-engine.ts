@@ -134,7 +134,7 @@ export async function generateHoldingRecommendations(
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 4096,
+    max_tokens: 8192,
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -149,6 +149,10 @@ export async function generateHoldingRecommendations(
     throw new Error("No text response from recommendation engine");
   }
 
+  if (response.stop_reason === "max_tokens") {
+    throw new Error("Recommendation engine response was truncated (max_tokens reached)");
+  }
+
   let raw = textBlock.text.trim();
   if (raw.startsWith("```")) {
     raw = raw.replace(/^```[a-z]*\n?/, "").replace(/\n?```$/, "").trim();
@@ -156,6 +160,7 @@ export async function generateHoldingRecommendations(
   const firstBracket = raw.indexOf("[");
   const lastBracket = raw.lastIndexOf("]");
   if (firstBracket === -1 || lastBracket === -1) {
+    console.error("[recommendation-engine] Unparseable response:", raw.slice(0, 500));
     throw new Error("Failed to parse recommendation engine response as JSON");
   }
   raw = raw.slice(firstBracket, lastBracket + 1);
