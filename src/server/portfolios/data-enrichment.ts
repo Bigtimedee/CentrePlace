@@ -420,7 +420,7 @@ export async function enrichHoldings<
           fetchAlphaVantageData(h.ticker),
         ]),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Enrichment timeout")), 12_000)
+          setTimeout(() => reject(new Error("Enrichment timeout")), 4_000)
         ),
       ]);
       const [marketData, alternatives, fmpData, finnhubData, alphaVantageData] = enriched;

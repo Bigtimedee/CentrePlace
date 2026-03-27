@@ -168,7 +168,7 @@ export async function generateHoldingRecommendations(
   }
   const client = new Anthropic({ apiKey });
 
-  const enriched = await enrichHoldings(holdings);
+  const enriched = await enrichHoldings(holdings.slice(0, 12));
 
   const holdingsPayload = enriched.map((h) => ({
     holdingId: h.id,

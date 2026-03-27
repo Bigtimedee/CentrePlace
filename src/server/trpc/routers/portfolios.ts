@@ -330,18 +330,23 @@ export const portfoliosRouter = createTRPCRouter({
       const validHoldingIds = new Set(holdings.map((h) => h.id));
       let recs;
       try {
-        recs = await generateHoldingRecommendations(
-          holdings.map((h) => ({
-            id: h.id,
-            ticker: h.ticker ?? null,
-            securityName: h.securityName,
-            assetClass: h.assetClass ?? null,
-            accountType: null,
-            shares: h.shares != null ? String(h.shares) : null,
-            currentPrice: h.currentPrice ?? null,
-            currentValue: h.currentValue ?? null,
-          }))
-        );
+        recs = await Promise.race([
+          generateHoldingRecommendations(
+            holdings.map((h) => ({
+              id: h.id,
+              ticker: h.ticker ?? null,
+              securityName: h.securityName,
+              assetClass: h.assetClass ?? null,
+              accountType: null,
+              shares: h.shares != null ? String(h.shares) : null,
+              currentPrice: h.currentPrice ?? null,
+              currentValue: h.currentValue ?? null,
+            }))
+          ),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("Request timed out. Please try again.")), 50_000)
+          ),
+        ]);
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         console.error("[generateRecommendations] AI error:", message);
