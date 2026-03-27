@@ -8,6 +8,7 @@ import { CryptoHoldingsForm } from "@/components/portfolios/crypto-holdings-form
 import { PlaidConnectionPanel } from "@/components/portfolios/plaid-connection-panel";
 import { PortfolioIntelligencePanel } from "@/components/portfolios/portfolio-intelligence-panel";
 import { HoldingRecommendationsPanel } from "@/components/portfolios/holding-recommendations-panel";
+import { AgentAnalysisPanel } from "@/components/portfolios/agent-analysis-panel";
 
 export default function PortfoliosPage() {
   return (
@@ -17,6 +18,7 @@ export default function PortfoliosPage() {
         <PlaidConnectionPanel />
         <PortfolioAllocationDashboard />
         <PortfolioIntelligencePanel />
+        <AgentAnalysisPanel />
         <PortfoliosForm />
         <HoldingsPanelsList />
         <HoldingRecommendationsPanel />
