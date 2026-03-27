@@ -3,8 +3,9 @@ import { type NextRequest } from "next/server";
 import { appRouter } from "@/server/trpc/routers";
 import { createContext } from "@/server/trpc/context";
 
-// Allow up to 30s for simulation-heavy routes (tax, scenarios, forecast)
-export const maxDuration = 300;
+// Vercel Hobby plan max is 60s; Pro plan supports up to 300s.
+// Set to 60 to match the Hobby ceiling and avoid silent clamping.
+export const maxDuration = 60;
 
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
@@ -12,12 +13,9 @@ const handler = (req: NextRequest) =>
     req,
     router: appRouter,
     createContext,
-    onError:
-      process.env.NODE_ENV === "development"
-        ? ({ path, error }) => {
-            console.error(`tRPC error on ${path ?? "<no-path>"}:`, error);
-          }
-        : undefined,
+    onError: ({ path, error }) => {
+      console.error(`tRPC error on ${path ?? "<no-path>"}:`, error.message);
+    },
   });
 
 export { handler as GET, handler as POST };

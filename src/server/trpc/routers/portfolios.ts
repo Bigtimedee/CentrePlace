@@ -353,28 +353,31 @@ export const portfoliosRouter = createTRPCRouter({
       // Filter out any recs whose holdingId Claude hallucinated (not in our actual holdings)
       const validRecs = recs.filter((r) => validHoldingIds.has(r.holdingId));
 
-      // Delete existing then insert fresh
+      // Delete existing then insert fresh — wrapped in a transaction so a failed
+      // insert does not leave the user with zero recommendations.
       try {
-        await ctx.db.delete(holdingRecommendations)
-          .where(eq(holdingRecommendations.userId, ctx.userId));
-        if (validRecs.length > 0) {
-          await ctx.db.insert(holdingRecommendations).values(
-            validRecs.map((r) => ({
-              userId: ctx.userId,
-              holdingId: r.holdingId,
-              ticker: r.ticker ?? null,
-              securityName: r.securityName,
-              action: r.action,
-              targetAllocationNote: r.targetAllocationNote,
-              alternativeTicker: r.alternativeTicker ?? null,
-              alternativeSecurityName: r.alternativeSecurityName ?? null,
-              shortRationale: r.shortRationale,
-              fullRationale: r.fullRationale,
-              citations: r.citations,
-              urgency: r.urgency,
-            }))
-          );
-        }
+        await ctx.db.transaction(async (tx) => {
+          await tx.delete(holdingRecommendations)
+            .where(eq(holdingRecommendations.userId, ctx.userId));
+          if (validRecs.length > 0) {
+            await tx.insert(holdingRecommendations).values(
+              validRecs.map((r) => ({
+                userId: ctx.userId,
+                holdingId: r.holdingId,
+                ticker: r.ticker ?? null,
+                securityName: r.securityName,
+                action: r.action,
+                targetAllocationNote: r.targetAllocationNote,
+                alternativeTicker: r.alternativeTicker ?? null,
+                alternativeSecurityName: r.alternativeSecurityName ?? null,
+                shortRationale: r.shortRationale,
+                fullRationale: r.fullRationale,
+                citations: r.citations,
+                urgency: r.urgency,
+              }))
+            );
+          }
+        });
       } catch (dbErr) {
         const message = dbErr instanceof Error ? dbErr.message : String(dbErr);
         console.error("[generateRecommendations] DB error:", message);

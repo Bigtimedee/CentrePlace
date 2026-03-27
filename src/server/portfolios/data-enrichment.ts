@@ -226,11 +226,17 @@ async function fetchFmpData(ticker: string): Promise<FmpData | null> {
     let priceTargetLow: number | null = null;
 
     if (priceTargetRes.status === "fulfilled" && priceTargetRes.value.ok) {
-      const ptJson = (await priceTargetRes.value.json()) as Record<string, unknown>;
-      priceTargetConsensus =
-        ptJson?.targetConsensus != null ? Number(ptJson.targetConsensus) : null;
-      priceTargetHigh = ptJson?.targetHigh != null ? Number(ptJson.targetHigh) : null;
-      priceTargetLow = ptJson?.targetLow != null ? Number(ptJson.targetLow) : null;
+      const ptRaw = (await priceTargetRes.value.json()) as unknown;
+      // FMP v3 price-target-summary returns an array; normalize to single object
+      const ptJson = Array.isArray(ptRaw)
+        ? (ptRaw[0] as Record<string, unknown> | undefined)
+        : (ptRaw as Record<string, unknown> | undefined);
+      if (ptJson) {
+        priceTargetConsensus =
+          ptJson.targetConsensus != null ? Number(ptJson.targetConsensus) : null;
+        priceTargetHigh = ptJson.targetHigh != null ? Number(ptJson.targetHigh) : null;
+        priceTargetLow = ptJson.targetLow != null ? Number(ptJson.targetLow) : null;
+      }
     }
 
     // Return null if we got nothing useful

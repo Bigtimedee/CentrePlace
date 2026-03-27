@@ -162,7 +162,11 @@ export async function generateHoldingRecommendations(
     currentValue: string | null;
   }>
 ): Promise<HoldingRecommendation[]> {
-  const client = new Anthropic();
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error("ANTHROPIC_API_KEY environment variable is not set");
+  }
+  const client = new Anthropic({ apiKey });
 
   const enriched = await enrichHoldings(holdings);
 
@@ -177,6 +181,9 @@ export async function generateHoldingRecommendations(
     currentValue: h.currentValue,
     marketData: h.marketData,
     alternatives: h.alternatives,
+    fmpData: h.fmpData,
+    finnhubData: h.finnhubData,
+    alphaVantageData: h.alphaVantageData,
   }));
 
   const response = await client.messages.create({
