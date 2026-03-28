@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header";
+import { TwelveMonthProjection } from "@/components/cashflow/twelve-month-projection";
 import { CashflowCenter } from "@/components/cashflow/cashflow-center";
 import { NextSectionBanner } from "@/components/layout/next-section-banner";
 
@@ -9,7 +10,8 @@ export default function CashflowPage() {
         title="Liquidity Timeline"
         description="Cash arrival schedule across carry, LP distributions, real estate, and income — net after estimated tax"
       />
-      <div className="mt-8">
+      <div className="mt-8 space-y-6">
+        <TwelveMonthProjection />
         <CashflowCenter />
       </div>
       <NextSectionBanner
