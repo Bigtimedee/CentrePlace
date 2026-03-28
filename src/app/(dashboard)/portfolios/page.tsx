@@ -7,6 +7,7 @@ import { DirectInvestmentsForm } from "@/components/portfolios/direct-investment
 import { CryptoHoldingsForm } from "@/components/portfolios/crypto-holdings-form";
 import { PlaidConnectionPanel } from "@/components/portfolios/plaid-connection-panel";
 import { PortfolioIntelligencePanel } from "@/components/portfolios/portfolio-intelligence-panel";
+import { IncomeOpportunitiesPanel } from "@/components/portfolios/income-opportunities-panel";
 import { HoldingRecommendationsPanel } from "@/components/portfolios/holding-recommendations-panel";
 import { AgentAnalysisPanel } from "@/components/portfolios/agent-analysis-panel";
 
@@ -32,6 +33,7 @@ export default function PortfoliosPage() {
         </div>
         <div className="space-y-6">
           <PortfolioIntelligencePanel />
+          <IncomeOpportunitiesPanel />
           <PortfolioAllocationDashboard />
         </div>
       </div>
