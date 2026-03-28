@@ -156,8 +156,15 @@ export function AgentAnalysisPanel() {
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">AI Agent Analysis</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <div className="flex items-center gap-2.5 mb-1">
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-800">
+              <svg className="h-4 w-4 text-white" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </span>
+            <h2 className="text-lg font-semibold text-slate-900">AI Agent Analysis</h2>
+          </div>
+          <p className="text-sm text-slate-500 ml-9">
             Multi-agent investment research powered by TradingAgents. Runs in the background and analyzes
             your confirmed holdings using fundamentals, sentiment, news, and market data.
           </p>

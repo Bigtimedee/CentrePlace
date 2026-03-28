@@ -130,9 +130,16 @@ export function PortfolioIntelligencePanel() {
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-slate-900">Portfolio Intelligence</h2>
-        <p className="mt-1 text-sm text-slate-500">
+      <div className="mb-5">
+        <div className="flex items-center gap-2.5 mb-1">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-600">
+            <svg className="h-4 w-4 text-white" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </span>
+          <h2 className="text-lg font-semibold text-slate-900">Portfolio Intelligence</h2>
+        </div>
+        <p className="text-sm text-slate-500 ml-9">
           Age-based allocation analysis and low-cost ETF suggestions tailored to your FI timeline.
         </p>
       </div>

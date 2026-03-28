@@ -36,14 +36,16 @@ export function PortfolioAllocationDashboard() {
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h2 className="text-base font-semibold text-gray-900 mb-1">Portfolio Allocation</h2>
-      <p className="text-sm text-gray-500 mb-4">
-        {holdings.length} holdings ·{" "}
-        <span className="font-medium text-gray-700">
-          ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} total
+    <div className="rounded-xl border border-gray-100 bg-slate-50 px-6 py-5">
+      <div className="flex items-center gap-2 mb-4">
+        <h2 className="text-sm font-semibold text-gray-700">Current Allocation Breakdown</h2>
+        <span className="text-xs text-gray-400">
+          · {holdings.length} holdings ·{" "}
+          <span className="font-medium text-gray-600">
+            ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })} total
+          </span>
         </span>
-      </p>
+      </div>
 
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1 min-w-0">
@@ -68,7 +70,7 @@ export function PortfolioAllocationDashboard() {
                       <span className="text-gray-400 font-normal">({pct.toFixed(1)}%)</span>
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
                         assetClass === "equity" ? "bg-blue-400"

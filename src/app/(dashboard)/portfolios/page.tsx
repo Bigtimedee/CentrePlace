@@ -14,17 +14,40 @@ export default function PortfoliosPage() {
   return (
     <div>
       <PageHeader title="Investment Portfolios" description="Taxable accounts, IRAs, 401(k)s — with asset allocation and return assumptions" />
+
+      {/* ── Section 1: Actionable intelligence (highest priority) ──────────── */}
       <div className="mt-8 space-y-6">
-        <PlaidConnectionPanel />
-        <PortfolioAllocationDashboard />
-        <PortfolioIntelligencePanel />
-        <AgentAnalysisPanel />
-        <PortfoliosForm />
-        <HoldingsPanelsList />
         <HoldingRecommendationsPanel />
-        <DirectInvestmentsForm />
-        <CryptoHoldingsForm />
+        <AgentAnalysisPanel />
       </div>
+
+      {/* ── Section 2: Allocation analysis ────────────────────────────────── */}
+      <div className="mt-10">
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">Portfolio Analysis</h2>
+          <div className="flex-1 h-px bg-slate-100" />
+        </div>
+        <div className="space-y-6">
+          <PortfolioIntelligencePanel />
+          <PortfolioAllocationDashboard />
+        </div>
+      </div>
+
+      {/* ── Section 3: Account management and holdings detail ─────────────── */}
+      <div className="mt-10">
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">Accounts &amp; Holdings</h2>
+          <div className="flex-1 h-px bg-slate-100" />
+        </div>
+        <div className="space-y-6">
+          <PlaidConnectionPanel />
+          <PortfoliosForm />
+          <HoldingsPanelsList />
+          <DirectInvestmentsForm />
+          <CryptoHoldingsForm />
+        </div>
+      </div>
+
       <NextSectionBanner
         href="/reinvestment-policy"
         label="Reinvestment Policy"
