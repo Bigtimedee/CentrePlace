@@ -150,7 +150,7 @@ Respond with a valid JSON array only — no markdown fences, no commentary outsi
   "urgency": "high" | "medium" | "low"
 }`;
 
-const BATCH_SIZE = 4;
+const BATCH_SIZE = 2;
 
 function buildPayload(enriched: Array<EnrichedHolding<{ id: string; ticker: string | null; securityName: string; assetClass: string | null; accountType: string | null; shares: string | null; currentPrice: string | null; currentValue: string | null }>>) {
   return enriched.map((h) => ({
@@ -277,7 +277,7 @@ export async function generateHoldingRecommendations(
         client.messages.create(
           {
             model: "claude-sonnet-4-6",
-            max_tokens: 4096,
+            max_tokens: 2048,
             system: SYSTEM_PROMPT,
             messages: [
               {
