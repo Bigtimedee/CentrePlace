@@ -41,23 +41,23 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 type TickerResult = {
-  trading_agents?: {
+  tradingAgents?: {
     final_trade_decision?: string;
     fundamentals_report?: string;
     sentiment_report?: string;
     news_report?: string;
     market_research_report?: string;
   };
-  finrobot?: {
-    report?: string;
+  finRobot?: {
+    research_report?: string;
   };
   error?: string;
 };
 
 function TickerResultCard({ ticker, result }: { ticker: string; result: TickerResult }) {
   const [open, setOpen] = useState(false);
-  const ta = result.trading_agents;
-  const fr = result.finrobot;
+  const ta = result.tradingAgents;
+  const fr = result.finRobot;
 
   return (
     <div className="rounded-lg border border-gray-100 bg-slate-50 p-4">
@@ -115,12 +115,12 @@ function TickerResultCard({ ticker, result }: { ticker: string; result: TickerRe
               <p className="mt-1 text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">{ta.market_research_report}</p>
             </details>
           )}
-          {fr?.report && (
+          {fr?.research_report && (
             <details>
               <summary className="cursor-pointer text-xs font-medium text-slate-600 hover:text-slate-800">
                 Equity Research Report
               </summary>
-              <p className="mt-1 text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">{fr.report}</p>
+              <p className="mt-1 text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">{fr.research_report}</p>
             </details>
           )}
         </div>

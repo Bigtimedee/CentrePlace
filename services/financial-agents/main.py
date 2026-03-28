@@ -46,10 +46,10 @@ def run_trading_agents_for_ticker(ticker: str, analysis_date: str) -> dict[str, 
 
     config = {
         **DEFAULT_CONFIG,
-        "llm_provider": "openai",
-        "backend_url": "https://api.openai.com/v1",
-        "deep_think_llm": os.environ.get("DEEP_THINK_MODEL", "gpt-4o"),
-        "quick_think_llm": os.environ.get("QUICK_THINK_MODEL", "gpt-4o-mini"),
+        "llm_provider": "anthropic",
+        "backend_url": "https://api.anthropic.com/v1",
+        "deep_think_llm": os.environ.get("DEEP_THINK_MODEL", "claude-opus-4-5"),
+        "quick_think_llm": os.environ.get("QUICK_THINK_MODEL", "claude-haiku-3-5"),
         "max_debate_rounds": 1,       # keep latency reasonable
         "online_tools": True,
     }
@@ -75,69 +75,73 @@ def run_trading_agents_for_ticker(ticker: str, analysis_date: str) -> dict[str, 
 def run_finrobot_for_ticker(ticker: str) -> dict[str, Any]:
     """
     Run FinRobot equity research report for a single ticker.
-    FinRobot uses AutoGen under the hood — requires OPENAI_API_KEY.
+    FinRobot uses AutoGen under the hood — requires ANTHROPIC_API_KEY.
     Returns a dict with the research report text.
-    Raises on hard failure; caller should catch.
+    FinRobot is supplementary; failures are captured and returned rather than raised.
     """
-    import autogen
-    from finrobot.agents.workflow import SingleAssistantShadow
-    from finrobot.functional import (
-        get_stock_financials,
-        get_company_profile,
-    )
+    ticker_result: dict[str, Any] = {"source": "FinRobot"}
+    try:
+        import autogen
+        from finrobot.agents.workflow import SingleAssistantShadow
+        from finrobot.functional import (
+            get_stock_financials,
+            get_company_profile,
+        )
 
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    config_list = [
-        {
-            "model": os.environ.get("DEEP_THINK_MODEL", "gpt-4o"),
-            "api_key": api_key,
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        config_list = [
+            {
+                "model": os.environ.get("DEEP_THINK_MODEL", "claude-opus-4-5"),
+                "api_key": api_key,
+                "base_url": "https://api.anthropic.com/v1",
+            }
+        ]
+        llm_config = {
+            "config_list": config_list,
+            "temperature": 0,
+            "timeout": 120,
         }
-    ]
-    llm_config = {
-        "config_list": config_list,
-        "temperature": 0,
-        "timeout": 120,
-    }
 
-    # Build a research prompt
-    today = datetime.now().strftime("%B %d, %Y")
-    prompt = (
-        f"You are a senior equity research analyst. As of {today}, produce a concise "
-        f"investment research summary for {ticker} covering: (1) business overview, "
-        f"(2) recent financial performance, (3) valuation, (4) key risks, "
-        f"(5) overall investment thesis and recommendation (Buy / Hold / Sell). "
-        f"Use available financial data tools. Be specific with numbers."
-    )
+        # Build a research prompt
+        today = datetime.now().strftime("%B %d, %Y")
+        prompt = (
+            f"You are a senior equity research analyst. As of {today}, produce a concise "
+            f"investment research summary for {ticker} covering: (1) business overview, "
+            f"(2) recent financial performance, (3) valuation, (4) key risks, "
+            f"(5) overall investment thesis and recommendation (Buy / Hold / Sell). "
+            f"Use available financial data tools. Be specific with numbers."
+        )
 
-    # Use SingleAssistantShadow which wraps AutoGen with FinRobot tooling
-    assistant = SingleAssistantShadow(
-        name="FinRobotAnalyst",
-        llm_config=llm_config,
-        max_consecutive_auto_reply=5,
-        human_input_mode="NEVER",
-    )
+        # Use SingleAssistantShadow which wraps AutoGen with FinRobot tooling
+        assistant = SingleAssistantShadow(
+            name="FinRobotAnalyst",
+            llm_config=llm_config,
+            max_consecutive_auto_reply=5,
+            human_input_mode="NEVER",
+        )
 
-    user_proxy = autogen.UserProxyAgent(
-        name="User",
-        human_input_mode="NEVER",
-        max_consecutive_auto_reply=0,
-        code_execution_config=False,
-    )
+        user_proxy = autogen.UserProxyAgent(
+            name="User",
+            human_input_mode="NEVER",
+            max_consecutive_auto_reply=0,
+            code_execution_config=False,
+        )
 
-    user_proxy.initiate_chat(assistant, message=prompt, clear_history=True)
+        user_proxy.initiate_chat(assistant, message=prompt, clear_history=True)
 
-    # Extract the last assistant message as the report
-    chat_history = assistant.chat_messages.get(user_proxy, [])
-    report = ""
-    for msg in reversed(chat_history):
-        if msg.get("role") == "assistant":
-            report = msg.get("content", "")
-            break
+        # Extract the last assistant message as the report
+        chat_history = assistant.chat_messages.get(user_proxy, [])
+        report = ""
+        for msg in reversed(chat_history):
+            if msg.get("role") == "assistant":
+                report = msg.get("content", "")
+                break
 
-    return {
-        "source": "FinRobot",
-        "research_report": report,
-    }
+        ticker_result["research_report"] = report
+    except Exception as e:
+        ticker_result["error"] = str(e)
+
+    return ticker_result
 
 
 # ── Background analysis job ──────────────────────────────────────────────────
