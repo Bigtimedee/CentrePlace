@@ -3,10 +3,10 @@ uvicorn[standard]==0.32.1
 httpx==0.28.1
 pydantic==2.10.3
 
-# TradingAgents (TauricResearch)
-tradingagents-framework==0.1.4
+# TradingAgents (TauricResearch) — install from GitHub (not on PyPI)
+git+https://github.com/TauricResearch/TradingAgents.git
 
 # FinRobot (AI4Finance-Foundation) — optional enrichment layer
 # Comment out if you don't want the longer install time
-finrobot==0.4.2
+finrobot==0.1.5
 pyautogen==0.3.1
