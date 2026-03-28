@@ -11,8 +11,8 @@ export const agentAnalysisRouter = createTRPCRouter({
    * Results arrive async via the webhook at /api/webhook/agent-analysis.
    */
   start: protectedProcedure.mutation(async ({ ctx }) => {
-    const railwayUrl = process.env.AGENT_RAILWAY_URL;
-    const webhookSecret = process.env.AGENT_WEBHOOK_SECRET;
+    const railwayUrl = process.env.AGENT_RAILWAY_URL?.trim();
+    const webhookSecret = process.env.AGENT_WEBHOOK_SECRET?.trim();
     if (!railwayUrl || !webhookSecret) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -56,6 +56,7 @@ export const agentAnalysisRouter = createTRPCRouter({
     fetch(`${railwayUrl}/analyze`, {
       method: "POST",
       headers: { "content-type": "application/json" },
+      signal: AbortSignal.timeout(10_000),
       body: JSON.stringify({
         job_id: job.id,
         tickers,
