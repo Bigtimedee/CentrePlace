@@ -15,13 +15,16 @@ export default function PortfoliosPage() {
     <div>
       <PageHeader title="Investment Portfolios" description="Taxable accounts, IRAs, 401(k)s — with asset allocation and return assumptions" />
 
-      {/* ── Section 1: Actionable intelligence (highest priority) ──────────── */}
+      {/* ── Section 1: Account setup and holdings data entry ─────────────── */}
       <div className="mt-8 space-y-6">
-        <HoldingRecommendationsPanel />
-        <AgentAnalysisPanel />
+        <PlaidConnectionPanel />
+        <PortfoliosForm />
+        <HoldingsPanelsList />
+        <DirectInvestmentsForm />
+        <CryptoHoldingsForm />
       </div>
 
-      {/* ── Section 2: Allocation analysis ────────────────────────────────── */}
+      {/* ── Section 2: Allocation analysis (requires holdings to exist) ───── */}
       <div className="mt-10">
         <div className="flex items-center gap-3 mb-5">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">Portfolio Analysis</h2>
@@ -33,18 +36,15 @@ export default function PortfoliosPage() {
         </div>
       </div>
 
-      {/* ── Section 3: Account management and holdings detail ─────────────── */}
+      {/* ── Section 3: AI insights (requires holdings + triggered by user) ── */}
       <div className="mt-10">
         <div className="flex items-center gap-3 mb-5">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">Accounts &amp; Holdings</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">AI Analysis</h2>
           <div className="flex-1 h-px bg-slate-100" />
         </div>
         <div className="space-y-6">
-          <PlaidConnectionPanel />
-          <PortfoliosForm />
-          <HoldingsPanelsList />
-          <DirectInvestmentsForm />
-          <CryptoHoldingsForm />
+          <HoldingRecommendationsPanel />
+          <AgentAnalysisPanel />
         </div>
       </div>
 
