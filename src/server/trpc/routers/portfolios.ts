@@ -8,6 +8,7 @@ import { computeAllocationRecommendation } from "../../portfolios/allocation-eng
 import { fetchETFSuggestions } from "../../portfolios/etf-suggestions";
 import { refreshHoldingPrices } from "../../portfolios/price-refresh";
 import { generateHoldingRecommendations } from "../../portfolios/recommendation-engine";
+import { enrichHoldings } from "../../portfolios/data-enrichment";
 
 // Separate base shape from refinement so .partial() can be used on the shape
 const accountShape = z.object({
@@ -393,4 +394,69 @@ export const portfoliosRouter = createTRPCRouter({
       }
       return validRecs;
     }),
+
+  /**
+   * Fetch all holdings for the user, enrich them with FMP dividend yield data,
+   * and return estimated annual yield income = sum(currentValue * dividendYieldPct / 100).
+   * dividendYieldPct from FMP is expressed as a percentage (e.g. 3.5 = 3.5%).
+   * Returns a lightweight summary suitable for the Income Gap Dashboard Card.
+   */
+  getPortfolioYieldSummary: protectedProcedure.query(async ({ ctx }) => {
+    const holdings = await ctx.db.query.accountHoldings.findMany({
+      where: eq(accountHoldings.userId, ctx.userId),
+      columns: {
+        id: true,
+        ticker: true,
+        securityName: true,
+        assetClass: true,
+        marketValue: true,
+        currentValue: true,
+      },
+    });
+
+    if (holdings.length === 0) {
+      return { estimatedAnnualYieldIncome: 0, holdingCount: 0 };
+    }
+
+    // Enrich with FMP data (which contains dividendYieldPct). Cap enrichment time.
+    let enriched: Awaited<ReturnType<typeof enrichHoldings>>;
+    try {
+      enriched = await Promise.race([
+        enrichHoldings(holdings.map((h) => ({ ...h, ticker: h.ticker ?? null }))),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Enrichment timeout")), 15_000)
+        ),
+      ]);
+    } catch {
+      return { estimatedAnnualYieldIncome: null, holdingCount: holdings.length };
+    }
+
+    // Build a value map from the original holdings (typed correctly) keyed by ticker
+    // so we can combine with enriched fmpData without TypeScript generics confusion.
+    const valueByTicker = new Map<string, number>();
+    for (const h of holdings) {
+      if (!h.ticker) continue;
+      const val =
+        h.currentValue != null ? parseFloat(String(h.currentValue)) : h.marketValue;
+      // Sum values for same ticker across accounts
+      valueByTicker.set(h.ticker, (valueByTicker.get(h.ticker) ?? 0) + val);
+    }
+
+    let estimatedAnnualYieldIncome = 0;
+    for (const h of enriched) {
+      const ticker = (h as { ticker?: string | null }).ticker;
+      if (!ticker) continue;
+      const value = valueByTicker.get(ticker) ?? 0;
+      const yieldPct = h.fmpData?.dividendYieldPct;
+      if (value > 0 && yieldPct != null && yieldPct > 0) {
+        // dividendYieldPct from FMP is already a percentage: 3.5 means 3.5%
+        estimatedAnnualYieldIncome += value * (yieldPct / 100);
+      }
+    }
+
+    return {
+      estimatedAnnualYieldIncome: Math.round(estimatedAnnualYieldIncome),
+      holdingCount: holdings.length,
+    };
+  }),
 });
