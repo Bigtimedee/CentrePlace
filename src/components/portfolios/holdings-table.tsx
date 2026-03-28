@@ -25,6 +25,7 @@ interface Props {
   accountId: string;
   holdings: Holding[];
   onRefetch: () => void;
+  accountType?: string | null;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -67,6 +68,57 @@ function roiDollar(h: Holding): number | null {
   const basis = h.costBasis != null ? parseFloat(h.costBasis) : null;
   if (basis == null) return null;
   return getValue(h) - basis;
+}
+
+// ─── Tax placement chip ───────────────────────────────────────────────────────
+
+function TaxPlacementChip({
+  assetClass,
+  securitySubType,
+  accountType,
+}: {
+  assetClass: string;
+  securitySubType: string | null;
+  accountType?: string | null;
+}) {
+  if (!accountType) return null;
+
+  const isTaxAdvantaged =
+    accountType === "traditional_ira" ||
+    accountType === "roth_ira" ||
+    accountType === "traditional_401k" ||
+    accountType === "roth_401k" ||
+    accountType === "sep_ira" ||
+    accountType === "solo_401k";
+
+  const isTraditional =
+    accountType === "traditional_ira" ||
+    accountType === "traditional_401k" ||
+    accountType === "sep_ira" ||
+    accountType === "solo_401k";
+
+  let message: string | null = null;
+
+  if (securitySubType === "muni_bond" && isTaxAdvantaged) {
+    message = "Consider moving to Taxable — muni tax exemption is wasted in tax-advantaged";
+  } else if (assetClass === "bond" && accountType === "taxable" && securitySubType !== "muni_bond") {
+    message = "Consider moving to IRA — bond income taxed as ordinary";
+  } else if (assetClass === "alt" && accountType === "taxable") {
+    message = "Consider moving to IRA — REIT dividends are ordinary income";
+  } else if (assetClass === "equity" && isTraditional) {
+    message = "Consider moving to Taxable — converts LTCG to ordinary income";
+  }
+
+  if (!message) return null;
+
+  return (
+    <span className="mt-0.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+      <svg className="h-3 w-3 flex-shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+      </svg>
+      {message}
+    </span>
+  );
 }
 
 // ─── Inline edit row ─────────────────────────────────────────────────────────
@@ -308,7 +360,7 @@ function AddRow({
 
 // ─── Main table ───────────────────────────────────────────────────────────────
 
-export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
+export function HoldingsTable({ accountId, holdings, onRefetch, accountType }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -393,6 +445,7 @@ export function HoldingsTable({ accountId, holdings, onRefetch }: Props) {
                   onEdit={() => setEditingId(h.id)}
                   onDelete={() => deleteMutation.mutate({ id: h.id })}
                   deleting={deleteMutation.isPending && deleteMutation.variables?.id === h.id}
+                  accountType={accountType}
                 />
               )
             )}
@@ -458,11 +511,13 @@ function HoldingRow({
   onEdit,
   onDelete,
   deleting,
+  accountType,
 }: {
   holding: Holding;
   onEdit: () => void;
   onDelete: () => void;
   deleting: boolean;
+  accountType?: string | null;
 }) {
   const value = getValue(h);
   const price = getPrice(h);
@@ -476,6 +531,11 @@ function HoldingRow({
       </td>
       <td className="px-3 py-2 text-slate-700 max-w-[220px]">
         <span className="line-clamp-2">{h.securityName}</span>
+        <TaxPlacementChip
+          assetClass={h.assetClass}
+          securitySubType={h.securitySubType}
+          accountType={accountType}
+        />
       </td>
       <td className="px-3 py-2 text-right text-slate-600">
         {h.costBasis != null ? fmtMoney(parseFloat(h.costBasis)) : (

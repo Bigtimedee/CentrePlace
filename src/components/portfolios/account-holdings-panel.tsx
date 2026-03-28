@@ -7,9 +7,46 @@ import { HoldingsTable } from "./holdings-table";
 interface Props {
   accountId: string;
   accountName: string;
+  accountType?: string | null;
 }
 
-export function AccountHoldingsPanel({ accountId, accountName }: Props) {
+function AccountStrategyBanner({ accountType }: { accountType?: string | null }) {
+  if (!accountType) return null;
+
+  let bgClass = "";
+  let textClass = "";
+  let guidance = "";
+
+  if (accountType === "taxable") {
+    bgClass = "bg-blue-50";
+    textClass = "text-blue-700";
+    guidance = "Best for: Tax-managed equities, munis, low-turnover index funds";
+  } else if (
+    accountType === "traditional_ira" ||
+    accountType === "traditional_401k" ||
+    accountType === "sep_ira" ||
+    accountType === "solo_401k"
+  ) {
+    bgClass = "bg-violet-50";
+    textClass = "text-violet-700";
+    guidance = "Best for: Bond funds, REITs, high-turnover funds — shelters ordinary income";
+  } else if (accountType === "roth_ira" || accountType === "roth_401k") {
+    bgClass = "bg-emerald-50";
+    textClass = "text-emerald-700";
+    guidance = "Best for: High-growth equities, aggressive positions — tax-free compounding";
+  } else {
+    return null;
+  }
+
+  return (
+    <div className={`${bgClass} ${textClass} text-xs px-3 py-1.5 rounded-lg mb-3`}>
+      <span className="font-semibold">Account strategy:</span>{" "}
+      <span>{guidance}</span>
+    </div>
+  );
+}
+
+export function AccountHoldingsPanel({ accountId, accountName, accountType }: Props) {
   const { data: statements, refetch } = trpc.portfolios.getHoldings.useQuery({ accountId });
 
   const latestStatement = statements?.[0];
@@ -35,12 +72,13 @@ export function AccountHoldingsPanel({ accountId, accountName }: Props) {
 
       {/* Account body */}
       <div className="p-4">
+        <AccountStrategyBanner accountType={accountType} />
         {holdings.length === 0 ? (
           <div className="space-y-3">
             <p className="text-sm text-gray-400 italic">
               No holdings imported yet. Upload a statement or add holdings manually.
             </p>
-            <HoldingsTable accountId={accountId} holdings={[]} onRefetch={refetch} />
+            <HoldingsTable accountId={accountId} holdings={[]} onRefetch={refetch} accountType={accountType} />
           </div>
         ) : (
           <>
@@ -50,6 +88,7 @@ export function AccountHoldingsPanel({ accountId, accountName }: Props) {
                 accountId={accountId}
                 holdings={holdings}
                 onRefetch={refetch}
+                accountType={accountType}
               />
             </div>
           </>

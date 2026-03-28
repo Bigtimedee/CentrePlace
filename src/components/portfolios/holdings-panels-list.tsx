@@ -19,6 +19,7 @@ export function HoldingsPanelsList() {
           key={acct.id}
           accountId={acct.id}
           accountName={acct.accountName}
+          accountType={acct.accountType}
         />
       ))}
     </div>
