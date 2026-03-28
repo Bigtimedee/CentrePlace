@@ -150,7 +150,7 @@ Respond with a valid JSON array only — no markdown fences, no commentary outsi
   "urgency": "high" | "medium" | "low"
 }`;
 
-const BATCH_SIZE = 8;
+const BATCH_SIZE = 4;
 
 function buildPayload(enriched: Array<EnrichedHolding<{ id: string; ticker: string | null; securityName: string; assetClass: string | null; accountType: string | null; shares: string | null; currentPrice: string | null; currentValue: string | null }>>) {
   return enriched.map((h) => ({
@@ -286,10 +286,10 @@ export async function generateHoldingRecommendations(
               },
             ],
           },
-          { timeout: 35_000 }
+          { timeout: 60_000 }
         ),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 35_000)
+          setTimeout(() => reject(new Error("AI response timed out. Please try again.")), 60_000)
         ),
       ]);
 

@@ -344,7 +344,7 @@ export const portfoliosRouter = createTRPCRouter({
             }))
           ),
           new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("Request timed out. Please try again.")), 50_000)
+            setTimeout(() => reject(new Error("Request timed out. Please try again.")), 80_000)
           ),
         ]);
       } catch (err) {

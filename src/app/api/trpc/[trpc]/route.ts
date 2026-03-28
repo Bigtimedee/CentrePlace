@@ -3,9 +3,9 @@ import { type NextRequest } from "next/server";
 import { appRouter } from "@/server/trpc/routers";
 import { createContext } from "@/server/trpc/context";
 
-// Vercel Hobby plan max is 60s; Pro plan supports up to 300s.
-// Set to 60 to match the Hobby ceiling and avoid silent clamping.
-export const maxDuration = 60;
+// Pro plan supports up to 300s. 90s gives generous headroom for the
+// AI recommendations mutation (enrichment + Claude + DB writes).
+export const maxDuration = 90;
 
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
