@@ -15,7 +15,9 @@ pyautogen==0.3.1
 # Not pip-installable; src/ directory is copied into the container at build time
 # (see Dockerfile). These are its runtime dependencies:
 langchain==0.3.7
-langchain-core>=0.3.0
+# Pin langchain-core to 0.3.x — without an upper bound pip can resolve 0.4.x
+# which is incompatible with langchain 0.3.x and langchain-anthropic 0.3.x
+langchain-core>=0.3.15,<0.4.0
 langchain-anthropic==0.3.5
 langgraph==0.2.56
 pandas>=2.1.0
@@ -24,3 +26,6 @@ python-dotenv==1.0.0
 colorama>=0.4.6
 tabulate>=0.9.0
 rich>=13.9.4
+
+# financialdatasets.ai client — used by ai-hedge-fund for market data
+financialdatasets==0.1.12
