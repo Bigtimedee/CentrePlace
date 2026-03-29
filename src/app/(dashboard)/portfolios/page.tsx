@@ -6,11 +6,6 @@ import { HoldingsPanelsList } from "@/components/portfolios/holdings-panels-list
 import { DirectInvestmentsForm } from "@/components/portfolios/direct-investments-form";
 import { CryptoHoldingsForm } from "@/components/portfolios/crypto-holdings-form";
 import { PlaidConnectionPanel } from "@/components/portfolios/plaid-connection-panel";
-import { PortfolioIntelligencePanel } from "@/components/portfolios/portfolio-intelligence-panel";
-import { IncomeOpportunitiesPanel } from "@/components/portfolios/income-opportunities-panel";
-import { HoldingRecommendationsPanel } from "@/components/portfolios/holding-recommendations-panel";
-import { AgentAnalysisPanel } from "@/components/portfolios/agent-analysis-panel";
-import { HedgeFundAnalysisPanel } from "@/components/portfolios/hedge-fund-analysis-panel";
 
 export default function PortfoliosPage() {
   return (
@@ -33,22 +28,7 @@ export default function PortfoliosPage() {
           <div className="flex-1 h-px bg-slate-100" />
         </div>
         <div className="space-y-6">
-          <PortfolioIntelligencePanel />
-          <IncomeOpportunitiesPanel />
           <PortfolioAllocationDashboard />
-        </div>
-      </div>
-
-      {/* ── Section 3: AI insights (requires holdings + triggered by user) ── */}
-      <div className="mt-10">
-        <div className="flex items-center gap-3 mb-5">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">AI Analysis</h2>
-          <div className="flex-1 h-px bg-slate-100" />
-        </div>
-        <div className="space-y-6">
-          <HoldingRecommendationsPanel />
-          <AgentAnalysisPanel />
-          <HedgeFundAnalysisPanel />
         </div>
       </div>
 

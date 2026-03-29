@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { UserButton, useUser } from "@clerk/nextjs";
 import {
   LayoutDashboard, User, DollarSign, TrendingUp, Building2,
-  Briefcase, Home, Shield, CreditCard, Scale, BarChart3, Receipt, Waves, ListChecks, Activity, Settings, Award, RefreshCw
+  Briefcase, Home, Shield, CreditCard, Scale, BarChart3, Receipt, Waves, ListChecks, Activity, Settings, Award, RefreshCw, PieChart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +27,8 @@ const navItems = [
   { href: "/scenarios",      label: "Scenarios",      icon: Building2,       section: "Planning" },
   { href: "/forecast",       label: "Probability Forecast", icon: Activity,  section: "Planning" },
   { href: "/tax",            label: "Tax Planning",   icon: Receipt,         section: "Planning" },
-  { href: "/plan",           label: "Action Plan",    icon: ListChecks,      section: "Planning" },
+  { href: "/plan",               label: "Action Plan",       icon: ListChecks, section: "Planning" },
+  { href: "/portfolio-analysis", label: "Portfolio Analysis", icon: PieChart,   section: "Planning" },
 ];
 
 // Pre-compute which items are the first in their section

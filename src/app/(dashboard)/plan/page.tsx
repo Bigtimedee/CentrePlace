@@ -13,9 +13,9 @@ export default function PlanPage() {
         <ActionPlanCenter />
       </div>
       <NextSectionBanner
-        href="/dashboard"
-        label="Dashboard"
-        description="View your complete financial independence projection and key milestones"
+        href="/portfolio-analysis"
+        label="Portfolio Analysis"
+        description="AI-powered intelligence, income opportunities, and holding recommendations for your investment portfolios"
       />
     </div>
   );
