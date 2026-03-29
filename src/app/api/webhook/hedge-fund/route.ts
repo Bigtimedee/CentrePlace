@@ -3,7 +3,7 @@ import { db } from "@/server/db";
 import { hedgeFundJobs } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
 
-export const maxDuration = 10;
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   // Validate webhook secret
