@@ -3,10 +3,14 @@ Financial Agents Microservice
 Wraps TradingAgents (TauricResearch) and FinRobot (AI4Finance-Foundation)
 for async per-ticker analysis. Runs on Railway, POSTs results back to
 a CentrePlace webhook when done.
+
+Also wraps the ai-hedge-fund LangGraph pipeline (virattt) which runs 18
+investor-persona agents and produces per-ticker signals plus a portfolio decision.
 """
 
 import asyncio
 import os
+import sys
 import traceback
 from datetime import datetime
 from typing import Any
@@ -31,6 +35,14 @@ class AnalyzeRequest(BaseModel):
 class AnalyzeResponse(BaseModel):
     status: str
     job_id: str
+
+
+class HedgeFundRequest(BaseModel):
+    job_id: str
+    tickers: list[str]
+    webhook_url: str
+    webhook_secret: str
+    analysis_date: str  # YYYY-MM-DD — used as end_date; start_date = 3 months prior
 
 
 # ── TradingAgents helper ─────────────────────────────────────────────────────
@@ -222,6 +234,180 @@ async def run_analysis_job(req: AnalyzeRequest) -> None:
         print(f"[webhook] Failed to POST results for job {req.job_id}: {exc}")
 
 
+# ── ai-hedge-fund helper ─────────────────────────────────────────────────────
+
+def run_hedge_fund_pipeline(tickers: list[str], start_date: str, end_date: str) -> dict[str, Any]:
+    """
+    Run the ai-hedge-fund LangGraph pipeline for the given tickers.
+    The hedge_fund_src/ directory (copied from virattt/ai-hedge-fund src/) must
+    be present in /app. We temporarily insert /app into sys.path so that
+    hedge_fund_src's internal imports (from src.agents.* etc.) resolve as
+    expected by re-aliasing the package name.
+
+    Returns the raw dict from run_hedge_fund: { decisions, analyst_signals }
+    """
+    # The ai-hedge-fund repo imports everything from "src.*". After copying
+    # src/ to hedge_fund_src/ we inject a sys.modules alias so those imports
+    # continue to work without patching any upstream files.
+    import importlib
+    import types
+
+    app_dir = "/app"
+    if app_dir not in sys.path:
+        sys.path.insert(0, app_dir)
+
+    # Create a "src" alias pointing to hedge_fund_src if not already present
+    if "src" not in sys.modules:
+        hedge_fund_src = importlib.import_module("hedge_fund_src")
+        sys.modules["src"] = hedge_fund_src
+
+    from src.main import run_hedge_fund  # noqa: E402
+
+    # Build a minimal portfolio dict (no existing positions — pure signal run)
+    portfolio = {
+        "cash": 100_000.0,
+        "positions": {ticker: {"long": 0, "short": 0, "long_cost_basis": 0.0, "short_cost_basis": 0.0} for ticker in tickers},
+        "realized_gains": {ticker: {"long": 0.0, "short": 0.0} for ticker in tickers},
+    }
+
+    result = run_hedge_fund(
+        tickers=tickers,
+        start_date=start_date,
+        end_date=end_date,
+        portfolio=portfolio,
+        show_reasoning=False,
+        selected_analysts=[],   # empty = all analysts
+        model_name="claude-sonnet-4-5",
+        model_provider="Anthropic",
+    )
+    return result
+
+
+# ── Background hedge-fund job ────────────────────────────────────────────────
+
+async def run_hedge_fund_job(req: HedgeFundRequest) -> None:
+    """
+    Runs the ai-hedge-fund LangGraph pipeline in a background thread, then
+    POSTs results back to the CentrePlace webhook.
+
+    Result shape POSTed to webhook:
+    {
+      job_id, status, completed_at,
+      results: {
+        [ticker]: {
+          signal: "bullish"|"bearish"|"neutral",
+          conviction: 0-100,
+          reasoning: str,
+          agentSignals: {
+            [agentName]: { signal, conviction, reasoning }
+          }
+        }
+      },
+      portfolioDecision: {
+        [ticker]: { action, quantity, confidence, reasoning }
+      }
+    }
+    """
+    # Derive a 3-month look-back window from analysis_date
+    from datetime import date, timedelta
+    end_dt = datetime.strptime(req.analysis_date, "%Y-%m-%d").date()
+    # Approximate 3 months as 91 days
+    start_dt = end_dt - timedelta(days=91)
+    start_date = start_dt.strftime("%Y-%m-%d")
+    end_date = req.analysis_date
+
+    raw: dict[str, Any] = {}
+    error_msg: str | None = None
+
+    try:
+        loop = asyncio.get_event_loop()
+        raw = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                run_hedge_fund_pipeline,
+                req.tickers,
+                start_date,
+                end_date,
+            ),
+            timeout=600.0,  # 10 min ceiling — the pipeline is slow
+        )
+    except asyncio.TimeoutError:
+        error_msg = "Hedge fund pipeline timed out after 600s"
+    except Exception as exc:
+        error_msg = f"{exc}\n{traceback.format_exc()}"
+
+    if error_msg:
+        payload = {
+            "job_id": req.job_id,
+            "status": "failed",
+            "error": error_msg,
+            "completed_at": datetime.utcnow().isoformat() + "Z",
+        }
+    else:
+        # raw = { "decisions": { TICKER: { action, quantity, confidence, reasoning } },
+        #         "analyst_signals": { agent_name: { TICKER: { signal, confidence, reasoning } } } }
+        decisions: dict[str, Any] = raw.get("decisions") or {}
+        analyst_signals: dict[str, Any] = raw.get("analyst_signals") or {}
+
+        # Reshape analyst_signals from { agent: { ticker: {...} } }
+        #                           to { ticker: { agentSignals: { agent: {...} } } }
+        per_ticker: dict[str, Any] = {}
+        for ticker in req.tickers:
+            ticker_upper = ticker.upper()
+            agent_map: dict[str, Any] = {}
+            for agent_name, ticker_map in analyst_signals.items():
+                if ticker_upper in ticker_map:
+                    sig = ticker_map[ticker_upper]
+                    agent_map[agent_name] = {
+                        "signal": sig.get("signal", "neutral"),
+                        "conviction": sig.get("confidence", 0),
+                        "reasoning": sig.get("reasoning", ""),
+                    }
+
+            # Derive a top-level signal for this ticker by majority vote
+            signals = [v["signal"] for v in agent_map.values() if v.get("signal")]
+            bullish = signals.count("bullish")
+            bearish = signals.count("bearish")
+            if bullish > bearish:
+                top_signal = "bullish"
+            elif bearish > bullish:
+                top_signal = "bearish"
+            else:
+                top_signal = "neutral"
+
+            convictions = [v["conviction"] for v in agent_map.values() if isinstance(v.get("conviction"), (int, float))]
+            avg_conviction = int(sum(convictions) / len(convictions)) if convictions else 0
+
+            per_ticker[ticker_upper] = {
+                "signal": top_signal,
+                "conviction": avg_conviction,
+                "reasoning": f"{bullish} bullish / {bearish} bearish across {len(signals)} analysts",
+                "agentSignals": agent_map,
+            }
+
+        payload = {
+            "job_id": req.job_id,
+            "status": "completed",
+            "results": per_ticker,
+            "portfolioDecision": decisions,
+            "completed_at": datetime.utcnow().isoformat() + "Z",
+        }
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                req.webhook_url,
+                json=payload,
+                headers={
+                    "x-agent-webhook-secret": req.webhook_secret,
+                    "content-type": "application/json",
+                },
+            )
+            resp.raise_for_status()
+    except Exception as exc:
+        print(f"[webhook] Failed to POST hedge-fund results for job {req.job_id}: {exc}")
+
+
 # ── Routes ───────────────────────────────────────────────────────────────────
 
 @app.post("/analyze", response_model=AnalyzeResponse)
@@ -236,6 +422,21 @@ async def analyze(req: AnalyzeRequest, background_tasks: BackgroundTasks) -> Ana
         raise HTTPException(status_code=400, detail="max 20 tickers per job")
 
     background_tasks.add_task(run_analysis_job, req)
+    return AnalyzeResponse(status="queued", job_id=req.job_id)
+
+
+@app.post("/hedge-fund", response_model=AnalyzeResponse)
+async def hedge_fund(req: HedgeFundRequest, background_tasks: BackgroundTasks) -> AnalyzeResponse:
+    """
+    Accepts a list of tickers and schedules the ai-hedge-fund LangGraph pipeline
+    in the background. Returns immediately with job_id; results arrive via webhook.
+    """
+    if not req.tickers:
+        raise HTTPException(status_code=400, detail="tickers list is empty")
+    if len(req.tickers) > 10:
+        raise HTTPException(status_code=400, detail="max 10 tickers per hedge-fund job")
+
+    background_tasks.add_task(run_hedge_fund_job, req)
     return AnalyzeResponse(status="queued", job_id=req.job_id)
 
 

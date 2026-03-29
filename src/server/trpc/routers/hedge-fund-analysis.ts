@@ -1,0 +1,123 @@
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../index";
+import { hedgeFundJobs, accountHoldings } from "../../db/schema";
+import { eq, and, isNotNull, desc } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+
+export const hedgeFundAnalysisRouter = createTRPCRouter({
+  /**
+   * Start a new hedge fund analysis job for the user's confirmed holdings.
+   * Fires off a request to the Railway microservice /hedge-fund endpoint and
+   * returns the job id. Results arrive async via /api/webhook/hedge-fund.
+   */
+  start: protectedProcedure.mutation(async ({ ctx }) => {
+    const railwayUrl = process.env.AGENT_RAILWAY_URL?.trim();
+    const webhookSecret = process.env.AGENT_WEBHOOK_SECRET?.trim();
+    if (!railwayUrl || !webhookSecret) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Hedge fund analysis service is not configured.",
+      });
+    }
+
+    // Gather confirmed holdings that have tickers
+    const holdings = await ctx.db.query.accountHoldings.findMany({
+      where: and(
+        eq(accountHoldings.userId, ctx.userId),
+        isNotNull(accountHoldings.accountId),
+        isNotNull(accountHoldings.ticker),
+      ),
+      columns: { ticker: true },
+    });
+
+    const tickers = [...new Set(holdings.map((h) => h.ticker!.toUpperCase()))];
+    if (tickers.length === 0) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "No confirmed holdings with tickers found.",
+      });
+    }
+
+    // Create job record in "pending" state
+    const [job] = await ctx.db
+      .insert(hedgeFundJobs)
+      .values({
+        userId: ctx.userId,
+        status: "pending",
+        tickers,
+        startedAt: new Date(),
+      })
+      .returning({ id: hedgeFundJobs.id });
+
+    const today = new Date().toISOString().slice(0, 10);
+    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://gpretire.com"}/api/webhook/hedge-fund`;
+
+    // Fire-and-forget to Railway — don't await, just let it run
+    fetch(`${railwayUrl}/hedge-fund`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      signal: AbortSignal.timeout(10_000),
+      body: JSON.stringify({
+        job_id: job.id,
+        tickers,
+        webhook_url: webhookUrl,
+        webhook_secret: webhookSecret,
+        analysis_date: today,
+      }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text().catch(() => "");
+          console.error(`[hedgeFundAnalysis] Railway rejected job ${job.id}: ${res.status} ${text}`);
+          await ctx.db
+            .update(hedgeFundJobs)
+            .set({ status: "failed", error: `Railway returned ${res.status}`, completedAt: new Date() })
+            .where(eq(hedgeFundJobs.id, job.id));
+        } else {
+          // Mark as "running" once Railway acknowledged
+          await ctx.db
+            .update(hedgeFundJobs)
+            .set({ status: "running" })
+            .where(eq(hedgeFundJobs.id, job.id));
+        }
+      })
+      .catch(async (err) => {
+        console.error(`[hedgeFundAnalysis] Failed to reach Railway for job ${job.id}:`, err);
+        await ctx.db
+          .update(hedgeFundJobs)
+          .set({ status: "failed", error: String(err), completedAt: new Date() })
+          .where(eq(hedgeFundJobs.id, job.id));
+      });
+
+    return { jobId: job.id, tickers, status: "pending" as const };
+  }),
+
+  /**
+   * Get the latest hedge fund analysis job for the current user.
+   */
+  getLatest: protectedProcedure.query(async ({ ctx }) => {
+    const job = await ctx.db.query.hedgeFundJobs.findFirst({
+      where: eq(hedgeFundJobs.userId, ctx.userId),
+      orderBy: [desc(hedgeFundJobs.createdAt)],
+    });
+    return job ?? null;
+  }),
+
+  /**
+   * Get a specific job by id (must belong to the current user).
+   */
+  getJob: protectedProcedure
+    .input(z.object({ jobId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const job = await ctx.db.query.hedgeFundJobs.findFirst({
+        where: and(
+          eq(hedgeFundJobs.id, input.jobId),
+          eq(hedgeFundJobs.userId, ctx.userId),
+        ),
+      });
+      if (!job) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Job not found." });
+      }
+      return job;
+    }),
+});

@@ -12,6 +12,12 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Clone ai-hedge-fund and copy its src/ package into the container
+# so we can import from hedge_fund_src.*
+RUN git clone --depth 1 https://github.com/virattt/ai-hedge-fund.git /tmp/ai-hedge-fund \
+    && cp -r /tmp/ai-hedge-fund/src /app/hedge_fund_src \
+    && rm -rf /tmp/ai-hedge-fund
+
 COPY . .
 
 # Railway sets PORT; default to 8000 for local dev
