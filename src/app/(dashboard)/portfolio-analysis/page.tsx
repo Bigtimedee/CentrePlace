@@ -40,9 +40,9 @@ export default function PortfolioAnalysisPage() {
       </div>
 
       <NextSectionBanner
-        href="/dashboard"
-        label="Dashboard"
-        description="Your complete financial picture — net worth, portfolio performance, and planning progress at a glance"
+        href="/real-estate"
+        label="Real Estate"
+        description="Properties with full amortization, rental income, and sale projections"
       />
     </div>
   );

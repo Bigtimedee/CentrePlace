@@ -19,6 +19,7 @@ const navItems = [
   { href: "/equity-compensation", label: "Equity Comp", icon: Award,           section: "Capital" },
   { href: "/portfolios",          label: "Portfolios",         icon: BarChart3,   section: "Capital" },
   { href: "/reinvestment-policy", label: "Reinvestment Policy", icon: RefreshCw,  section: "Capital" },
+  { href: "/portfolio-analysis",  label: "Portfolio Analysis",  icon: PieChart,    section: "Capital" },
   { href: "/real-estate",         label: "Real Estate",         icon: Home,        section: "Capital" },
   { href: "/insurance",      label: "Insurance",      icon: Shield,          section: "Capital" },
   { href: "/cashflow",       label: "Liquidity",      icon: Waves,           section: "Capital" },
@@ -28,7 +29,6 @@ const navItems = [
   { href: "/forecast",       label: "Probability Forecast", icon: Activity,  section: "Planning" },
   { href: "/tax",            label: "Tax Planning",   icon: Receipt,         section: "Planning" },
   { href: "/plan",               label: "Action Plan",       icon: ListChecks, section: "Planning" },
-  { href: "/portfolio-analysis", label: "Portfolio Analysis", icon: PieChart,   section: "Planning" },
 ];
 
 // Pre-compute which items are the first in their section
