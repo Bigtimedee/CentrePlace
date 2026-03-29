@@ -13,9 +13,9 @@ export default function ReinvestmentPolicyPage() {
         <ReinvestmentPolicyPanel />
       </div>
       <NextSectionBanner
-        href="/portfolio-analysis"
-        label="Portfolio Analysis"
-        description="AI-powered intelligence, income opportunities, and holding recommendations for your investment portfolios"
+        href="/real-estate"
+        label="Real Estate"
+        description="Properties with full amortization, rental income, and sale projections"
       />
     </div>
   );

@@ -40,9 +40,9 @@ export default function PortfolioAnalysisPage() {
       </div>
 
       <NextSectionBanner
-        href="/real-estate"
-        label="Real Estate"
-        description="Properties with full amortization, rental income, and sale projections"
+        href="/estate"
+        label="Estate Planning"
+        description="Gross estate, tax liability, planning opportunities, and beneficiary allocations"
       />
     </div>
   );

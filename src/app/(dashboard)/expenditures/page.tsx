@@ -10,9 +10,9 @@ export default function ExpendituresPage() {
         <ExpendituresForm />
       </div>
       <NextSectionBanner
-        href="/estate"
-        label="Estate Planning"
-        description="Gross estate, tax liability, planning opportunities, and beneficiary allocations"
+        href="/portfolio-analysis"
+        label="Portfolio Analysis"
+        description="AI-powered intelligence, income opportunities, and holding recommendations for your investment portfolios"
       />
     </div>
   );
