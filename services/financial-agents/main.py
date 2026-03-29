@@ -60,8 +60,8 @@ def run_trading_agents_for_ticker(ticker: str, analysis_date: str) -> dict[str, 
         **DEFAULT_CONFIG,
         "llm_provider": "anthropic",
         "backend_url": "https://api.anthropic.com/v1",
-        "deep_think_llm": os.environ.get("DEEP_THINK_MODEL", "claude-opus-4-5"),
-        "quick_think_llm": os.environ.get("QUICK_THINK_MODEL", "claude-haiku-3-5"),
+        "deep_think_llm": os.environ.get("DEEP_THINK_MODEL", "claude-opus-4-6"),
+        "quick_think_llm": os.environ.get("QUICK_THINK_MODEL", "claude-haiku-4-5-20251001"),
         "max_debate_rounds": 1,       # keep latency reasonable
         "online_tools": True,
     }
@@ -103,7 +103,7 @@ def run_finrobot_for_ticker(ticker: str) -> dict[str, Any]:
         api_key = os.environ.get("ANTHROPIC_API_KEY", "")
         config_list = [
             {
-                "model": os.environ.get("DEEP_THINK_MODEL", "claude-opus-4-5"),
+                "model": os.environ.get("DEEP_THINK_MODEL", "claude-opus-4-6"),
                 "api_key": api_key,
                 "base_url": "https://api.anthropic.com/v1",
             }
@@ -277,7 +277,7 @@ def run_hedge_fund_pipeline(tickers: list[str], start_date: str, end_date: str) 
         portfolio=portfolio,
         show_reasoning=False,
         selected_analysts=[],   # empty = all analysts
-        model_name="claude-sonnet-4-5",
+        model_name="claude-sonnet-4-6",
         model_provider="Anthropic",
     )
     return result

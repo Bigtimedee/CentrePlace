@@ -56,12 +56,20 @@ test.describe("/portfolios page cleanup", () => {
   });
 });
 
-test.describe("/plan page next-section banner", () => {
-  test("plan page NextSectionBanner links to /portfolio-analysis", async ({ page }) => {
+test.describe("next-section banner chain", () => {
+  test("expenditures NextSectionBanner links to /portfolio-analysis", async ({ page }) => {
     await login(page);
-    await page.goto("/plan");
+    await page.goto("/expenditures");
     await page.waitForLoadState("networkidle");
     const banner = page.locator('a[href="/portfolio-analysis"]');
+    await expect(banner).toBeVisible();
+  });
+
+  test("portfolio-analysis NextSectionBanner links to /estate", async ({ page }) => {
+    await login(page);
+    await page.goto("/portfolio-analysis");
+    await page.waitForLoadState("networkidle");
+    const banner = page.locator('a[href="/estate"]');
     await expect(banner).toBeVisible();
   });
 });

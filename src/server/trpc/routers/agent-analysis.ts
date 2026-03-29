@@ -94,13 +94,28 @@ export const agentAnalysisRouter = createTRPCRouter({
 
   /**
    * Get the latest agent analysis job for the current user.
+   * Auto-fails jobs that have been stuck in "running" for more than 20 minutes.
    */
   getLatest: protectedProcedure.query(async ({ ctx }) => {
     const job = await ctx.db.query.agentAnalysisJobs.findFirst({
       where: eq(agentAnalysisJobs.userId, ctx.userId),
       orderBy: [desc(agentAnalysisJobs.createdAt)],
     });
-    return job ?? null;
+    if (!job) return null;
+
+    if (job.status === "running" && job.startedAt) {
+      const ageMs = Date.now() - new Date(job.startedAt).getTime();
+      if (ageMs > 20 * 60 * 1000) {
+        const timeoutError = "Analysis timed out after 20 minutes with no response from the service.";
+        await ctx.db
+          .update(agentAnalysisJobs)
+          .set({ status: "failed", error: timeoutError, completedAt: new Date() })
+          .where(eq(agentAnalysisJobs.id, job.id));
+        return { ...job, status: "failed" as const, error: timeoutError, completedAt: new Date() };
+      }
+    }
+
+    return job;
   }),
 
   /**
