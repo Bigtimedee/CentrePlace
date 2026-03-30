@@ -3,14 +3,16 @@
 import { useSignUp } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRef, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type Phase = "choose" | "password" | "no-ticket";
 
-export default function SignUpPage() {
+function SignUpInner() {
   const { signUp, fetchStatus } = useSignUp();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const ticketApplied = useRef<boolean>(false);
 
   const ticket = searchParams.get("__clerk_ticket");
 
@@ -24,11 +26,15 @@ export default function SignUpPage() {
 
   const handleGoogle = async () => {
     if (!signUp || fetchStatus === "fetching") return;
+    if (!ticket) { setError("Invalid invitation link."); return; }
     setError("");
     setLoading(true);
     try {
-      const ticketResult = await signUp.ticket({ ticket: ticket! });
-      if (ticketResult.error) throw ticketResult.error;
+      if (!ticketApplied.current) {
+        const ticketResult = await signUp.ticket({ ticket });
+        if (ticketResult.error) throw ticketResult.error;
+        ticketApplied.current = true;
+      }
       const ssoResult = await signUp.sso({
         strategy: "oauth_google",
         redirectUrl: `${window.location.origin}/sign-up/sso-callback`,
@@ -43,23 +49,27 @@ export default function SignUpPage() {
 
   const handlePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!ticket) { setError("Invalid invitation link."); return; }
     if (!signUp || fetchStatus === "fetching" || loading) return;
     if (password !== confirm) { setError("Passwords do not match."); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     setError("");
     setLoading(true);
     try {
-      const ticketResult = await signUp.ticket({ ticket: ticket! });
-      if (ticketResult.error) {
-        const msg = ticketResult.error.message ?? "";
-        if (msg.toLowerCase().includes("already") || msg.toLowerCase().includes("exists")) {
-          setError("An account with this email already exists. Try signing in.");
-        } else if (msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("invalid")) {
-          setError("This invitation link has expired. Contact your administrator for a new one.");
-        } else {
-          setError("Something went wrong. Please try again.");
+      if (!ticketApplied.current) {
+        const ticketResult = await signUp.ticket({ ticket });
+        if (ticketResult.error) {
+          const msg = ticketResult.error.message ?? "";
+          if (msg.toLowerCase().includes("already") || msg.toLowerCase().includes("exists")) {
+            setError("An account with this email already exists. Try signing in.");
+          } else if (msg.toLowerCase().includes("expired") || msg.toLowerCase().includes("invalid")) {
+            setError("This invitation link has expired. Contact your administrator for a new one.");
+          } else {
+            setError("Something went wrong. Please try again.");
+          }
+          return;
         }
-        return;
+        ticketApplied.current = true;
       }
       const pwResult = await signUp.password({ firstName, lastName, password });
       if (pwResult.error) {
@@ -76,6 +86,8 @@ export default function SignUpPage() {
       const finalizeResult = await signUp.finalize();
       if (finalizeResult.error) {
         setError("Sign-up could not be completed. Contact your administrator.");
+      } else {
+        router.push("/dashboard");
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -244,5 +256,13 @@ export default function SignUpPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-950"><div className="text-slate-400 text-sm">Loading…</div></div>}>
+      <SignUpInner />
+    </Suspense>
   );
 }

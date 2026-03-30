@@ -12,13 +12,21 @@ interface InvitationRow {
 export function InvitationTable({ invitations }: { invitations: InvitationRow[] }) {
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
+  const [revokeError, setRevokeError] = useState<string | null>(null);
 
   const revoke = async (inviteId: string, email: string) => {
     if (!confirm(`Revoke invitation for ${email}?`)) return;
     setPending(inviteId);
+    setRevokeError(null);
     try {
-      await fetch(`/api/admin/invite/${inviteId}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/invite/${inviteId}`, { method: "DELETE" });
+      if (!res.ok) {
+        setRevokeError("Failed to revoke invitation. Please try again.");
+        return;
+      }
       router.refresh();
+    } catch {
+      setRevokeError("Failed to revoke invitation. Please try again.");
     } finally {
       setPending(null);
     }
@@ -29,6 +37,10 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
   }
 
   return (
+    <>
+    {revokeError && (
+      <p className="text-sm text-red-500 mb-3">{revokeError}</p>
+    )}
     <div className="rounded-xl border border-slate-200 overflow-hidden">
       <table className="w-full text-sm">
         <thead>
@@ -75,5 +87,6 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
         </tbody>
       </table>
     </div>
+    </>
   );
 }

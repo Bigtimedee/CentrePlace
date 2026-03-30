@@ -37,7 +37,7 @@ export default clerkMiddleware(
           httpOnly: true,
           secure: true,
           sameSite: "lax",
-          path: "/sign-up",
+          path: "/",
         });
         return response;
       }
