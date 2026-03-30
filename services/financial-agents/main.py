@@ -433,8 +433,8 @@ async def hedge_fund(req: HedgeFundRequest, background_tasks: BackgroundTasks) -
     """
     if not req.tickers:
         raise HTTPException(status_code=400, detail="tickers list is empty")
-    if len(req.tickers) > 10:
-        raise HTTPException(status_code=400, detail="max 10 tickers per hedge-fund job")
+    if len(req.tickers) > 20:
+        raise HTTPException(status_code=400, detail="max 20 tickers per hedge-fund job")
 
     background_tasks.add_task(run_hedge_fund_job, req)
     return AnalyzeResponse(status="queued", job_id=req.job_id)
