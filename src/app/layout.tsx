@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCProvider } from "@/lib/trpc-provider";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const dmSans = DM_Sans({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
 export const metadata: Metadata = {
   title: "GPretire.com",
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider dynamic>
       <html lang="en">
-        <body className={`${inter.className} bg-slate-50 text-slate-900 antialiased`}>
+        <body className={`${dmSans.className} antialiased`} style={{ background: "var(--background)", color: "var(--foreground)" }}>
           <TRPCProvider>
             {children}
           </TRPCProvider>

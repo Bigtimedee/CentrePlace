@@ -43,9 +43,9 @@ export function Sidebar() {
   const isAdmin = user?.publicMetadata?.role === "admin";
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 w-60 bg-slate-900 border-r border-slate-800 flex flex-col">
+    <aside className="fixed inset-y-0 left-0 z-50 w-60 flex flex-col" style={{ background: "#0E1623", borderRight: "1px solid #1A2640" }}>
       {/* Logo */}
-      <div className="h-16 flex items-center gap-3 px-4 border-b border-slate-800">
+      <div className="h-16 flex items-center gap-3 px-4" style={{ borderBottom: "1px solid #1A2640" }}>
         <Image src="/logo.jpeg" alt="GPretire.com" width={36} height={36} className="h-9 w-9 rounded-full object-cover flex-shrink-0" />
         <span className="text-base font-semibold tracking-tight text-white">GPretire.com</span>
       </div>
@@ -55,7 +55,7 @@ export function Sidebar() {
         {itemsWithSectionHeader.map((item) => (
           <div key={item.href}>
             {item.showHeader && (
-              <p className="px-3 py-2 mt-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <p className="px-3 py-2 mt-3 text-xs font-medium tracking-widest uppercase" style={{ color: "#3D5478" }}>
                 {item.section}
               </p>
             )}
@@ -64,9 +64,13 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 pathname === item.href
-                  ? "bg-slate-800 text-white"
-                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                  ? "text-white"
+                  : "hover:text-white"
               )}
+              style={pathname === item.href
+                ? { background: "rgba(200, 164, 90, 0.12)", color: "#C8A45A" }
+                : { color: "#7A95B4" }
+              }
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
               {item.label}
@@ -83,9 +87,13 @@ export function Sidebar() {
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
               pathname.startsWith("/admin")
-                ? "bg-slate-800 text-white"
-                : "text-slate-500 hover:text-white hover:bg-slate-800/60"
+                ? "text-white"
+                : "hover:text-white"
             )}
+            style={pathname.startsWith("/admin")
+              ? { background: "rgba(200, 164, 90, 0.12)", color: "#C8A45A" }
+              : { color: "#3D5478" }
+            }
           >
             <Settings className="h-4 w-4 flex-shrink-0" />
             Admin
@@ -94,7 +102,7 @@ export function Sidebar() {
       )}
 
       {/* User button */}
-      <div className="h-16 flex items-center px-6 border-t border-slate-800">
+      <div className="h-16 flex items-center px-6" style={{ borderTop: "1px solid #1A2640" }}>
         <UserButton />
       </div>
     </aside>
