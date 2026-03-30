@@ -21,8 +21,8 @@ const BASE: EstateTaxInput = {
 // Federal Estate Tax
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("Federal Estate Tax — 2026 post-TCJA-sunset", () => {
-  it("no federal tax below single exemption (~$7.18M)", () => {
+describe("Federal Estate Tax — 2026 OBBBA ($15M exemption)", () => {
+  it("no federal tax below single exemption ($15M)", () => {
     const result = calculateEstateTax({
       ...BASE,
       grossEstate: 5_000_000,
@@ -41,34 +41,34 @@ describe("Federal Estate Tax — 2026 post-TCJA-sunset", () => {
   });
 
   it("taxes estate above single exemption at 40%", () => {
-    // $10M estate, single: taxable = 10M - 7.18M = 2.82M × 40% = $1,128,000
+    // $20M estate, single: taxable = 20M - 15M = 5M × 40% = $2,000,000
     const result = calculateEstateTax({
       ...BASE,
-      grossEstate: 10_000_000,
+      grossEstate: 20_000_000,
       stateCode: "TX",
     });
-    const expectedTax = (10_000_000 - FEDERAL_EXEMPTION_2026) * 0.40;
+    const expectedTax = (20_000_000 - FEDERAL_EXEMPTION_2026) * 0.40;
     expect(result.federalEstateTax).toBeCloseTo(expectedTax, 0);
   });
 
   it("MFJ doubles the federal exemption (portability)", () => {
-    // $20M estate, MFJ: exemption = 7.18M × 2 = 14.36M; taxable = 5.64M
+    // $40M estate, MFJ: exemption = 15M × 2 = 30M; taxable = 10M × 40% = 4M
     const single = calculateEstateTax({
       ...BASE,
-      grossEstate: 20_000_000,
+      grossEstate: 40_000_000,
       filingStatus: "single",
       stateCode: "TX",
     });
     const mfj = calculateEstateTax({
       ...BASE,
-      grossEstate: 20_000_000,
+      grossEstate: 40_000_000,
       filingStatus: "married_filing_jointly",
       stateCode: "TX",
     });
     expect(mfj.federalEstateTax).toBeLessThan(single.federalEstateTax);
-    // MFJ tax = (20M - 14.36M) × 40% = 5.64M × 40% = 2.256M
+    // MFJ tax = (40M - 30M) × 40% = 10M × 40% = 4M
     expect(mfj.federalEstateTax).toBeCloseTo(
-      (20_000_000 - FEDERAL_EXEMPTION_2026 * 2) * 0.40,
+      (40_000_000 - FEDERAL_EXEMPTION_2026 * 2) * 0.40,
       0
     );
   });
@@ -93,13 +93,13 @@ describe("Federal Estate Tax — 2026 post-TCJA-sunset", () => {
   it("charitable deductions reduce federal taxable estate", () => {
     const withCharity = calculateEstateTax({
       ...BASE,
-      grossEstate: 15_000_000,
+      grossEstate: 20_000_000,
       charitableDeductions: 3_000_000,
       stateCode: "TX",
     });
     const withoutCharity = calculateEstateTax({
       ...BASE,
-      grossEstate: 15_000_000,
+      grossEstate: 20_000_000,
       stateCode: "TX",
     });
     expect(withCharity.federalEstateTax).toBeLessThan(withoutCharity.federalEstateTax);
@@ -240,10 +240,10 @@ describe("State estate tax — New York cliff", () => {
 });
 
 describe("Combined federal + state", () => {
-  it("NY $15M estate has both federal and state tax", () => {
+  it("NY $20M estate has both federal and state tax", () => {
     const result = calculateEstateTax({
       ...BASE,
-      grossEstate: 15_000_000,
+      grossEstate: 20_000_000,
       stateCode: "NY",
     });
     expect(result.federalEstateTax).toBeGreaterThan(0);
@@ -253,10 +253,10 @@ describe("Combined federal + state", () => {
     );
   });
 
-  it("TX $15M estate has only federal estate tax", () => {
+  it("TX $20M estate has only federal estate tax", () => {
     const result = calculateEstateTax({
       ...BASE,
-      grossEstate: 15_000_000,
+      grossEstate: 20_000_000,
       stateCode: "TX",
     });
     expect(result.federalEstateTax).toBeGreaterThan(0);

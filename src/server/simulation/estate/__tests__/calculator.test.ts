@@ -294,7 +294,7 @@ describe("LP investments", () => {
 // ── Estate Tax ────────────────────────────────────────────────────────────────
 
 describe("federal estate tax", () => {
-  it("charges no federal tax when estate is below $7.18M (single)", () => {
+  it("charges no federal tax when estate is below $15M (single)", () => {
     const result = calculateEstate(
       makeInput({
         investmentAccounts: [
@@ -306,16 +306,16 @@ describe("federal estate tax", () => {
     expect(result.totalEstateTax).toBe(0);
   });
 
-  it("charges 40% on amount above single exemption ($7.18M)", () => {
+  it("charges 40% on amount above single exemption ($15M)", () => {
     const result = calculateEstate(
       makeInput({
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 10_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 20_000_000 },
         ],
       }),
     );
-    // $10M − $7.18M = $2.82M taxable → × 0.40 = $1.128M
-    expect(result.federalEstateTax).toBeCloseTo(1_128_000, -3);
+    // $20M − $15M = $5M taxable → × 0.40 = $2M
+    expect(result.federalEstateTax).toBeCloseTo(2_000_000, -3);
   });
 
   it("doubles exemption for MFJ filing", () => {
@@ -327,9 +327,9 @@ describe("federal estate tax", () => {
         ],
       }),
     );
-    // MFJ exemption = $14.36M; $10M < $14.36M → no tax
+    // MFJ exemption = $30M; $10M < $30M → no tax
     expect(result.federalEstateTax).toBe(0);
-    expect(result.federalExemption).toBe(14_360_000);
+    expect(result.federalExemption).toBe(30_000_000);
   });
 });
 
@@ -422,7 +422,7 @@ describe("planning metrics", () => {
     const result = calculateEstate(
       makeInput({
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 10_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 14_000_000 },
         ],
         realEstate: [
           {
@@ -528,7 +528,7 @@ describe("full scenario — high-net-worth single in OR", () => {
         { id: "c2", name: "Liam", birthYear: 2000, inheritancePct: 0.5 },
       ],
       investmentAccounts: [
-        { id: "a1", accountName: "Brokerage",       accountType: "taxable",          currentBalance: 8_000_000 },
+        { id: "a1", accountName: "Brokerage",       accountType: "taxable",          currentBalance: 12_000_000 },
         { id: "a2", accountName: "Traditional IRA", accountType: "traditional_ira",  currentBalance: 3_000_000 },
       ],
       realEstate: [
@@ -560,13 +560,13 @@ describe("full scenario — high-net-worth single in OR", () => {
       currentYear,
     });
 
-    // Gross estate: 8M + 3M + 1.6M (RE net) + 3M (net carry) + 2M (LP) = 17.6M
-    expect(result.grossEstate).toBe(17_600_000);
+    // Gross estate: 12M + 3M + 1.6M (RE net) + 3M (net carry) + 2M (LP) = 21.6M
+    expect(result.grossEstate).toBe(21_600_000);
     expect(result.ilitDeathBenefit).toBe(5_000_000);
 
-    // Federal taxable estate = grossEstate − ilitBenefit = 17.6M − 5M = 12.6M
-    // Federal tax = (12.6M − 7.18M) × 40% = 5.42M × 0.40 = $2.168M
-    expect(result.federalEstateTax).toBeCloseTo(2_168_000, -3);
+    // Federal taxable estate = grossEstate − ilitBenefit = 21.6M − 5M = 16.6M
+    // Federal tax = (16.6M − 15M) × 40% = 1.6M × 0.40 = $640K
+    expect(result.federalEstateTax).toBeCloseTo(640_000, -3);
 
     // Oregon state tax > 0
     expect(result.stateEstateTax).toBeGreaterThan(0);

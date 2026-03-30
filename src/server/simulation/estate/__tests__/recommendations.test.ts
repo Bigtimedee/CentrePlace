@@ -82,10 +82,10 @@ describe("ILIT Conversion rule", () => {
   });
 
   it("triggers when estate is above the federal exemption and personal policy > $500k", () => {
-    // Single: $10M estate, $3M personal policy → above $7.18M exemption
+    // Single: $16M estate, $3M personal policy → above $15M exemption
     const ids = recIds({
       investmentAccounts: [
-        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 10_000_000 },
+        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 16_000_000 },
       ],
       insurance: [
         {
@@ -105,7 +105,7 @@ describe("ILIT Conversion rule", () => {
     const rec = findRec(
       {
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 10_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 14_000_000 },
         ],
         insurance: [
           {
@@ -125,12 +125,12 @@ describe("ILIT Conversion rule", () => {
   });
 
   it("priority is 'medium' when estate is within $2M below the exemption", () => {
-    // Single: $6.0M accounts + $0.8M personal policy = $6.8M gross estate
-    // $7.18M − $6.8M = $0.38M below exemption (within $2M threshold) → "medium"
+    // Single: $13.5M accounts + $0.8M personal policy = $14.3M gross estate
+    // $15M − $14.3M = $0.7M below exemption (within $2M threshold) → "medium"
     const rec = findRec(
       {
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 6_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 13_500_000 },
         ],
         insurance: [
           {
@@ -150,11 +150,11 @@ describe("ILIT Conversion rule", () => {
   });
 
   it("estimatedTaxSavings is positive and matches counterfactual calculation", () => {
-    // $12M estate with $3M personal policy — saving = tax($12M) - tax($9M)
+    // $15M estate with $3M personal policy — saving = tax($18M) - tax($15M ILIT)
     const rec = findRec(
       {
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 12_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 15_000_000 },
         ],
         insurance: [
           {
@@ -171,9 +171,8 @@ describe("ILIT Conversion rule", () => {
     );
     expect(rec).toBeDefined();
     expect(rec!.estimatedTaxSavings).toBeGreaterThan(0);
-    // Tax($15M) - Tax($12M - $3M ILIT) = Tax($15M) - Tax($9M)
-    // = ($15M - $7.18M)×40% - ($9M - $7.18M)×40% = $3.128M - $0.728M = $2.4M
-    expect(rec!.estimatedTaxSavings).toBeCloseTo(2_400_000, -4);
+    // Tax($18M) - Tax($15M with $3M ILIT excluded) = ($18M-$15M)×40% - 0 = $1.2M
+    expect(rec!.estimatedTaxSavings).toBeCloseTo(1_200_000, -4);
   });
 });
 
@@ -202,11 +201,11 @@ describe("Annual Gifting rule", () => {
   });
 
   it("priority is 'high' when estate is > $5M above exemption", () => {
-    // $15M estate → $7.82M above $7.18M exemption
+    // $22M estate → $7M above $15M exemption
     const rec = findRec(
       {
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 15_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 22_000_000 },
         ],
       },
       "annual-gifting",
@@ -240,12 +239,11 @@ describe("Annual Gifting rule", () => {
   });
 
   it("includes 'Years to gift below threshold' when estate is above exemption", () => {
-    // Single, 1 child: $19k/yr. Estate $10M, exemption $7.18M → $2.82M excess
-    // ceil(2_820_000 / 19_000) = 149 years
+    // Single, 1 child: $19k/yr. Estate $20M, exemption $15M → $5M excess
     const rec = findRec(
       {
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 10_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 20_000_000 },
         ],
         children: [
           { id: "c1", name: "Alice", birthYear: 2000, inheritancePct: 1.0 },
@@ -273,7 +271,7 @@ describe("Marital Deduction rule", () => {
     expect(ids).not.toContain("marital-deduction");
   });
 
-  it("does NOT trigger for MFJ when estate <= combined exemption ($14.36M)", () => {
+  it("does NOT trigger for MFJ when estate <= combined exemption ($30M)", () => {
     const ids = recIds({
       profile: {
         filingStatus: "married_filing_jointly",
@@ -295,7 +293,7 @@ describe("Marital Deduction rule", () => {
         birthYear: 1970,
       },
       investmentAccounts: [
-        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 18_000_000 },
+        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 35_000_000 },
       ],
     });
     expect(ids).toContain("marital-deduction");
@@ -310,7 +308,7 @@ describe("Marital Deduction rule", () => {
           birthYear: 1970,
         },
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 18_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 35_000_000 },
         ],
       },
       "marital-deduction",
@@ -389,10 +387,10 @@ describe("Charitable Giving rule", () => {
   });
 
   it("triggers when excess is >= $3M", () => {
-    // Estate $11M → $3.82M above $7.18M exemption
+    // Estate $20M → $5M above $15M exemption
     const ids = recIds({
       investmentAccounts: [
-        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 11_000_000 },
+        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 20_000_000 },
       ],
     });
     expect(ids).toContain("charitable-giving");
@@ -402,7 +400,7 @@ describe("Charitable Giving rule", () => {
     const rec = findRec(
       {
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 15_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 20_000_000 },
         ],
       },
       "charitable-giving",
@@ -487,10 +485,10 @@ describe("Trust Strategies rule", () => {
   });
 
   it("triggers when excess is >= $5M above exemption", () => {
-    // $15M estate → $7.82M above $7.18M exemption
+    // $22M estate → $7M above $15M exemption
     const ids = recIds({
       investmentAccounts: [
-        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 15_000_000 },
+        { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 22_000_000 },
       ],
     });
     expect(ids).toContain("grat-slat");
@@ -500,7 +498,7 @@ describe("Trust Strategies rule", () => {
     const rec = findRec(
       {
         investmentAccounts: [
-          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 15_000_000 },
+          { id: "a1", accountName: "Brokerage", accountType: "taxable", currentBalance: 22_000_000 },
         ],
       },
       "grat-slat",
