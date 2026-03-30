@@ -1,0 +1,18 @@
+# Railpack reads this file to configure the Nixpacks build.
+# Because Railway's dashboard builder is set to Railpack (overriding
+# railway.toml's DOCKERFILE directive), we configure Railpack here instead.
+
+[phases.setup]
+# Add git so the build phase can clone ai-hedge-fund.
+# build-essential (gcc) is needed by some Python C-extension deps.
+nixPkgs = ["git", "gcc", "gnumake"]
+
+[phases.build]
+cmds = [
+  "git clone --depth 1 https://github.com/virattt/ai-hedge-fund.git /tmp/aihf",
+  "cp -r /tmp/aihf/src ./hedge_fund_src",
+  "rm -rf /tmp/aihf"
+]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
