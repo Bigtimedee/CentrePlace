@@ -12,7 +12,7 @@ import asyncio
 import os
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import httpx
@@ -170,7 +170,7 @@ async def run_analysis_job(req: AnalyzeRequest) -> None:
 
         # ── TradingAgents ────────────────────────────────────────────────────
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             ta_result = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
@@ -190,7 +190,7 @@ async def run_analysis_job(req: AnalyzeRequest) -> None:
         # FinRobot is optional: if the import fails (not installed / missing
         # dependencies) we silently skip it for this ticker.
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             fr_result = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
@@ -215,7 +215,7 @@ async def run_analysis_job(req: AnalyzeRequest) -> None:
         "job_id": req.job_id,
         "status": "completed",
         "results": results,
-        "completed_at": datetime.utcnow().isoformat() + "Z",
+        "completed_at": datetime.now(timezone.utc).isoformat(),
     }
 
     try:
@@ -320,7 +320,7 @@ async def run_hedge_fund_job(req: HedgeFundRequest) -> None:
     error_msg: str | None = None
 
     try:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         raw = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
@@ -341,7 +341,7 @@ async def run_hedge_fund_job(req: HedgeFundRequest) -> None:
             "job_id": req.job_id,
             "status": "failed",
             "error": error_msg,
-            "completed_at": datetime.utcnow().isoformat() + "Z",
+            "completed_at": datetime.now(timezone.utc).isoformat(),
         }
     else:
         # raw = { "decisions": { TICKER: { action, quantity, confidence, reasoning } },
@@ -390,7 +390,7 @@ async def run_hedge_fund_job(req: HedgeFundRequest) -> None:
             "status": "completed",
             "results": per_ticker,
             "portfolioDecision": decisions,
-            "completed_at": datetime.utcnow().isoformat() + "Z",
+            "completed_at": datetime.now(timezone.utc).isoformat(),
         }
 
     try:

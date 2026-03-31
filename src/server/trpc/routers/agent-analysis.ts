@@ -71,7 +71,7 @@ export const agentAnalysisRouter = createTRPCRouter({
           console.error(`[agentAnalysis] Railway rejected job ${job.id}: ${res.status} ${text}`);
           await ctx.db
             .update(agentAnalysisJobs)
-            .set({ status: "failed", error: `Railway returned ${res.status}`, completedAt: new Date() })
+            .set({ status: "failed", error: `Railway returned ${res.status}${text ? `: ${text}` : ""}`, completedAt: new Date() })
             .where(eq(agentAnalysisJobs.id, job.id));
         } else {
           // Mark as "running" once Railway acknowledged
