@@ -202,9 +202,9 @@ export function ProfileForm() {
           <div className="divide-y divide-slate-200">
             {children.map(child => (
               <div key={child.id} className="flex items-center justify-between px-6 py-3">
-                <div>
+                <div className="min-w-0 flex-1">
                   <span className="text-sm text-slate-700 font-medium">{child.name}</span>
-                  <span className="text-xs text-slate-600 ml-3">
+                  <span className="text-xs text-slate-600 ml-3 break-words">
                     b. {child.birthYear}
                     {(child.k12TuitionCost ?? 0) > 0 && ` · K-12 ${formatCurrency(child.k12TuitionCost ?? 0, true)}/yr`}
                     {child.educationType !== "none" ? ` · ${child.educationType} college ${formatCurrency(child.annualEducationCost ?? 0, true)}/yr` : ""}
