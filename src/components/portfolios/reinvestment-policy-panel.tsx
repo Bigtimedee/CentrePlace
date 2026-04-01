@@ -158,7 +158,7 @@ export function ReinvestmentPolicyPanel() {
                 variant="danger"
                 size="sm"
                 onClick={() => del.mutate()}
-                disabled={del.isPending}
+                loading={del.isPending}
               >
                 {del.isPending ? "Removing…" : "Remove Policy"}
               </Button>
@@ -464,7 +464,8 @@ export function ReinvestmentPolicyPanel() {
             <div className="flex flex-col items-end gap-1">
               <Button
                 onClick={() => upsert.mutate(toMutation(form))}
-                disabled={upsert.isPending || !allocOk}
+                disabled={!allocOk}
+                loading={upsert.isPending}
               >
                 {upsert.isPending ? "Saving…" : "Save Policy"}
               </Button>

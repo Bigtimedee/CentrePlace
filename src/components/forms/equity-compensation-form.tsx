@@ -244,7 +244,8 @@ function GrantForm({
         <Button
           size="sm"
           onClick={() => onSave(form)}
-          disabled={isPending || !form.companyName || form.totalShares <= 0 || form.currentFmv <= 0}
+          disabled={!form.companyName || form.totalShares <= 0 || form.currentFmv <= 0}
+          loading={isPending}
         >
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving..." : "Save Grant"}
         </Button>
@@ -324,7 +325,7 @@ function VestingEventForm({
         <Button variant="ghost" size="sm" onClick={onCancel}>
           <X className="h-3.5 w-3.5" />
         </Button>
-        <Button size="sm" onClick={() => onSave(form)} disabled={isPending || form.shares <= 0}>
+        <Button size="sm" onClick={() => onSave(form)} disabled={form.shares <= 0} loading={isPending}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving..." : "Add"}
         </Button>
       </div>
@@ -428,7 +429,7 @@ function ShareLotForm({
         <Button variant="ghost" size="sm" onClick={onCancel}>
           <X className="h-3.5 w-3.5" />
         </Button>
-        <Button size="sm" onClick={() => onSave(form)} disabled={isPending || form.shares <= 0}>
+        <Button size="sm" onClick={() => onSave(form)} disabled={form.shares <= 0} loading={isPending}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving..." : "Add Lot"}
         </Button>
       </div>

@@ -269,7 +269,7 @@ function CarryPositionForm({
 
       <div className="flex gap-2 justify-end">
         <Button variant="ghost" size="sm" onClick={onCancel}><X className="h-3.5 w-3.5" /> Cancel</Button>
-        <Button size="sm" onClick={() => onSave(form, tranches)} disabled={isPending || !form.fundName}>
+        <Button size="sm" onClick={() => onSave(form, tranches)} disabled={!form.fundName} loading={isPending}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving…" : "Save Position"}
         </Button>
       </div>

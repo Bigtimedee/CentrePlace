@@ -230,7 +230,7 @@ function PropertyFormPanel({
 
       <div className="flex gap-2 justify-end">
         <Button variant="ghost" size="sm" onClick={onCancel}><X className="h-3.5 w-3.5" /> Cancel</Button>
-        <Button size="sm" onClick={() => onSave(form)} disabled={isPending || !form.propertyName}>
+        <Button size="sm" onClick={() => onSave(form)} disabled={!form.propertyName} loading={isPending}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving…" : "Save Property"}
         </Button>
       </div>

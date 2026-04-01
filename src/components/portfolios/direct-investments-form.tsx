@@ -320,7 +320,7 @@ function DirectInvestmentForm({
         <Button variant="ghost" size="sm" onClick={onCancel}>
           <X className="h-3.5 w-3.5" /> Cancel
         </Button>
-        <Button size="sm" onClick={() => onSave(form)} disabled={isPending || !isValid}>
+        <Button size="sm" onClick={() => onSave(form)} disabled={!isValid} loading={isPending}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving…" : "Save Investment"}
         </Button>
       </div>

@@ -101,7 +101,7 @@ export function RealizationPolicyForm() {
         description="How carry and LP proceeds are reinvested — if not set, proceeds go into the general investment pool"
         action={
           enabled ? (
-            <Button variant="danger" size="sm" onClick={() => del.mutate()} disabled={del.isPending}>
+            <Button variant="danger" size="sm" onClick={() => del.mutate()} loading={del.isPending}>
               {del.isPending ? "Removing…" : "Remove Policy"}
             </Button>
           ) : (
@@ -210,7 +210,7 @@ export function RealizationPolicyForm() {
             </div>
 
             <div className="flex justify-end">
-              <Button onClick={() => upsert.mutate(toMutation(form))} disabled={upsert.isPending || !allocOk}>
+              <Button onClick={() => upsert.mutate(toMutation(form))} disabled={!allocOk} loading={upsert.isPending}>
                 {upsert.isPending ? "Saving…" : "Save Policy"}
               </Button>
             </div>

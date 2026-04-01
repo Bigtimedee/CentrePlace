@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { FormField } from "@/components/ui/form-field";
 
 export function IncomeForm() {
   const { data, isLoading, refetch } = trpc.income.get.useQuery();
-  const upsert = trpc.income.upsert.useMutation({ onSuccess: () => refetch() });
+  const upsert = trpc.income.upsert.useMutation({ onSuccess: () => { refetch(); toast.success("Income saved"); } });
 
   const [form, setForm] = useState({
     annualSalary: 0,
@@ -94,12 +95,11 @@ export function IncomeForm() {
                 bonusGrowthRate: form.bonusGrowthRate / 100,
               })
             }
-            disabled={upsert.isPending}
+            loading={upsert.isPending}
           >
             {upsert.isPending ? "Saving…" : "Save Income"}
           </Button>
         </div>
-        {upsert.isSuccess && <p className="text-xs text-emerald-600 text-right mt-2">Saved</p>}
       </CardBody>
     </Card>
   );

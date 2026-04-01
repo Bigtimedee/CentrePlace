@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import { formatCurrency } from "@/lib/utils";
 export function ProfileForm() {
   const { data: profile, isLoading, refetch } = trpc.profile.get.useQuery();
 
-  const upsert = trpc.profile.upsert.useMutation({ onSuccess: () => refetch() });
+  const upsert = trpc.profile.upsert.useMutation({ onSuccess: () => { refetch(); toast.success("Profile saved"); } });
   const addChild = trpc.profile.addChild.useMutation({ onSuccess: () => { refetch(); setShowChildForm(false); } });
   const deleteChild = trpc.profile.deleteChild.useMutation({ onSuccess: () => refetch() });
 
@@ -176,13 +177,10 @@ export function ProfileForm() {
           </div>
 
           <div className="mt-5 flex justify-end">
-            <Button onClick={handleSave} disabled={upsert.isPending}>
+            <Button onClick={handleSave} loading={upsert.isPending}>
               {upsert.isPending ? "Saving…" : "Save Profile"}
             </Button>
           </div>
-          {upsert.isSuccess && (
-            <p className="text-xs text-emerald-600 text-right mt-2">Saved</p>
-          )}
         </CardBody>
       </Card>
 
@@ -324,7 +322,7 @@ export function ProfileForm() {
 
             <div className="flex gap-2 justify-end mt-5">
               <Button variant="ghost" size="sm" onClick={() => setShowChildForm(false)}>Cancel</Button>
-              <Button size="sm" onClick={handleAddChild} disabled={addChild.isPending || !childForm.name}>
+              <Button size="sm" onClick={handleAddChild} disabled={!childForm.name} loading={addChild.isPending}>
                 {addChild.isPending ? "Adding…" : "Add Child"}
               </Button>
             </div>

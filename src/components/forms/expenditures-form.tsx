@@ -73,7 +73,7 @@ function RecurringRowForm({
       </FormField>
       <div className="flex gap-2 md:col-span-4 justify-end">
         <Button variant="ghost" size="sm" onClick={onCancel}><X className="h-3.5 w-3.5" /> Cancel</Button>
-        <Button size="sm" onClick={() => onSave(form)} disabled={isPending || !form.description || !form.annualAmount}>
+        <Button size="sm" onClick={() => onSave(form)} disabled={!form.description || !form.annualAmount} loading={isPending}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving…" : "Save"}
         </Button>
       </div>
@@ -136,7 +136,7 @@ function OneTimeRowForm({
       </FormField>
       <div className="flex gap-2 col-span-2 md:col-span-5 justify-end">
         <Button variant="ghost" size="sm" onClick={onCancel}><X className="h-3.5 w-3.5" /> Cancel</Button>
-        <Button size="sm" onClick={() => onSave(form)} disabled={isPending || !form.description || !form.amount}>
+        <Button size="sm" onClick={() => onSave(form)} disabled={!form.description || !form.amount} loading={isPending}>
           <Check className="h-3.5 w-3.5" /> {isPending ? "Saving…" : "Save"}
         </Button>
       </div>
