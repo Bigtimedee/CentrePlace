@@ -213,6 +213,7 @@ export function HedgeFundAnalysisPanel() {
 
   const isActive = latestJob?.status === "pending" || latestJob?.status === "running";
   const results = latestJob?.results as Record<string, TickerResult> | null | undefined;
+  const portfolioDecision = latestJob?.portfolioDecision as Record<string, PortfolioDecision> | null | undefined;
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -285,6 +286,7 @@ export function HedgeFundAnalysisPanel() {
                   key={ticker}
                   ticker={ticker}
                   result={result as TickerResult}
+                  decision={portfolioDecision?.[ticker]}
                 />
               ))}
             </div>

@@ -8,6 +8,7 @@ export const hedgeFundJobs = pgTable("hedge_fund_jobs", {
   status: text("status").notNull().default("pending"),
   tickers: jsonb("tickers").notNull().default([]),       // string[]
   results: jsonb("results"),                             // { [ticker]: { signal, conviction, reasoning, agentSignals } }
+  portfolioDecision: jsonb("portfolio_decision"),        // { [ticker]: { action, quantity, confidence, reasoning } }
   error: text("error"),
   startedAt: timestamp("started_at"),
   completedAt: timestamp("completed_at"),

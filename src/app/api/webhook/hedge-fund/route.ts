@@ -20,10 +20,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { job_id, status, results, error } = body as {
+  const { job_id, status, results, portfolioDecision, error } = body as {
     job_id: string;
     status: string;
     results?: Record<string, unknown>;
+    portfolioDecision?: Record<string, unknown>;
     error?: string;
   };
 
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
     .set({
       status: status === "completed" ? "completed" : "failed",
       results: results ?? null,
+      portfolioDecision: portfolioDecision ?? null,
       error: error ?? null,
       completedAt: now,
     })
