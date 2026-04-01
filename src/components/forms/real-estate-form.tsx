@@ -396,7 +396,7 @@ export function RealEstateForm() {
                 ) : (
                   <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-100">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-3">
+                      <div className="flex items-baseline gap-3 flex-wrap">
                         <span className="text-sm font-medium text-slate-700">{prop.propertyName}</span>
                         <span className="text-xs text-slate-600">{PROPERTY_TYPE_LABELS[prop.propertyType]}</span>
                         {prop.is1031Exchange && <span className="text-xs text-indigo-600">1031</span>}
