@@ -154,7 +154,14 @@ export function AgentAnalysisPanel() {
 
   return (
     <div className="relative rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div>
+      {/* Coming Soon overlay — remove once /analyze pipeline is verified working */}
+      <div className="absolute inset-0 z-10 rounded-xl bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center gap-2">
+        <span className="rounded-full bg-slate-100 border border-slate-200 px-4 py-1.5 text-sm font-semibold text-slate-500 tracking-wide uppercase">
+          Coming Soon
+        </span>
+        <p className="text-xs text-slate-400">This feature is under development</p>
+      </div>
+      <div className="pointer-events-none select-none opacity-40">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
