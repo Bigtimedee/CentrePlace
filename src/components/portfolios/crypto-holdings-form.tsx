@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/ui/form-field";
@@ -344,9 +345,7 @@ export function CryptoHoldingsForm() {
 
       {/* Empty state */}
       {data.length === 0 && !adding ? (
-        <CardBody>
-          <p className="text-sm text-slate-600">No crypto holdings added yet.</p>
-        </CardBody>
+        <CardBody><EmptyState message="No crypto holdings added yet." /></CardBody>
       ) : (
         <div className="divide-y divide-slate-200">
           {data.map((holding) => (

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -265,7 +266,7 @@ export function PortfoliosForm() {
         )}
 
         {data.length === 0 && !adding ? (
-          <CardBody><p className="text-sm text-slate-600">No investment accounts added yet.</p></CardBody>
+          <CardBody><EmptyState message="No investment accounts added yet." /></CardBody>
         ) : (
           <div className="divide-y divide-slate-200">
             {data.map(acct => (

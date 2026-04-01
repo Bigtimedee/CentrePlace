@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -202,7 +203,7 @@ export function ExpendituresForm() {
         )}
 
         {recurring.length === 0 && !addingRecurring ? (
-          <CardBody><p className="text-sm text-slate-600">No recurring expenses added yet.</p></CardBody>
+          <CardBody><EmptyState message="No recurring expenses added yet." /></CardBody>
         ) : (
           <>
             {recurring.length > 0 && (
@@ -281,7 +282,7 @@ export function ExpendituresForm() {
         )}
 
         {oneTime.length === 0 && !addingOneTime ? (
-          <CardBody><p className="text-sm text-slate-600">No one-time expenses added yet.</p></CardBody>
+          <CardBody><EmptyState message="No one-time expenses added yet." /></CardBody>
         ) : (
           <>
             {oneTime.length > 0 && (
