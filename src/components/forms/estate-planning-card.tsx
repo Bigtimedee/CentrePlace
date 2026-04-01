@@ -71,6 +71,7 @@ export function EstatePlanningCard({ data }: Props) {
               No beneficiaries configured. Add children in the Profile section.
             </div>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200">
@@ -133,6 +134,7 @@ export function EstatePlanningCard({ data }: Props) {
                 </tr>
               </tfoot>
             </table>
+            </div>
           )}
         </CardBody>
       </Card>

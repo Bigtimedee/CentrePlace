@@ -56,6 +56,7 @@ export function EstateBreakdownCard({ data }: Props) {
         description="All assets included in or excluded from the taxable estate"
       />
       <CardBody className="p-0">
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-slate-200">
@@ -153,6 +154,7 @@ export function EstateBreakdownCard({ data }: Props) {
             )}
           </tfoot>
         </table>
+        </div>
       </CardBody>
     </Card>
   );
