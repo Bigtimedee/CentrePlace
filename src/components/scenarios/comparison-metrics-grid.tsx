@@ -128,10 +128,11 @@ export function ComparisonMetricsGrid({ runs }: Props) {
       <div>
         <h3 className="text-sm font-semibold text-slate-900 mb-4">Side-by-Side Metrics</h3>
 
+        <div className="overflow-x-auto">
         {/* Column headers */}
         <div
           className="grid gap-0 rounded-t-xl overflow-hidden border border-b-0 border-slate-200"
-          style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)` }}
+          style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)`, minWidth: "400px" }}
         >
           <div className="bg-slate-100 px-4 py-2.5 text-xs font-medium text-slate-600 border-r border-slate-200">
             Metric
@@ -156,7 +157,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
               className={`grid gap-0 border-b border-slate-200 last:border-b-0 ${
                 i % 2 === 0 ? "bg-white" : "bg-slate-100"
               }`}
-              style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)` }}
+              style={{ gridTemplateColumns: `160px repeat(${runs.length}, 1fr)`, minWidth: "400px" }}
             >
               {/* Label */}
               <div className="px-4 py-2.5 text-xs text-slate-600 border-r border-slate-200 font-medium flex items-center gap-1.5">
@@ -194,6 +195,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
             </div>
           ))}
         </div>
+        </div>{/* end overflow-x-auto */}
       </div>
 
       {/* Permanent Income info modal */}
