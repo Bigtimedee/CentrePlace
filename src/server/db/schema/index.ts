@@ -12,5 +12,4 @@ export * from "./direct-investments";
 export * from "./crypto-holdings";
 export * from "./equity-compensation";
 export * from "./agent-analysis";
-export * from "./hedge-fund";
 export * from "./relations";

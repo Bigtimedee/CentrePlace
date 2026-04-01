@@ -62,14 +62,7 @@
       "idx": 8,
       "version": "7",
       "when": 1774748005470,
-      "tag": "0008_far_caretaker",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1775011633019,
-      "tag": "0009_add_portfolio_decision",
+      "tag": "0008_agent_analysis_jobs",
       "breakpoints": true
     }
   ]

@@ -1,1 +1,0 @@
-ALTER TABLE "hedge_fund_jobs" ADD COLUMN "portfolio_decision" jsonb;

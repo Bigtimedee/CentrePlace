@@ -13,7 +13,6 @@ import { directInvestments } from "./direct-investments";
 import { cryptoHoldings } from "./crypto-holdings";
 import { equityGrants, equityVestingEvents, equityShareLots } from "./equity-compensation";
 import { agentAnalysisJobs } from "./agent-analysis";
-import { hedgeFundJobs } from "./hedge-fund";
 
 // ── userProfiles ─────────────────────────────────────────────────────────────
 export const userProfilesRelations = relations(userProfiles, ({ many, one }) => ({
@@ -41,7 +40,6 @@ export const userProfilesRelations = relations(userProfiles, ({ many, one }) => 
   cryptoHoldings: many(cryptoHoldings),
   equityGrants: many(equityGrants),
   agentAnalysisJobs: many(agentAnalysisJobs),
-  hedgeFundJobs: many(hedgeFundJobs),
 }));
 
 export const childrenRelations = relations(children, ({ one }) => ({
@@ -231,10 +229,3 @@ export const agentAnalysisJobsRelations = relations(agentAnalysisJobs, ({ one })
   }),
 }));
 
-// ── hedge fund jobs ───────────────────────────────────────────────────────────
-export const hedgeFundJobsRelations = relations(hedgeFundJobs, ({ one }) => ({
-  user: one(userProfiles, {
-    fields: [hedgeFundJobs.userId],
-    references: [userProfiles.id],
-  }),
-}));

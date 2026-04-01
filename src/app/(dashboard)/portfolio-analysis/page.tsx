@@ -4,7 +4,6 @@ import { PortfolioIntelligencePanel } from "@/components/portfolios/portfolio-in
 import { IncomeOpportunitiesPanel } from "@/components/portfolios/income-opportunities-panel";
 import { HoldingRecommendationsPanel } from "@/components/portfolios/holding-recommendations-panel";
 import { AgentAnalysisPanel } from "@/components/portfolios/agent-analysis-panel";
-import { HedgeFundAnalysisPanel } from "@/components/portfolios/hedge-fund-analysis-panel";
 
 export default function PortfolioAnalysisPage() {
   return (
@@ -35,7 +34,6 @@ export default function PortfolioAnalysisPage() {
         <div className="space-y-6">
           <HoldingRecommendationsPanel />
           <AgentAnalysisPanel />
-          <HedgeFundAnalysisPanel />
         </div>
       </div>
 

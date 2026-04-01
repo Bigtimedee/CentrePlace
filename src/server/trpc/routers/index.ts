@@ -18,7 +18,6 @@ import { directInvestmentsRouter } from "./direct-investments";
 import { cryptoRouter } from "./crypto";
 import { equityCompensationRouter } from "./equity-compensation";
 import { agentAnalysisRouter } from "./agent-analysis";
-import { hedgeFundAnalysisRouter } from "./hedge-fund-analysis";
 
 export const appRouter = createTRPCRouter({
   profile: profileRouter,
@@ -40,7 +39,6 @@ export const appRouter = createTRPCRouter({
   crypto: cryptoRouter,
   equityCompensation: equityCompensationRouter,
   agentAnalysis: agentAnalysisRouter,
-  hedgeFundAnalysis: hedgeFundAnalysisRouter,
 });
 
 export type AppRouter = typeof appRouter;
