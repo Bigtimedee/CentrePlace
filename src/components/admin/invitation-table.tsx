@@ -42,6 +42,7 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
       <p className="text-sm text-red-500 mb-3">{revokeError}</p>
     )}
     <div className="rounded-xl border border-slate-200 overflow-hidden">
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-slate-200 bg-white">
@@ -86,6 +87,7 @@ export function InvitationTable({ invitations }: { invitations: InvitationRow[] 
           })}
         </tbody>
       </table>
+      </div>
     </div>
     </>
   );
