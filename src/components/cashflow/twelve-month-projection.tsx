@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { trpc } from "@/lib/trpc";
 import type { QuarterResult } from "@/server/simulation/engine/types";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -163,12 +164,24 @@ export function TwelveMonthProjection() {
     );
   }
 
-  if (!simData) return null;
+  if (!simData) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <EmptyState message="Run the simulation to see your 12-month income projection." />
+      </div>
+    );
+  }
 
   const currentYear = new Date().getFullYear();
   const rows = buildQuarterRows(simData.quarters, currentYear);
 
-  if (rows.length === 0) return null;
+  if (rows.length === 0) {
+    return (
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <EmptyState message="No quarterly data available for the current year." />
+      </div>
+    );
+  }
 
   // ── Derived annual KPIs ────────────────────────────────────────────────────
 

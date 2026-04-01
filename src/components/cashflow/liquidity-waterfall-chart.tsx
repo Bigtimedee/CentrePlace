@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
 import type { CashEventSource, QuarterlyLiquidityBucket } from "@/server/simulation/cashflow/types";
+import { EmptyState } from "@/components/ui/empty-state";
 import { SOURCE_CONFIG } from "./cashflow-filter-bar";
 
 function fmtK(value: number) {
@@ -103,6 +104,10 @@ export function LiquidityWaterfallChart({ quarters, activeSources, viewMode }: P
     "Cumulative": Math.round(q.cumulativeNet),
     _events: q.events,
   }));
+
+  if (data.length === 0) {
+    return <EmptyState message="Run the simulation to see liquidity events." />;
+  }
 
   const maxCumulative = Math.max(...data.map(d => d["Cumulative"]), 1);
 

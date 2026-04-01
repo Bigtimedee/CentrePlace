@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import type { ScenarioRun } from "@/server/simulation/engine/scenario-types";
 import type { QuarterResult } from "@/server/simulation/engine/types";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // ── Formatters ────────────────────────────────────────────────────────────────
 
@@ -100,6 +101,10 @@ interface Props {
 
 export function ComparisonProjectionChart({ runs }: Props) {
   const data = buildChartData(runs);
+
+  if (runs.length === 0) {
+    return <EmptyState message="Add scenarios to compare projections." />;
+  }
 
   return (
     <div>

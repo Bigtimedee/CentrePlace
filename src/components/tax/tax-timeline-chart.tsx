@@ -13,6 +13,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import type { AnnualTaxProjection } from "@/server/simulation/tax/projection-types";
+import { EmptyState } from "@/components/ui/empty-state";
 
 function fmtK(value: number) {
   if (Math.abs(value) >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
@@ -50,6 +51,10 @@ interface Props {
 }
 
 export function TaxTimelineChart({ projections }: Props) {
+  if (projections.length === 0) {
+    return <EmptyState message="Run the simulation to see the tax timeline." />;
+  }
+
   const data = projections.map(p => ({
     year: p.year,
     "Fed Ordinary": Math.round(p.federalOrdinaryTax),

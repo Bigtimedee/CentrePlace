@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { formatPct } from "@/lib/utils";
 import type { AnnualTaxProjection } from "@/server/simulation/tax/projection-types";
+import { EmptyState } from "@/components/ui/empty-state";
 
 function fmtK(value: number) {
   if (Math.abs(value) >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
@@ -58,6 +59,10 @@ interface Props {
 }
 
 export function RothConversionLadder({ projections }: Props) {
+  if (projections.length === 0) {
+    return <EmptyState message="Run the simulation to see Roth conversion opportunities." />;
+  }
+
   // First 15 years, only years with positive conversion capacity
   const data = projections
     .slice(0, 15)

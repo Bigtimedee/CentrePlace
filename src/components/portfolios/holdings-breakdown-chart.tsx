@@ -1,6 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface Props {
   holdings: { assetClass: string; marketValue: number }[];
@@ -34,7 +35,7 @@ export function HoldingsBreakdownChart({ holdings }: Props) {
 
   const total = data.reduce((s, d) => s + d.value, 0);
 
-  if (data.length === 0) return null;
+  if (data.length === 0) return <EmptyState message="Add portfolio holdings to see the breakdown." />;
 
   return (
     <div className="flex flex-col items-center gap-4">
