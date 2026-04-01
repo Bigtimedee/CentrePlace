@@ -10,7 +10,7 @@ interface CardProps {
 
 export function Card({ className, children }: CardProps) {
   return (
-    <div className={cn("rounded-xl bg-white border border-[#E5E0D8]", className)}>
+    <div className={cn("rounded-xl bg-white border border-slate-200", className)}>
       {children}
     </div>
   );
@@ -24,7 +24,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, description, action }: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between px-6 py-4 border-b border-[#E5E0D8]">
+    <div className="flex items-start justify-between px-6 py-4 border-b border-slate-200">
       <div>
         <h3 className="text-sm font-semibold" style={{ color: "#1A1612" }}>{title}</h3>
         {description && <p className="text-xs mt-0.5" style={{ color: "#9B9188" }}>{description}</p>}

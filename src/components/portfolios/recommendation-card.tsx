@@ -121,7 +121,7 @@ export function RecommendationCard({ rec, isExpanded, onToggle }: Props) {
         id={cardBodyId}
         className={`overflow-hidden transition-[max-height] duration-300 ease-in-out${isExpanded ? " max-h-[1000px]" : " max-h-0"}`}
       >
-        <div className="px-4 pb-4 border-t border-slate-100 pt-3 space-y-4">
+        <div className="px-4 pb-4 border-t border-slate-200 pt-3 space-y-4">
           {/* Full rationale */}
           <p className="text-sm text-slate-700 leading-relaxed">{rec.fullRationale}</p>
 

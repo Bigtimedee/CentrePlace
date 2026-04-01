@@ -276,7 +276,7 @@ export function IncomeGapCard() {
           </div>
 
           {/* Total income row */}
-          <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2">
+          <div className="mt-2 flex items-center justify-between border-t border-slate-200 pt-2">
             <span className="text-sm font-semibold text-slate-700">Total Income</span>
             <span className="text-sm font-bold text-slate-900 tabular-nums">
               {fmtMoney(totalIncome)}
