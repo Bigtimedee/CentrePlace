@@ -46,7 +46,7 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-50 w-60 flex flex-col" style={{ background: "#0E1623", borderRight: "1px solid #1A2640" }}>
       {/* Logo */}
       <div className="h-16 flex items-center gap-3 px-4" style={{ borderBottom: "1px solid #1A2640" }}>
-        <Image src="/logo.jpeg" alt="GPretire.com" width={36} height={36} className="h-9 w-9 rounded-full object-cover flex-shrink-0" />
+        <Image src="/logo.svg" alt="GPretire.com" width={36} height={36} className="h-9 w-9 rounded-lg flex-shrink-0" />
         <span className="text-base font-semibold tracking-tight text-white">GPretire.com</span>
       </div>
 
