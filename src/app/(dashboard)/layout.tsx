@@ -6,7 +6,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-slate-50">
       <Sidebar />
       <main className="pl-0 md:pl-60 pt-14 md:pt-0">
-        <div className="max-w-7xl mx-auto px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 py-6 md:px-8 md:py-8">
           <UsernameGate>
             {children}
           </UsernameGate>
