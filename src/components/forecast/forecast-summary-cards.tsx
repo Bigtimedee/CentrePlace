@@ -1,31 +1,7 @@
 "use client";
 
 import type { MonteCarloResult } from "@/server/simulation/engine/monte-carlo-types";
-
-interface MetricTileProps {
-  label: string;
-  value: string;
-  sub?: string;
-  color: "emerald" | "indigo" | "amber" | "rose" | "slate";
-}
-
-function MetricTile({ label, value, sub, color }: MetricTileProps) {
-  const valueClass = {
-    emerald: "text-emerald-600",
-    indigo: "text-indigo-600",
-    amber: "text-amber-600",
-    rose: "text-rose-600",
-    slate: "text-slate-500",
-  }[color];
-
-  return (
-    <div className="flex-1 min-w-[160px] rounded-xl border border-slate-200 bg-white px-5 py-4">
-      <p className="text-xs text-slate-600 mb-1">{label}</p>
-      <p className={`text-2xl font-semibold ${valueClass}`}>{value}</p>
-      {sub && <p className="text-xs text-slate-600 mt-1">{sub}</p>}
-    </div>
-  );
-}
+import { MetricTile } from "@/components/ui/metric-tile";
 
 interface Props {
   result: MonteCarloResult;
