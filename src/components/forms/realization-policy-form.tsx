@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +59,7 @@ function pct(n: number) {
 
 export function RealizationPolicyForm() {
   const { data: policy, isLoading, refetch } = trpc.realizationPolicy.get.useQuery();
-  const upsert = trpc.realizationPolicy.upsert.useMutation({ onSuccess: () => refetch() });
+  const upsert = trpc.realizationPolicy.upsert.useMutation({ onSuccess: () => { refetch(); toast.success("Policy saved"); } });
   const del = trpc.realizationPolicy.delete.useMutation({ onSuccess: () => refetch() });
 
   const [enabled, setEnabled] = useState(false);
@@ -213,9 +214,6 @@ export function RealizationPolicyForm() {
                 {upsert.isPending ? "Saving…" : "Save Policy"}
               </Button>
             </div>
-            {upsert.isSuccess && (
-              <p className="text-xs text-emerald-600 text-right">Saved</p>
-            )}
           </div>
         </CardBody>
       )}

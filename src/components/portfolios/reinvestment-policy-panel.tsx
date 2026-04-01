@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
 import { Card, CardHeader, CardBody } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,7 +83,7 @@ function AllocationSkeleton() {
 
 export function ReinvestmentPolicyPanel() {
   const { data: policy, isLoading, refetch } = trpc.realizationPolicy.get.useQuery();
-  const upsert = trpc.realizationPolicy.upsert.useMutation({ onSuccess: () => refetch() });
+  const upsert = trpc.realizationPolicy.upsert.useMutation({ onSuccess: () => { refetch(); toast.success("Policy saved"); } });
   const del = trpc.realizationPolicy.delete.useMutation({
     onSuccess: () => {
       setMode("self-directed");
@@ -469,9 +470,6 @@ export function ReinvestmentPolicyPanel() {
               </Button>
               {mode === "recommended" && (
                 <p className="text-xs text-muted-foreground">Rate fields are editable</p>
-              )}
-              {upsert.isSuccess && (
-                <p className="text-xs text-emerald-600">Saved</p>
               )}
             </div>
           </div>
