@@ -513,7 +513,8 @@ function GrantDetailPanel({
         {grant.vestingEvents.length === 0 && !addingVest ? (
           <p className="text-xs text-slate-600 italic">No vesting events added yet.</p>
         ) : (
-          <div className="space-y-1">
+          <div className="overflow-x-auto">
+          <div className="space-y-1 min-w-[400px]">
             {grant.vestingEvents
               .slice()
               .sort((a, b) => a.year - b.year || a.quarter.localeCompare(b.quarter))
@@ -533,6 +534,7 @@ function GrantDetailPanel({
                   </Button>
                 </div>
               ))}
+          </div>
           </div>
         )}
       </div>
@@ -577,7 +579,8 @@ function GrantDetailPanel({
         {grant.shareLots.length === 0 && !addingLot ? (
           <p className="text-xs text-slate-600 italic">No share lots added yet.</p>
         ) : (
-          <div className="space-y-1">
+          <div className="overflow-x-auto">
+          <div className="space-y-1 min-w-[500px]">
             {grant.shareLots
               .slice()
               .sort((a, b) => a.acquiredDate.localeCompare(b.acquiredDate))
@@ -601,6 +604,7 @@ function GrantDetailPanel({
                   </Button>
                 </div>
               ))}
+          </div>
           </div>
         )}
       </div>
