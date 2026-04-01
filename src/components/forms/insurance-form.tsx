@@ -278,7 +278,7 @@ export function InsuranceForm() {
                 ) : (
                   <div className="flex items-center justify-between px-6 py-3 hover:bg-slate-100">
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-3">
+                      <div className="flex items-baseline gap-3 flex-wrap">
                         <Shield className="h-3.5 w-3.5 text-slate-600 flex-shrink-0" />
                         <span className="text-sm font-medium text-slate-700">{policy.policyName}</span>
                         <span className="text-xs text-slate-600">{POLICY_TYPE_LABELS[policy.policyType]}</span>
@@ -313,7 +313,7 @@ export function InsuranceForm() {
       </Card>
 
       {data.length > 0 && (
-        <div className="flex items-center justify-end gap-6 text-sm text-slate-500">
+        <div className="flex items-center justify-end gap-6 flex-wrap text-sm text-slate-500">
           <span>Total death benefit: <span className="text-slate-700 font-semibold">{formatCurrency(totalDeathBenefit, true)}</span></span>
           {ilitBenefit > 0 && (
             <span>ILIT (excluded from estate): <span className="text-indigo-600 font-semibold">{formatCurrency(ilitBenefit, true)}</span></span>
