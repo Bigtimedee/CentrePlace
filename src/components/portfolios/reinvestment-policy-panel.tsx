@@ -274,7 +274,7 @@ export function ReinvestmentPolicyPanel() {
               <h4 className="text-sm font-medium text-foreground mb-3">
                 Equity (e.g. S&amp;P 500)
               </h4>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField label="Allocation">
                   {recLoading ? (
                     <AllocationSkeleton />
