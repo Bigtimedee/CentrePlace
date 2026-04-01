@@ -137,7 +137,7 @@ export function TaxEventTable({ projections }: Props) {
           {allEvents.length > 10 && (
             <button
               onClick={() => setShowAll(v => !v)}
-              className="mt-3 text-xs text-indigo-600 hover:text-indigo-500 transition-colors"
+              className="mt-3 text-xs text-indigo-600 hover:text-indigo-500 transition-colors cursor-pointer"
             >
               {showAll ? "Show fewer" : `Show all ${allEvents.length} events`}
             </button>

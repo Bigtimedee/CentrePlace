@@ -114,7 +114,7 @@ export function ScenarioCard(props: Props | AddButtonProps) {
     return (
       <button
         onClick={props.onAdd}
-        className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-600 hover:border-slate-300 hover:text-slate-700 transition-colors min-w-[200px]"
+        className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-5 py-4 text-sm text-slate-600 hover:border-slate-300 hover:text-slate-700 transition-colors min-w-[200px] cursor-pointer"
       >
         <Plus className="h-4 w-4" />
         Add Scenario
@@ -170,14 +170,14 @@ export function ScenarioCard(props: Props | AddButtonProps) {
         {!isBase && (
           <button
             onClick={onRemove}
-            className="text-slate-600 hover:text-slate-500 transition-colors ml-auto flex-shrink-0"
+            className="text-slate-600 hover:text-slate-500 transition-colors ml-auto flex-shrink-0 cursor-pointer"
           >
             <X className="h-3.5 w-3.5" />
           </button>
         )}
         <button
           onClick={() => setExpanded(v => !v)}
-          className="text-slate-600 hover:text-slate-500 transition-colors flex-shrink-0"
+          className="text-slate-600 hover:text-slate-500 transition-colors flex-shrink-0 cursor-pointer"
         >
           {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
         </button>
@@ -294,7 +294,7 @@ export function ScenarioCard(props: Props | AddButtonProps) {
           {!isBase && (
             <button
               onClick={() => onChange({ ...scenario, overrides: {} })}
-              className="w-full text-xs text-slate-600 hover:text-slate-500 text-center pt-1 transition-colors"
+              className="w-full text-xs text-slate-600 hover:text-slate-500 text-center pt-1 transition-colors cursor-pointer"
             >
               Reset to base
             </button>

@@ -154,7 +154,7 @@ export function ComparisonFIBreakdown({ runs }: Props) {
       {/* Header / toggle */}
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left"
+        className="w-full flex items-center justify-between px-6 py-4 text-left cursor-pointer"
       >
         <div>
           <p className="text-sm font-semibold text-slate-900">FI Formula Breakdown</p>

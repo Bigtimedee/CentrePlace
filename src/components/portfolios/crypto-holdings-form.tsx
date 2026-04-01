@@ -216,7 +216,7 @@ function CryptoHoldingForm({
         <button
           type="button"
           onClick={() => setShowAdvanced((v) => !v)}
-          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
         >
           {showAdvanced ? (
             <ChevronUp className="h-3.5 w-3.5" />

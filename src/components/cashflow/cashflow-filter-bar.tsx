@@ -31,7 +31,7 @@ export function CashflowFilterBar({ activeSources, onToggle, viewMode, onToggleV
             <button
               key={src}
               onClick={() => onToggle(src)}
-              className={`text-xs font-medium border rounded-full px-3 py-1 transition-colors ${
+              className={`text-xs font-medium border rounded-full px-3 py-1 transition-colors cursor-pointer ${
                 isActive
                   ? config.activeClass
                   : "bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-600"
@@ -49,7 +49,7 @@ export function CashflowFilterBar({ activeSources, onToggle, viewMode, onToggleV
 
       <button
         onClick={onToggleViewMode}
-        className="text-xs font-medium border rounded-full px-3 py-1 transition-colors bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-600"
+        className="text-xs font-medium border rounded-full px-3 py-1 transition-colors cursor-pointer bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-600"
       >
         View: {viewMode === "annual" ? "Annual" : "Quarterly"}
       </button>

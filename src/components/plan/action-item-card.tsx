@@ -70,7 +70,7 @@ export function ActionItemCard({ item, expanded = false, onToggle }: ActionItemC
       <button
         type="button"
         onClick={onToggle}
-        className="w-full text-left px-5 py-4 flex items-start gap-4"
+        className="w-full text-left px-5 py-4 flex items-start gap-4 cursor-pointer"
       >
         {/* Dot */}
         <div className={`mt-1 h-2 w-2 flex-shrink-0 rounded-full ${uc.dot}`} />

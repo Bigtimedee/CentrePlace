@@ -62,7 +62,7 @@ function RecommendationRow({ rec }: { rec: EstateRecommendation }) {
       {/* Collapsed header — always visible */}
       <button
         onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-start gap-3 px-4 py-4 text-left hover:bg-slate-100 transition-colors"
+        className="w-full flex items-start gap-3 px-4 py-4 text-left hover:bg-slate-100 transition-colors cursor-pointer"
       >
         <div className={`mt-0.5 flex-shrink-0 ${meta.color}`}>
           <Icon className="h-4 w-4" />
