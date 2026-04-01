@@ -48,7 +48,7 @@ export function HoldingsReviewModal({
   const totalValue = holdings.reduce((s, h) => s + h.marketValue, 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0E1623]/70 p-4">
       <div className="w-full max-w-3xl rounded-xl bg-white shadow-2xl flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b">
@@ -109,7 +109,7 @@ export function HoldingsReviewModal({
             <select
               value={selectedAccountId}
               onChange={(e) => setSelectedAccountId(e.target.value)}
-              className="rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]"
             >
               {accounts.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -129,7 +129,8 @@ export function HoldingsReviewModal({
             <button
               onClick={() => confirm.mutate({ statementId, accountId: selectedAccountId })}
               disabled={confirm.isPending || !selectedAccountId}
-              className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+              className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 hover:opacity-90"
+              style={{ background: "#1B3A6B" }}
             >
               <CheckCircle className="h-4 w-4" />
               {confirm.isPending ? "Saving…" : "Confirm & Save"}

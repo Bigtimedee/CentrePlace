@@ -55,7 +55,7 @@ export function Sidebar() {
         {itemsWithSectionHeader.map((item) => (
           <div key={item.href}>
             {item.showHeader && (
-              <p className="px-3 py-2 mt-3 text-xs font-medium tracking-widest uppercase" style={{ color: "#3D5478" }}>
+              <p className="px-3 py-2 mt-3 text-xs font-medium tracking-widest uppercase" style={{ color: "#6B8DB5" }}>
                 {item.section}
               </p>
             )}
@@ -68,8 +68,8 @@ export function Sidebar() {
                   : "hover:text-white"
               )}
               style={pathname === item.href
-                ? { background: "rgba(200, 164, 90, 0.12)", color: "#C8A45A" }
-                : { color: "#7A95B4" }
+                ? { background: "rgba(200, 164, 90, 0.18)", color: "#C8A45A" }
+                : { color: "#8AAED0" }
               }
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />

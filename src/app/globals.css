@@ -10,6 +10,16 @@
   --primary: #1B3A6B;
 }
 
+@theme inline {
+  --color-brand-bg: var(--background);
+  --color-brand-fg: var(--foreground);
+  --color-brand-surface: var(--surface);
+  --color-brand-border: var(--border);
+  --color-brand-muted: var(--muted);
+  --color-brand-accent: var(--accent);
+  --color-brand-primary: var(--primary);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

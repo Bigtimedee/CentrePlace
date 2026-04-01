@@ -55,13 +55,13 @@ export function ForecastSummaryCards({ result }: Props) {
       <MetricTile
         label="Favorable FI"
         value={p25FiYear ? String(p25FiYear) : "—"}
-        sub="75% of paths reach FI by this year"
+        sub="25% of paths reach FI by this year"
         color="emerald"
       />
       <MetricTile
         label="Challenging FI"
         value={p75FiYear ? String(p75FiYear) : "—"}
-        sub="25% of paths need until this year"
+        sub="75% of paths reach FI by this year"
         color="amber"
       />
     </div>

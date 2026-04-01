@@ -15,7 +15,7 @@ interface FormFieldProps {
 export function FormField({ label, hint, error, children, className, required }: FormFieldProps) {
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label className="text-sm font-medium text-slate-700">
+      <label className="text-sm font-medium" style={{ color: "#1A1612" }}>
         {label}
         {required && <span className="text-red-600 ml-1">*</span>}
       </label>

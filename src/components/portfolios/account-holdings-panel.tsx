@@ -13,35 +13,44 @@ interface Props {
 function AccountStrategyBanner({ accountType }: { accountType?: string | null }) {
   if (!accountType) return null;
 
-  let bgClass = "";
-  let textClass = "";
-  let guidance = "";
+  const strategyMap: Record<string, { className: string; guidance: string }> = {
+    taxable: {
+      className: "bg-blue-50 text-blue-700",
+      guidance: "Best for: Tax-managed equities, munis, low-turnover index funds",
+    },
+    traditional_ira: {
+      className: "bg-violet-50 text-violet-700",
+      guidance: "Best for: Bond funds, REITs, high-turnover funds — shelters ordinary income",
+    },
+    traditional_401k: {
+      className: "bg-violet-50 text-violet-700",
+      guidance: "Best for: Bond funds, REITs, high-turnover funds — shelters ordinary income",
+    },
+    sep_ira: {
+      className: "bg-violet-50 text-violet-700",
+      guidance: "Best for: Bond funds, REITs, high-turnover funds — shelters ordinary income",
+    },
+    solo_401k: {
+      className: "bg-violet-50 text-violet-700",
+      guidance: "Best for: Bond funds, REITs, high-turnover funds — shelters ordinary income",
+    },
+    roth_ira: {
+      className: "bg-emerald-50 text-emerald-700",
+      guidance: "Best for: High-growth equities, aggressive positions — tax-free compounding",
+    },
+    roth_401k: {
+      className: "bg-emerald-50 text-emerald-700",
+      guidance: "Best for: High-growth equities, aggressive positions — tax-free compounding",
+    },
+  };
 
-  if (accountType === "taxable") {
-    bgClass = "bg-blue-50";
-    textClass = "text-blue-700";
-    guidance = "Best for: Tax-managed equities, munis, low-turnover index funds";
-  } else if (
-    accountType === "traditional_ira" ||
-    accountType === "traditional_401k" ||
-    accountType === "sep_ira" ||
-    accountType === "solo_401k"
-  ) {
-    bgClass = "bg-violet-50";
-    textClass = "text-violet-700";
-    guidance = "Best for: Bond funds, REITs, high-turnover funds — shelters ordinary income";
-  } else if (accountType === "roth_ira" || accountType === "roth_401k") {
-    bgClass = "bg-emerald-50";
-    textClass = "text-emerald-700";
-    guidance = "Best for: High-growth equities, aggressive positions — tax-free compounding";
-  } else {
-    return null;
-  }
+  const strategy = accountType ? strategyMap[accountType] : undefined;
+  if (!strategy) return null;
 
   return (
-    <div className={`${bgClass} ${textClass} text-xs px-3 py-1.5 rounded-lg mb-3`}>
+    <div className={`${strategy.className} text-xs px-3 py-1.5 rounded-lg mb-3`}>
       <span className="font-semibold">Account strategy:</span>{" "}
-      <span>{guidance}</span>
+      <span>{strategy.guidance}</span>
     </div>
   );
 }
@@ -53,9 +62,9 @@ export function AccountHoldingsPanel({ accountId, accountName, accountType }: Pr
   const holdings = latestStatement?.holdings ?? [];
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+    <div className="rounded-xl border bg-white overflow-hidden shadow-sm" style={{ borderColor: "#E5E0D8" }}>
       {/* Account header bar */}
-      <div className="flex items-center justify-between px-5 py-3 bg-slate-50 border-b border-gray-100">
+      <div className="flex items-center justify-between px-5 py-3 bg-[#F5F3EE] border-b" style={{ borderColor: "#E5E0D8" }}>
         <div className="flex items-center gap-2">
           <svg className="h-4 w-4 text-slate-400 flex-shrink-0" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -75,8 +84,8 @@ export function AccountHoldingsPanel({ accountId, accountName, accountType }: Pr
         <AccountStrategyBanner accountType={accountType} />
         {holdings.length === 0 ? (
           <div className="space-y-3">
-            <p className="text-sm text-gray-400 italic">
-              No holdings imported yet. Upload a statement or add holdings manually.
+            <p className="text-sm italic" style={{ color: "#9B9188" }}>
+              No holdings imported yet — upload a statement or add holdings manually.
             </p>
             <HoldingsTable accountId={accountId} holdings={[]} onRefetch={refetch} accountType={accountType} />
           </div>
