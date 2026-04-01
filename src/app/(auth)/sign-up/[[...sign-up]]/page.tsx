@@ -110,11 +110,11 @@ function SignUpInner() {
 
         <div className="mb-8 text-center">
           <Image
-            src="/logo.jpeg"
+            src="/logo.svg"
             alt="GPretire.com"
             width={64}
             height={64}
-            className="w-16 h-16 rounded-full object-cover mx-auto mb-4"
+            className="w-16 h-16 rounded-xl mx-auto mb-4"
           />
           <h1 className="text-2xl font-semibold text-slate-100 mb-1">
             {phase === "no-ticket" ? "Invalid invitation" : "Create your account"}
