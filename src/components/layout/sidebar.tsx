@@ -62,13 +62,13 @@ export function Sidebar() {
             <Link
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                "flex items-center gap-3 py-2 rounded-md text-sm font-medium transition-colors",
                 pathname === item.href
-                  ? "text-white"
-                  : "hover:text-white"
+                  ? "border-l-[3px] pl-[9px] pr-3"
+                  : "px-3 hover:text-white"
               )}
               style={pathname === item.href
-                ? { background: "rgba(200, 164, 90, 0.18)", color: "#C8A45A" }
+                ? { background: "rgba(200, 164, 90, 0.22)", borderColor: "#C8A45A", color: "#C8A45A" }
                 : { color: "#8AAED0" }
               }
             >
@@ -85,13 +85,13 @@ export function Sidebar() {
           <Link
             href="/admin"
             className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              "flex items-center gap-3 py-2 rounded-md text-sm font-medium transition-colors",
               pathname.startsWith("/admin")
-                ? "text-white"
-                : "hover:text-white"
+                ? "border-l-[3px] pl-[9px] pr-3"
+                : "px-3 hover:text-white"
             )}
             style={pathname.startsWith("/admin")
-              ? { background: "rgba(200, 164, 90, 0.12)", color: "#C8A45A" }
+              ? { background: "rgba(200, 164, 90, 0.22)", borderColor: "#C8A45A", color: "#C8A45A" }
               : { color: "#3D5478" }
             }
           >
