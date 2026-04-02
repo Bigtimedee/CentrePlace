@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
             <p className="text-slate-600 text-xs mb-6">Check your inbox at <strong className="text-slate-400">{email}</strong></p>
             <Link
               href="/reset-password"
-              className="inline-block rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
+              className="inline-block rounded-lg bg-[#C8A45A] px-5 py-2.5 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] transition-colors"
             >
               Enter reset code →
             </Link>
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
               />
             </div>
 
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full rounded-lg bg-[#C8A45A] px-4 py-2.5 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "Sending…" : "Send reset code"}
             </button>
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
 
         <p className="mt-6 text-center text-sm text-slate-600">
           Remember your password?{" "}
-          <Link href="/sign-in" className="text-indigo-400 hover:text-indigo-300 transition-colors">
+          <Link href="/sign-in" className="text-[#C8A45A] hover:text-amber-300 transition-colors">
             Sign in
           </Link>
         </p>

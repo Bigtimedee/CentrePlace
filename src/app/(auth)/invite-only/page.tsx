@@ -16,7 +16,7 @@ export default function InviteOnlyPage() {
 
         <Link
           href="/sign-in"
-          className="inline-block rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
+          className="inline-block rounded-lg bg-[#C8A45A] px-5 py-2.5 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] transition-colors"
         >
           Sign in to existing account
         </Link>

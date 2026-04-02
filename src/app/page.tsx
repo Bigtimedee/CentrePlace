@@ -19,7 +19,7 @@ export default async function RootPage() {
         </div>
         <Link
           href="/sign-in"
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
+          className="rounded-lg bg-[#C8A45A] px-4 py-2 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] transition-colors"
         >
           Sign in
         </Link>
@@ -44,7 +44,7 @@ export default async function RootPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/sign-in"
-            className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 transition-colors"
+            className="rounded-lg bg-[#C8A45A] px-6 py-3 text-sm font-semibold text-[#1A0F28] hover:bg-[#D4A574] transition-colors"
           >
             Sign in to your account
           </Link>
@@ -55,7 +55,7 @@ export default async function RootPage() {
       {/* Features */}
       <section className="max-w-5xl mx-auto w-full px-6 pb-24 grid grid-cols-1 sm:grid-cols-2 gap-5">
         <FeatureCard
-          icon={<TrendingUp className="w-5 h-5 text-indigo-400" />}
+          icon={<TrendingUp className="w-5 h-5 text-[#C8A45A]" />}
           title="Carry & LP Modeling"
           description="Map every fund, tranche, and vesting schedule. See exactly when carry and LP distributions hit your bank account — and how much after taxes."
         />

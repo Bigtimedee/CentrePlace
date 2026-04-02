@@ -12,8 +12,8 @@ export default function AdminPage() {
           href="/admin/users"
           className="rounded-xl border border-slate-700 bg-slate-900 p-6 hover:border-slate-600 transition-colors group"
         >
-          <div className="w-10 h-10 rounded-lg bg-indigo-900/40 border border-indigo-700/50 flex items-center justify-center mb-4">
-            <Users className="w-5 h-5 text-indigo-400" />
+          <div className="w-10 h-10 rounded-lg bg-[#2D1B3D]/40 border border-[#C8A45A]/30 flex items-center justify-center mb-4">
+            <Users className="w-5 h-5 text-[#C8A45A]" />
           </div>
           <h2 className="text-slate-100 font-medium mb-1 group-hover:text-white">User Management</h2>
           <p className="text-slate-600 text-sm">View, invite, suspend, and remove users.</p>

@@ -110,7 +110,7 @@ function SignUpInner() {
 
         <div className="mb-8 text-center">
           <Image
-            src="/logo.svg"
+            src="/GPretire.jpeg"
             alt="GPretire.com"
             width={64}
             height={64}
@@ -133,7 +133,7 @@ function SignUpInner() {
             </p>
             <Link
               href="/sign-in"
-              className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm"
+              className="text-[#C8A45A] hover:text-amber-300 transition-colors text-sm"
             >
               Sign in instead →
             </Link>
@@ -165,7 +165,7 @@ function SignUpInner() {
             <button
               onClick={() => setPhase("password")}
               disabled={loading}
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 transition-colors"
+              className="w-full rounded-lg bg-[#C8A45A] px-4 py-2.5 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] disabled:opacity-50 transition-colors"
             >
               Create account with password
             </button>
@@ -185,7 +185,7 @@ function SignUpInner() {
                   value={firstName}
                   onChange={e => setFirstName(e.target.value)}
                   placeholder="Jane"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
                 />
               </div>
               <div>
@@ -196,7 +196,7 @@ function SignUpInner() {
                   value={lastName}
                   onChange={e => setLastName(e.target.value)}
                   placeholder="Smith"
-                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
                 />
               </div>
             </div>
@@ -209,7 +209,7 @@ function SignUpInner() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
               />
             </div>
 
@@ -221,7 +221,7 @@ function SignUpInner() {
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 placeholder="Repeat your password"
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
               />
             </div>
 
@@ -230,7 +230,7 @@ function SignUpInner() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full rounded-lg bg-[#C8A45A] px-4 py-2.5 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? "Creating account…" : "Create account"}
             </button>
@@ -248,7 +248,7 @@ function SignUpInner() {
         {phase !== "no-ticket" && (
           <p className="mt-6 text-center text-sm text-slate-600">
             Already have an account?{" "}
-            <Link href="/sign-in" className="text-indigo-400 hover:text-indigo-300 transition-colors">
+            <Link href="/sign-in" className="text-[#C8A45A] hover:text-amber-300 transition-colors">
               Sign in
             </Link>
           </p>
