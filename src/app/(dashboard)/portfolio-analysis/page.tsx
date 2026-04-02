@@ -4,6 +4,7 @@ import { PortfolioIntelligencePanel } from "@/components/portfolios/portfolio-in
 import { IncomeOpportunitiesPanel } from "@/components/portfolios/income-opportunities-panel";
 import { HoldingRecommendationsPanel } from "@/components/portfolios/holding-recommendations-panel";
 import { AgentAnalysisPanel } from "@/components/portfolios/agent-analysis-panel";
+import { ResearchPanel } from "@/components/research/research-panel";
 
 export default function PortfolioAnalysisPage() {
   return (
@@ -35,6 +36,15 @@ export default function PortfolioAnalysisPage() {
           <HoldingRecommendationsPanel />
           <AgentAnalysisPanel />
         </div>
+      </div>
+
+      {/* ── Financial Research ───────────────────────────────────────────────── */}
+      <div className="mt-10">
+        <div className="flex items-center gap-3 mb-5">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-400">Financial Research</h2>
+          <div className="flex-1 h-px bg-slate-100" />
+        </div>
+        <ResearchPanel />
       </div>
 
       <NextSectionBanner

@@ -71,6 +71,13 @@
       "when": 1775166134950,
       "tag": "0009_left_unicorn",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1775168005393,
+      "tag": "0010_lethal_arclight",
+      "breakpoints": true
     }
   ]
 }
