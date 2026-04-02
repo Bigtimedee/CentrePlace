@@ -50,10 +50,10 @@ export function Sidebar() {
       {/* Mobile topbar — visible only on small screens */}
       <div
         className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 h-14 md:hidden"
-        style={{ background: "#0E1623", borderBottom: "1px solid #1A2640" }}
+        style={{ background: "#1A0F28", borderBottom: "1px solid #2D1B3D" }}
       >
         <div className="flex items-center gap-2.5">
-          <Image src="/logo.svg" alt="GPretire.com" width={28} height={28} className="h-7 w-7 rounded-md flex-shrink-0" />
+          <Image src="/GPretire.jpeg" alt="GPretire.com" width={28} height={28} className="h-7 w-7 rounded-md flex-shrink-0" />
           <span className="text-sm font-semibold tracking-tight text-white">GPretire.com</span>
         </div>
         <button
@@ -68,7 +68,7 @@ export function Sidebar() {
       {/* Mobile backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-950/60 md:hidden"
+          className="fixed inset-0 z-40 bg-purple-950/70 md:hidden"
           onClick={close}
           aria-hidden
         />
@@ -81,17 +81,17 @@ export function Sidebar() {
           "md:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
-        style={{ background: "#0E1623", borderRight: "1px solid #1A2640" }}
+        style={{ background: "#1A0F28", borderRight: "1px solid #2D1B3D" }}
       >
         {/* Logo — desktop only (mobile has topbar) */}
-        <div className="h-16 hidden md:flex items-center gap-3 px-4" style={{ borderBottom: "1px solid #1A2640" }}>
-          <Image src="/logo.svg" alt="GPretire.com" width={36} height={36} className="h-9 w-9 rounded-lg flex-shrink-0" />
+        <div className="h-16 hidden md:flex items-center gap-3 px-4" style={{ borderBottom: "1px solid #2D1B3D" }}>
+          <Image src="/GPretire.jpeg" alt="GPretire.com" width={36} height={36} className="h-9 w-9 rounded-lg flex-shrink-0" />
           <span className="text-base font-semibold tracking-tight text-white">GPretire.com</span>
         </div>
 
         {/* Logo — mobile sidebar header */}
-        <div className="h-14 flex md:hidden items-center gap-3 px-4" style={{ borderBottom: "1px solid #1A2640" }}>
-          <Image src="/logo.svg" alt="GPretire.com" width={28} height={28} className="h-7 w-7 rounded-md flex-shrink-0" />
+        <div className="h-14 flex md:hidden items-center gap-3 px-4" style={{ borderBottom: "1px solid #2D1B3D" }}>
+          <Image src="/GPretire.jpeg" alt="GPretire.com" width={28} height={28} className="h-7 w-7 rounded-md flex-shrink-0" />
           <span className="text-sm font-semibold tracking-tight text-white">GPretire.com</span>
         </div>
 
@@ -100,7 +100,7 @@ export function Sidebar() {
           {itemsWithSectionHeader.map((item) => (
             <div key={item.href}>
               {item.showHeader && (
-                <p className="px-3 py-2 mt-3 text-xs font-medium tracking-widest uppercase" style={{ color: "#6B8DB5" }}>
+                <p className="px-3 py-2 mt-3 text-xs font-medium tracking-widest uppercase" style={{ color: "#7A6B82" }}>
                   {item.section}
                 </p>
               )}
@@ -111,11 +111,11 @@ export function Sidebar() {
                   "flex items-center gap-3 py-2 rounded-md text-sm font-medium transition-colors",
                   pathname === item.href
                     ? "border-l-[3px] pl-[9px] pr-3"
-                    : "px-3 hover:text-white"
+                    : "px-3 hover:text-amber-200"
                 )}
                 style={pathname === item.href
                   ? { background: "rgba(200, 164, 90, 0.22)", borderColor: "#C8A45A", color: "#C8A45A" }
-                  : { color: "#8AAED0" }
+                  : { color: "rgba(200,164,90,0.55)" }
                 }
               >
                 <item.icon className="h-4 w-4 flex-shrink-0" />
@@ -135,11 +135,11 @@ export function Sidebar() {
                 "flex items-center gap-3 py-2 rounded-md text-sm font-medium transition-colors",
                 pathname.startsWith("/admin")
                   ? "border-l-[3px] pl-[9px] pr-3"
-                  : "px-3 hover:text-white"
+                  : "px-3 hover:text-amber-200"
               )}
               style={pathname.startsWith("/admin")
                 ? { background: "rgba(200, 164, 90, 0.22)", borderColor: "#C8A45A", color: "#C8A45A" }
-                : { color: "#3D5478" }
+                : { color: "rgba(200,164,90,0.35)" }
               }
             >
               <Settings className="h-4 w-4 flex-shrink-0" />
@@ -149,7 +149,7 @@ export function Sidebar() {
         )}
 
         {/* User button */}
-        <div className="h-16 flex items-center px-6" style={{ borderTop: "1px solid #1A2640" }}>
+        <div className="h-16 flex items-center px-6" style={{ borderTop: "1px solid #2D1B3D" }}>
           <UserButton />
         </div>
       </aside>
