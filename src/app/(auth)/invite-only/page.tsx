@@ -6,7 +6,7 @@ export default function InviteOnlyPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-950">
       <div className="max-w-md w-full mx-auto px-6 text-center">
         <div className="mb-6">
-          <Image src="/logo.jpeg" alt="GPretire.com" width={80} height={80} className="w-20 h-20 rounded-full object-cover mx-auto mb-4" />
+          <Image src="/GPRetire.jpeg" alt="GPretire.com" width={80} height={80} className="w-20 h-20 rounded-full object-cover mx-auto mb-4" />
           <h1 className="text-2xl font-semibold text-slate-100 mb-2">Access by invitation only</h1>
           <p className="text-slate-400 text-sm leading-relaxed">
             GPretire.com is a private platform. New accounts are created by invitation from an administrator.

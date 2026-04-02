@@ -15,7 +15,7 @@ function AccountStrategyBanner({ accountType }: { accountType?: string | null })
 
   const strategyMap: Record<string, { className: string; guidance: string }> = {
     taxable: {
-      className: "bg-blue-50 text-blue-700",
+      className: "bg-[#FFF8EE] text-[#C8A45A]",
       guidance: "Best for: Tax-managed equities, munis, low-turnover index funds",
     },
     traditional_ira: {

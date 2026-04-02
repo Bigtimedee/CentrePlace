@@ -29,10 +29,10 @@ export function UsernameGate({ children }: { children: React.ReactNode }) {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm">
-        <div className="w-full max-w-sm mx-4 rounded-2xl border border-slate-700 bg-slate-900 p-8 shadow-2xl">
-          <h2 className="text-xl font-semibold text-slate-100 mb-1">Welcome — one last step</h2>
-          <p className="text-slate-400 text-sm mb-6">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A0F28]/80 backdrop-blur-sm">
+        <div className="w-full max-w-sm mx-4 rounded-2xl border border-[#4A3257] bg-[#2D1B3D] p-8 shadow-2xl">
+          <h2 className="text-xl font-semibold text-[#E8D5B0] mb-1">Welcome — one last step</h2>
+          <p className="text-[#7A6B82] text-sm mb-6">
             Choose a display name. This is how you'll appear in the app.
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -45,7 +45,7 @@ export function UsernameGate({ children }: { children: React.ReactNode }) {
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder="e.g. Dave M."
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
+              className="w-full rounded-lg border border-[#4A3257] bg-[#1E1230] px-3.5 py-2.5 text-sm text-[#E8D5B0] placeholder-[#7A6B82] focus:border-[#C8A45A] focus:outline-none"
             />
             {error && <p className="text-sm text-red-400">{error}</p>}
             <button

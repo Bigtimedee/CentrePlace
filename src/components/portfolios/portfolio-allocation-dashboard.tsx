@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { HoldingsBreakdownChart } from "./holdings-breakdown-chart";
 
 const ASSET_CLASS_COLORS: Record<string, string> = {
-  equity: "bg-blue-100 text-blue-800",
+  equity: "bg-[#FFF3D8] text-[#C8A45A]",
   bond: "bg-green-100 text-green-800",
   alt: "bg-purple-100 text-purple-800",
   cash: "bg-gray-100 text-gray-700",
@@ -73,7 +73,7 @@ export function PortfolioAllocationDashboard() {
                   <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
-                        assetClass === "equity" ? "bg-blue-400"
+                        assetClass === "equity" ? "bg-[#C8A45A]"
                         : assetClass === "bond" ? "bg-green-400"
                         : assetClass === "alt" ? "bg-purple-400"
                         : "bg-gray-300"

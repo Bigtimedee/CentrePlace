@@ -26,7 +26,7 @@ const GRANT_TYPE_LABELS: Record<GrantType, string> = {
 };
 
 const GRANT_TYPE_COLORS: Record<GrantType, string> = {
-  rsu: "bg-blue-50 text-blue-700",
+  rsu: "bg-[#FFF8EE] text-[#C8A45A]",
   iso: "bg-emerald-50 text-emerald-700",
   nso: "bg-amber-50 text-amber-700",
   warrant: "bg-purple-50 text-purple-700",
@@ -417,7 +417,7 @@ function ShareLotForm({
               type="checkbox"
               checked={form.isIsoQualifying}
               onChange={(e) => set({ isIsoQualifying: e.target.checked })}
-              className="h-4 w-4 rounded border-slate-300 bg-white text-blue-500"
+              className="h-4 w-4 rounded border-slate-300 bg-white text-[#C8A45A]"
             />
             <span className="text-sm text-slate-700">Qualifying</span>
           </label>

@@ -20,7 +20,7 @@ function actionBadgeClasses(action: HoldingRecommendation["action"]): string {
     case "HOLD":
       return `${base} bg-slate-100 text-slate-600`;
     case "REPLACE":
-      return `${base} bg-blue-100 text-blue-800`;
+      return `${base} bg-[#FFF3D8] text-[#C8A45A]`;
     case "SELL":
       return `${base} bg-red-100 text-red-700`;
     default:
@@ -59,7 +59,7 @@ function CitationBlock({ citation }: { citation: Citation }) {
             href={citation.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold text-blue-700 hover:underline"
+            className="text-sm font-semibold text-[#C8A45A] hover:underline"
           >
             {citation.bookTitle}
           </a>
@@ -127,13 +127,13 @@ export function RecommendationCard({ rec, isExpanded, onToggle }: Props) {
 
           {/* Alternative row for REPLACE */}
           {rec.action === "REPLACE" && rec.alternativeTicker && (
-            <div className="flex items-center gap-2 rounded-md bg-blue-50 border border-blue-100 px-3 py-2 text-sm">
-              <span className="font-medium text-blue-800">Alternative:</span>
-              <span className="font-mono font-semibold text-blue-900">{rec.alternativeTicker}</span>
+            <div className="flex items-center gap-2 rounded-md bg-[#FFF8EE] border border-[#D4B896] px-3 py-2 text-sm">
+              <span className="font-medium text-[#C8A45A]">Alternative:</span>
+              <span className="font-mono font-semibold text-[#C8A45A]">{rec.alternativeTicker}</span>
               {rec.alternativeSecurityName && (
                 <>
-                  <span className="text-blue-700">&mdash;</span>
-                  <span className="text-blue-700">{rec.alternativeSecurityName}</span>
+                  <span className="text-[#7A6B82]">&mdash;</span>
+                  <span className="text-[#7A6B82]">{rec.alternativeSecurityName}</span>
                 </>
               )}
             </div>

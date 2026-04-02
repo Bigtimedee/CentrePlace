@@ -14,7 +14,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         ref={ref}
         className={cn(
           "w-full bg-white border border-slate-300 text-slate-900 rounded-md px-3 py-2 text-sm",
-          "focus:outline-none focus:ring-2 focus:ring-[#1B3A6B] focus:border-transparent",
+          "focus:outline-none focus:ring-2 focus:ring-[#C8A45A] focus:border-transparent",
           "disabled:opacity-50 disabled:cursor-not-allowed appearance-none",
           error && "border-red-500",
           className

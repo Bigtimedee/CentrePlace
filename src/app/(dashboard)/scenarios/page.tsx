@@ -74,7 +74,7 @@ export default function ScenariosPage() {
         {/* Scenario control bar */}
         <Card>
           <CardBody>
-            <p className="text-xs text-slate-600 mb-4">
+            <p className="text-xs text-[#7A6B82] mb-4">
               Each scenario runs a full 40-year simulation with your live data + any overrides you set below.
               Empty overrides = your live data as-is.
             </p>
@@ -98,7 +98,7 @@ export default function ScenariosPage() {
 
         {/* Error state */}
         {error && (
-          <div className="rounded-xl border border-slate-800 bg-slate-900 px-6 py-10 text-center text-sm text-slate-400">
+          <div className="rounded-xl border border-[#4A3257] bg-[#2D1B3D] px-6 py-10 text-center text-sm text-[#7A6B82]">
             {isProfileMissing ? (
               <>
                 <p className="mb-3">Complete your profile to run scenario comparisons.</p>
@@ -117,7 +117,7 @@ export default function ScenariosPage() {
 
         {/* Loading state */}
         {isLoading && !error && (
-          <div className="flex items-center justify-center py-16 text-slate-600 text-sm">
+          <div className="flex items-center justify-center py-16 text-[#7A6B82] text-sm">
             <svg className="animate-spin h-5 w-5 mr-3 text-[#C8A45A]" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />

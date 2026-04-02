@@ -15,14 +15,14 @@ export function NextSectionBanner({ href, label, description }: NextSectionBanne
       href={href}
       className="group mt-10 flex items-center justify-between rounded-xl border bg-white px-6 py-5 transition-all hover:bg-[#F5F3EE]"
       style={{ borderColor: "#E5E0D8" }}
-      onMouseEnter={e => (e.currentTarget.style.borderColor = "#1B3A6B")}
+      onMouseEnter={e => (e.currentTarget.style.borderColor = "#C8A45A")}
       onMouseLeave={e => (e.currentTarget.style.borderColor = "#E5E0D8")}
     >
       <div>
         <p className="mb-1 text-xs font-medium uppercase tracking-widest text-slate-600">
           Up next
         </p>
-        <p className="text-base font-semibold text-slate-900 group-hover:text-[#1B3A6B] transition-colors">
+        <p className="text-base font-semibold text-slate-900 group-hover:text-[#C8A45A] transition-colors">
           {label}
         </p>
         <p className="mt-0.5 text-sm text-slate-600">{description}</p>

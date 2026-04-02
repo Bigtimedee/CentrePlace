@@ -27,7 +27,7 @@ function GapBadge({ gap }: { gap: number }) {
   }
   if (gap < -0.03) {
     return (
-      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+      <span className="inline-flex items-center rounded-full bg-[#FFF3D8] px-2 py-0.5 text-xs font-medium text-[#C8A45A]">
         overweight
       </span>
     );
@@ -51,7 +51,7 @@ function AllocationRow({ g }: { g: AllocationGap }) {
       <td className="py-2 text-right text-slate-700">{formatPct(g.current)}</td>
       <td className="py-2 text-right text-slate-700">{formatPct(g.recommended)}</td>
       <td className="py-2 text-right text-slate-700">
-        <span className={g.gap > 0 ? "text-amber-700" : g.gap < 0 ? "text-blue-700" : "text-green-700"}>
+        <span className={g.gap > 0 ? "text-amber-700" : g.gap < 0 ? "text-[#C8A45A]" : "text-green-700"}>
           {g.gap > 0 ? "+" : ""}{formatPct(g.gap)}
         </span>
       </td>

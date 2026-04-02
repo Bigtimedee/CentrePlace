@@ -26,8 +26,8 @@ function StatusBadge({ status }: { status: string }) {
   }
   if (status === "running") {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FFF3D8] px-2 py-0.5 text-xs font-medium text-[#C8A45A]">
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#C8A45A]" />
         running
       </span>
     );
@@ -180,7 +180,7 @@ export function AgentAnalysisPanel() {
         <button
           onClick={() => startMutation.mutate()}
           disabled={isActive || startMutation.isPending || jobLoading}
-          className="flex shrink-0 items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex shrink-0 items-center gap-2 rounded-lg bg-[#C8A45A] px-4 py-2 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {(isActive || startMutation.isPending) && <Spinner />}
           {isActive ? "Analyzing..." : "Run Analysis"}
@@ -219,7 +219,7 @@ export function AgentAnalysisPanel() {
           )}
 
           {isActive && (
-            <div className="flex items-center gap-2 rounded-lg bg-blue-50 p-4 text-sm text-blue-700">
+            <div className="flex items-center gap-2 rounded-lg bg-[#FFF8EE] p-4 text-sm text-[#C8A45A]">
               <Spinner />
               <span>Analysis in progress. This typically takes 2 to 5 minutes. This page will update automatically.</span>
             </div>

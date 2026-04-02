@@ -19,7 +19,7 @@ export default function Error({
       <p className="text-gray-500">An unexpected error occurred. Please try again.</p>
       <button
         onClick={reset}
-        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        className="rounded-md bg-[#C8A45A] px-4 py-2 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574]"
       >
         Try again
       </button>

@@ -53,7 +53,7 @@ const EMPTY: FormState = {
 };
 
 const ASSET_CLASS_COLORS: Record<string, string> = {
-  equity: "bg-blue-100 text-blue-800",
+  equity: "bg-[#FFF3D8] text-[#C8A45A]",
   bond: "bg-green-100 text-green-800",
   alt: "bg-purple-100 text-purple-800",
   cash: "bg-gray-100 text-gray-700",
