@@ -190,12 +190,12 @@ export function HoldingRecommendationsPanel() {
   ];
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm ring-1 ring-indigo-50">
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm ring-1 ring-amber-50">
       {/* Panel header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-6">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#C8A45A]">
               <svg className="h-4 w-4 text-white" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -321,7 +321,7 @@ export function HoldingRecommendationsPanel() {
                   aria-pressed={activeFilter === f.value}
                   className={
                     activeFilter === f.value
-                      ? "inline-flex items-center rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 cursor-pointer transition-colors duration-150"
+                      ? "inline-flex items-center rounded-full border border-[#D4B896] bg-[#FFF3D8] px-3 py-1 text-xs font-medium text-[#C8A45A] cursor-pointer transition-colors duration-150"
                       : "inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600 cursor-pointer transition-colors duration-150 hover:bg-slate-50 hover:border-slate-300"
                   }
                 >
@@ -337,7 +337,7 @@ export function HoldingRecommendationsPanel() {
                 id="rec-sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortValue)}
-                className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
               >
                 <option value="urgency">Urgency (High first)</option>
                 <option value="action">Action Type</option>

@@ -64,7 +64,7 @@ export function UserTable({ users }: { users: UserRow[] }) {
                   <div className="text-slate-900 font-medium">{name}</div>
                   <div className="text-slate-600 text-xs">{user.email}</div>
                   {user.role === "admin" && (
-                    <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-xs bg-indigo-50 text-indigo-600 border border-indigo-200">
+                    <span className="inline-block mt-0.5 px-1.5 py-0.5 rounded text-xs bg-[#FFF3D8] text-[#C8A45A] border border-[#D4B896]">
                       admin
                     </span>
                   )}

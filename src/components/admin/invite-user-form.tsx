@@ -32,7 +32,7 @@ export function InviteUserForm() {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 max-w-md">
       <h2 className="text-slate-900 font-medium mb-4 flex items-center gap-2">
-        <Mail className="w-4 h-4 text-indigo-600" />
+        <Mail className="w-4 h-4 text-[#C8A45A]" />
         Invite a new user
       </h2>
       <form onSubmit={handleSubmit} className="flex gap-3">
@@ -42,12 +42,12 @@ export function InviteUserForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="user@example.com"
-          className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+          className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
         />
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="rounded-lg bg-[#C8A45A] px-4 py-2 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? "Sending…" : "Send invite"}
         </button>

@@ -45,13 +45,13 @@ export function UsernameGate({ children }: { children: React.ReactNode }) {
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder="e.g. Dave M."
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-[#C8A45A] focus:outline-none"
             />
             {error && <p className="text-sm text-red-400">{error}</p>}
             <button
               type="submit"
               disabled={setUsername.isPending || value.trim().length < 2}
-              className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full rounded-lg bg-[#C8A45A] px-4 py-2.5 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {setUsername.isPending ? "Saving…" : "Continue"}
             </button>

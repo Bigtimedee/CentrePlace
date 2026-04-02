@@ -144,7 +144,7 @@ export function ActionItemCard({ item, expanded = false, onToggle }: ActionItemC
           <div className="mt-4">
             <Link
               href={item.deepLinkHref}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#C8A45A] hover:text-amber-400 transition-colors"
             >
               {item.deepLinkLabel}
               <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

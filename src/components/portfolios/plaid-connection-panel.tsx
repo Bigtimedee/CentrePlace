@@ -209,7 +209,7 @@ export function PlaidConnectionPanel() {
       <Card>
         <CardBody>
           <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
-            <RefreshCw className="h-8 w-8 text-indigo-400 animate-spin" />
+            <RefreshCw className="h-8 w-8 text-[#C8A45A] animate-spin" />
             <div>
               <p className="text-sm font-medium text-foreground">Extracting data and disconnecting…</p>
               <p className="text-xs text-muted-foreground mt-1">

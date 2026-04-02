@@ -160,20 +160,20 @@ function EditRow({
     ? previewValue - costBasisNum : null;
 
   return (
-    <tr className="bg-indigo-50">
+    <tr className="bg-[#FFF3D8]">
       <td className="px-3 py-2">
         <input
           value={form.ticker}
           onChange={set("ticker")}
           placeholder="TICKER"
-          className="w-24 rounded border border-indigo-200 px-2 py-1 text-xs font-mono uppercase focus:outline-none focus:ring-1 focus:ring-indigo-400"
+          className="w-24 rounded border border-[#D4B896] px-2 py-1 text-xs font-mono uppercase focus:outline-none focus:ring-1 focus:ring-amber-400"
         />
       </td>
       <td className="px-3 py-2">
         <input
           value={form.securityName}
           onChange={set("securityName")}
-          className="w-full min-w-[180px] rounded border border-indigo-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400"
+          className="w-full min-w-[180px] rounded border border-[#D4B896] px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400"
         />
       </td>
       <td className="px-3 py-2">
@@ -182,7 +182,7 @@ function EditRow({
           onChange={set("costBasis")}
           type="number"
           placeholder="optional"
-          className="w-28 rounded border border-indigo-200 px-2 py-1 text-xs text-right focus:outline-none focus:ring-1 focus:ring-indigo-400"
+          className="w-28 rounded border border-[#D4B896] px-2 py-1 text-xs text-right focus:outline-none focus:ring-1 focus:ring-amber-400"
         />
       </td>
       <td className="px-3 py-2">
@@ -191,7 +191,7 @@ function EditRow({
           onChange={set("shares")}
           type="number"
           placeholder="—"
-          className="w-24 rounded border border-indigo-200 px-2 py-1 text-xs text-right focus:outline-none focus:ring-1 focus:ring-indigo-400"
+          className="w-24 rounded border border-[#D4B896] px-2 py-1 text-xs text-right focus:outline-none focus:ring-1 focus:ring-amber-400"
         />
       </td>
       {/* Today's Value — live preview based on shares × stored price */}
@@ -398,7 +398,7 @@ export function HoldingsTable({ accountId, holdings, onRefetch, accountType }: P
       <div className="flex items-center justify-between">
         <button
           onClick={() => setAdding(true)}
-          className="flex items-center gap-1 rounded px-2 py-1 text-xs text-indigo-600 hover:bg-indigo-50 font-medium"
+          className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[#C8A45A] hover:bg-[#FFF3D8] font-medium"
         >
           <Plus className="h-3.5 w-3.5" />
           Add Holding
@@ -576,7 +576,7 @@ function HoldingRow({
         <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={onEdit}
-            className="rounded p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50"
+            className="rounded p-1 text-slate-400 hover:text-[#C8A45A] hover:bg-[#FFF3D8]"
             title="Edit"
           >
             <Pencil className="h-3.5 w-3.5" />

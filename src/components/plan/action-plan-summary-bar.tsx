@@ -44,7 +44,7 @@ function MetricTile({
 
 function FIProgressBar({ pctFunded, isFI }: { pctFunded: number; isFI: boolean }) {
   const pct = Math.round(pctFunded * 100);
-  const barColor = isFI ? "bg-emerald-500" : pct >= 75 ? "bg-indigo-500" : pct >= 50 ? "bg-amber-500" : "bg-rose-500";
+  const barColor = isFI ? "bg-emerald-500" : pct >= 75 ? "bg-[#C8A45A]" : pct >= 50 ? "bg-amber-500" : "bg-rose-500";
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
@@ -87,7 +87,7 @@ export function ActionPlanSummaryBar({ result }: ActionPlanSummaryBarProps) {
         label={`${planYear} Quantified Opportunity`}
         value={totalQuantifiedDollarImpact > 0 ? formatCurrency(totalQuantifiedDollarImpact) : "—"}
         sub={`across ${items.length} action item${items.length !== 1 ? "s" : ""}`}
-        accent="text-indigo-600"
+        accent="text-[#C8A45A]"
       />
 
       <MetricTile

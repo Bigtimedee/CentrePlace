@@ -176,9 +176,9 @@ export function ReinvestmentPolicyPanel() {
                   aria-checked={mode === "self-directed"}
                   onClick={() => setMode("self-directed")}
                   className={[
-                    "px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
+                    "px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400",
                     mode === "self-directed"
-                      ? "bg-indigo-600 text-white shadow-sm"
+                      ? "bg-[#C8A45A] text-[#1A0F28] shadow-sm"
                       : "bg-transparent text-slate-600 hover:text-slate-900",
                   ].join(" ")}
                 >
@@ -190,9 +190,9 @@ export function ReinvestmentPolicyPanel() {
                   aria-checked={mode === "recommended"}
                   onClick={() => setMode("recommended")}
                   className={[
-                    "px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
+                    "px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400",
                     mode === "recommended"
-                      ? "bg-indigo-600 text-white shadow-sm"
+                      ? "bg-[#C8A45A] text-[#1A0F28] shadow-sm"
                       : "bg-transparent text-slate-600 hover:text-slate-900",
                   ].join(" ")}
                 >
@@ -225,7 +225,7 @@ export function ReinvestmentPolicyPanel() {
             {/* Recommended mode banner */}
             {mode === "recommended" && (
               <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-4">
-                <Sparkles className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
+                <Sparkles className="h-4 w-4 text-[#C8A45A] shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-foreground">
                     Allocation-guided percentages
@@ -234,7 +234,7 @@ export function ReinvestmentPolicyPanel() {
                     The allocation percentages below are derived from your portfolio profile.
                     Adjust the return rate assumptions, then save.
                     {recommendation?.profile && (
-                      <span className="ml-1 inline-flex items-center rounded-full bg-indigo-50 border border-indigo-200 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                      <span className="ml-1 inline-flex items-center rounded-full bg-[#FFF3D8] border border-[#D4B896] px-2 py-0.5 text-xs font-medium text-[#C8A45A]">
                         {profileLabel[recommendation.profile] ?? recommendation.profile}
                       </span>
                     )}
