@@ -399,7 +399,7 @@ export function RealEstateForm() {
                       <div className="flex items-baseline gap-3 flex-wrap">
                         <span className="text-sm font-medium text-slate-700">{prop.propertyName}</span>
                         <span className="text-xs text-slate-600">{PROPERTY_TYPE_LABELS[prop.propertyType]}</span>
-                        {prop.is1031Exchange && <span className="text-xs text-indigo-600">1031</span>}
+                        {prop.is1031Exchange && <span className="text-xs text-[#C8A45A]">1031</span>}
                         {prop.mortgage && <span className="text-xs text-slate-600">mortgage</span>}
                       </div>
                       <div className="text-xs text-slate-600 mt-0.5">

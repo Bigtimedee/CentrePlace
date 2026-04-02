@@ -21,7 +21,7 @@ function MetricTile({
     green: "text-emerald-600",
     amber: "text-amber-600",
     red: "text-rose-600",
-    indigo: "text-indigo-600",
+    indigo: "text-[#C8A45A]",
   };
   return (
     <div className="bg-slate-50 rounded-lg px-4 py-3">
@@ -146,7 +146,7 @@ export function FISummaryCard() {
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${isFI ? "bg-emerald-500" : "bg-indigo-500"}`}
+              className={`h-full rounded-full transition-all duration-500 ${isFI ? "bg-emerald-500" : "bg-[#C8A45A]"}`}
               style={{ width: `${Math.round(pctFunded * 100)}%` }}
             />
           </div>

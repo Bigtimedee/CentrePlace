@@ -56,7 +56,7 @@ export interface ScenarioRun {
 export const SCENARIO_TEMPLATES: Array<Omit<ScenarioDefinition, "id">> = [
   {
     name: "Base",
-    color: "#6366f1",
+    color: "#C8A45A",
     overrides: {},
   },
   {
@@ -82,7 +82,7 @@ export const SCENARIO_TEMPLATES: Array<Omit<ScenarioDefinition, "id">> = [
 // ── Color palette for user-created scenarios ──────────────────────────────────
 
 export const SCENARIO_COLORS = [
-  "#6366f1", // indigo
+  "#C8A45A", // gold
   "#f43f5e", // rose
   "#10b981", // emerald
   "#f59e0b", // amber

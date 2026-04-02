@@ -229,7 +229,7 @@ export function ExpendituresForm() {
                         <div className="min-w-0 flex-1">
                           <span className="text-sm text-slate-700">{exp.description}</span>
                           <span className="text-xs text-slate-600 ml-3">{CATEGORY_LABELS[exp.category]} · {(exp.growthRate * 100).toFixed(1)}%/yr growth</span>
-                          {exp.isPlaidSynced && <span className="text-xs text-indigo-600 ml-2">Plaid</span>}
+                          {exp.isPlaidSynced && <span className="text-xs text-[#C8A45A] ml-2">Plaid</span>}
                         </div>
                         <div className="ml-4 flex items-center gap-4">
                           <span className="text-sm font-semibold text-slate-700">{formatCurrency(exp.annualAmount)}</span>

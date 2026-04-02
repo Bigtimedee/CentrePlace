@@ -28,7 +28,7 @@ export function ForecastControls({
           step={1}
           value={volatility}
           onChange={e => onVolatilityChange(Number(e.target.value))}
-          className="w-16 rounded-md border border-slate-200 bg-white px-2 py-1 text-center text-sm text-slate-900 focus:border-indigo-500 focus:outline-none"
+          className="w-16 rounded-md border border-slate-200 bg-white px-2 py-1 text-center text-sm text-slate-900 focus:border-[#C8A45A] focus:outline-none"
         />
         <span className="text-slate-500">%</span>
       </label>
@@ -38,7 +38,7 @@ export function ForecastControls({
           type="checkbox"
           checked={varyCarry}
           onChange={e => onVaryCarryChange(e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 bg-white text-indigo-600 focus:ring-indigo-500"
+          className="h-4 w-4 rounded border-slate-300 bg-white text-[#C8A45A] focus:ring-amber-400"
         />
         <span>Randomise carry haircut</span>
       </label>
@@ -46,7 +46,7 @@ export function ForecastControls({
       <button
         onClick={onRun}
         disabled={isLoading}
-        className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="rounded-lg bg-[#C8A45A] px-4 py-1.5 text-sm font-medium text-[#1A0F28] hover:bg-[#D4A574] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isLoading ? "Running…" : "Run Forecast"}
       </button>

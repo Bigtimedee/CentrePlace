@@ -124,7 +124,7 @@ function PolicyForm({
             onClick={() => set({ policyType: type })}
             className={`text-left p-3 rounded-lg border transition-colors ${
               form.policyType === type
-                ? "border-indigo-500 bg-indigo-50"
+                ? "border-[#C8A45A] bg-[#FFF3D8]"
                 : "border-slate-200 hover:border-slate-300"
             }`}
           >
@@ -283,7 +283,7 @@ export function InsuranceForm() {
                         <span className="text-sm font-medium text-slate-700">{policy.policyName}</span>
                         <span className="text-xs text-slate-600">{POLICY_TYPE_LABELS[policy.policyType]}</span>
                         {policy.ownershipStructure === "ilit" && (
-                          <span className="text-xs text-indigo-600 font-medium">ILIT</span>
+                          <span className="text-xs text-[#C8A45A] font-medium">ILIT</span>
                         )}
                         {policy.isEstateTaxFunding && (
                           <span className="text-xs text-amber-600">estate tax</span>
@@ -316,7 +316,7 @@ export function InsuranceForm() {
         <div className="flex items-center justify-end gap-6 flex-wrap text-sm text-slate-500">
           <span>Total death benefit: <span className="text-slate-700 font-semibold">{formatCurrency(totalDeathBenefit, true)}</span></span>
           {ilitBenefit > 0 && (
-            <span>ILIT (excluded from estate): <span className="text-indigo-600 font-semibold">{formatCurrency(ilitBenefit, true)}</span></span>
+            <span>ILIT (excluded from estate): <span className="text-[#C8A45A] font-semibold">{formatCurrency(ilitBenefit, true)}</span></span>
           )}
         </div>
       )}

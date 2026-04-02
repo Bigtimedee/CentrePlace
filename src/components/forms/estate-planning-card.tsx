@@ -104,7 +104,7 @@ export function EstatePlanningCard({ data }: Props) {
                         <div className="flex items-center justify-end gap-2">
                           <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden w-16">
                             <div
-                              className="h-full bg-indigo-500/70 rounded-full"
+                              className="h-full bg-[#C8A45A]/70 rounded-full"
                               style={{ width: `${b.inheritancePct * 100}%` }}
                             />
                           </div>
@@ -128,7 +128,7 @@ export function EstatePlanningCard({ data }: Props) {
                   <td className="px-4 py-3 text-right font-mono text-xs font-bold text-slate-700">
                     {formatPct(beneficiaries.reduce((s, b) => s + b.inheritancePct, 0))}
                   </td>
-                  <td className="px-6 py-3 text-right font-mono font-bold text-indigo-600">
+                  <td className="px-6 py-3 text-right font-mono font-bold text-[#C8A45A]">
                     {formatCurrency(estateAfterTax, true)}
                   </td>
                 </tr>

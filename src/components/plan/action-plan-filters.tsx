@@ -33,7 +33,7 @@ export function ActionPlanFilters({ items, active, onChange }: ActionPlanFilters
         onClick={() => onChange("all")}
         className={`rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
           active === "all"
-            ? "bg-indigo-600 text-white"
+            ? "bg-[#C8A45A] text-[#1A0F28]"
             : "bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200"
         }`}
       >
@@ -50,7 +50,7 @@ export function ActionPlanFilters({ items, active, onChange }: ActionPlanFilters
             onClick={() => onChange(value)}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
               isActive
-                ? "bg-indigo-600 text-white"
+                ? "bg-[#C8A45A] text-[#1A0F28]"
                 : "bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200"
             }`}
           >

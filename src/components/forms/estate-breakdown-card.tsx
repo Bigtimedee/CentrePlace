@@ -17,7 +17,7 @@ const CATEGORY_META: Record<
   EstateComponentCategory,
   { label: string; icon: React.ComponentType<{ className?: string }>; color: string }
 > = {
-  investment_account: { label: "Investment Accounts", icon: TrendingUp, color: "text-indigo-600" },
+  investment_account: { label: "Investment Accounts", icon: TrendingUp, color: "text-[#C8A45A]" },
   real_estate:        { label: "Real Estate",          icon: Home,       color: "text-emerald-600" },
   insurance_personal: { label: "Insurance (Personal)", icon: Shield,     color: "text-amber-600" },
   insurance_ilit:     { label: "Insurance (ILIT)",     icon: Shield,     color: "text-violet-600" },
@@ -130,11 +130,11 @@ export function EstateBreakdownCard({ data }: Props) {
           <tfoot>
             <tr className="border-t-2 border-slate-200">
               <td className="px-6 py-3 text-sm font-semibold text-slate-900">Gross Taxable Estate</td>
-              <td className="px-4 py-3 text-right font-mono font-bold text-indigo-600">
+              <td className="px-4 py-3 text-right font-mono font-bold text-[#C8A45A]">
                 {formatCurrency(grossEstate, true)}
               </td>
               <td className="px-4 py-3 text-center">
-                <CheckCircle2 className="h-4 w-4 text-indigo-600 mx-auto" />
+                <CheckCircle2 className="h-4 w-4 text-[#C8A45A] mx-auto" />
               </td>
               <td className="px-4 py-3 hidden lg:table-cell" />
             </tr>

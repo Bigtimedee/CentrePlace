@@ -80,8 +80,8 @@ function CustomTooltip({
           <span className="text-slate-900">{fmtM(p75)}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="text-indigo-600 font-medium">P50</span>
-          <span className="text-indigo-600 font-medium">{fmtM(p50)}</span>
+          <span className="text-[#C8A45A] font-medium">P50</span>
+          <span className="text-[#C8A45A] font-medium">{fmtM(p50)}</span>
         </div>
         <div className="flex justify-between gap-4">
           <span className="text-slate-500">P25</span>
@@ -116,11 +116,11 @@ export function MonteCarloChart({ result }: Props) {
         </div>
         <div className="flex flex-wrap gap-4 text-xs text-slate-600">
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-3 h-2 rounded" style={{ background: "#6366f1", opacity: 0.5 }} />
+            <span className="inline-block w-3 h-2 rounded" style={{ background: "#C8A45A", opacity: 0.5 }} />
             P25–P75
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-4 border-t-2 border-indigo-500" />
+            <span className="inline-block w-4 border-t-2 border-[#C8A45A]" />
             Median
           </span>
           <span className="flex items-center gap-1.5">
@@ -155,12 +155,12 @@ export function MonteCarloChart({ result }: Props) {
 
           {/* Fan: stacked areas representing P10–P90 band */}
           <Area type="monotone" dataKey="p10"       stackId="fan" fill="transparent" stroke="none" legendType="none" />
-          <Area type="monotone" dataKey="d_p10_p25" stackId="fan" fill="#6366f1" fillOpacity={0.12} stroke="none" legendType="none" />
-          <Area type="monotone" dataKey="d_p25_p75" stackId="fan" fill="#6366f1" fillOpacity={0.22} stroke="none" legendType="none" />
-          <Area type="monotone" dataKey="d_p75_p90" stackId="fan" fill="#6366f1" fillOpacity={0.12} stroke="none" legendType="none" />
+          <Area type="monotone" dataKey="d_p10_p25" stackId="fan" fill="#C8A45A" fillOpacity={0.12} stroke="none" legendType="none" />
+          <Area type="monotone" dataKey="d_p25_p75" stackId="fan" fill="#C8A45A" fillOpacity={0.22} stroke="none" legendType="none" />
+          <Area type="monotone" dataKey="d_p75_p90" stackId="fan" fill="#C8A45A" fillOpacity={0.12} stroke="none" legendType="none" />
 
           {/* Lines */}
-          <Line type="monotone" dataKey="p50"             stroke="#6366f1" strokeWidth={2}   dot={false} name="Median" />
+          <Line type="monotone" dataKey="p50"             stroke="#C8A45A" strokeWidth={2}   dot={false} name="Median" />
           <Line type="monotone" dataKey="base"            stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="4 3" dot={false} name="Base case" />
           <Line type="monotone" dataKey="requiredCapital" stroke="#f59e0b" strokeWidth={1.5} strokeDasharray="5 4" dot={false} name="Required for FI" />
 

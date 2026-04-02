@@ -35,7 +35,7 @@ const CATEGORY_META: Record<
   gifting:          { icon: Gift,      color: "text-emerald-600" },
   trust:            { icon: Landmark,  color: "text-violet-600" },
   real_estate:      { icon: Building2, color: "text-sky-600" },
-  portability:      { icon: FileCheck, color: "text-indigo-600" },
+  portability:      { icon: FileCheck, color: "text-[#C8A45A]" },
   charitable:       { icon: Heart,     color: "text-rose-600" },
   opportunity_zone: { icon: Zap,       color: "text-yellow-600" },
 };
@@ -106,9 +106,9 @@ function RecommendationRow({ rec }: { rec: EstateRecommendation }) {
             </div>
           )}
 
-          <div className="mt-4 flex items-start gap-2 p-3 rounded-lg bg-indigo-50 border border-indigo-200">
-            <ArrowRight className="h-3.5 w-3.5 text-indigo-600 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-indigo-700 leading-relaxed">{rec.actionRequired}</p>
+          <div className="mt-4 flex items-start gap-2 p-3 rounded-lg bg-[#FFF3D8] border border-[#D4B896]">
+            <ArrowRight className="h-3.5 w-3.5 text-[#C8A45A] mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-[#1A0F28] leading-relaxed">{rec.actionRequired}</p>
           </div>
         </div>
       )}

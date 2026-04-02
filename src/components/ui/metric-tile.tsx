@@ -7,7 +7,7 @@ interface MetricTileProps {
 
 const VALUE_COLOR: Record<NonNullable<MetricTileProps["color"]>, string> = {
   emerald: "text-emerald-600",
-  indigo:  "text-indigo-600",
+  indigo:  "text-[#C8A45A]",
   amber:   "text-amber-600",
   rose:    "text-rose-600",
   slate:   "text-slate-500",
