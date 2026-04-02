@@ -39,7 +39,9 @@ export const plaidConnections = pgTable("plaid_connections", {
   accessToken: text("access_token").notNull(), // encrypted at rest via Supabase
   itemId: text("item_id").notNull(),
   institutionName: text("institution_name"),
-  syncMode: text("sync_mode").notNull().default("persistent"), // "oneshot" | "persistent"
+  // TODO: rows with syncMode "persistent" are legacy (pre-oneshot architecture).
+  // Migrate them by running: UPDATE plaid_connections SET sync_mode = 'oneshot' WHERE sync_mode = 'persistent';
+  syncMode: text("sync_mode").notNull().default("oneshot"), // "oneshot" | "persistent"
   lastSyncedAt: timestamp("last_synced_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (t) => [

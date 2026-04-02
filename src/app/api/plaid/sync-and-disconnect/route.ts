@@ -21,15 +21,21 @@ export async function revokeConnection(
 ): Promise<void> {
   try {
     await plaidClient.itemRemove({ access_token: accessToken });
-  } catch {
-    // Swallow — Plaid removal failure must not block DB cleanup
+  } catch (err) {
+    console.error(
+      "[revoke-connection] itemRemove failed:",
+      err instanceof Error ? err.message : String(err),
+    );
   }
   try {
     await db
       .delete(plaidConnections)
       .where(and(eq(plaidConnections.id, connectionId), eq(plaidConnections.userId, userId)));
-  } catch {
-    // Swallow — log in production monitoring
+  } catch (err) {
+    console.error(
+      "[revoke-connection] DB delete failed:",
+      err instanceof Error ? err.message : String(err),
+    );
   }
 }
 
@@ -62,7 +68,6 @@ export async function POST(req: NextRequest) {
   let allTransactions: Transaction[] = [];
   let plaidAccounts: AccountBase[] = [];
   let fetchSucceeded = false;
-  let fetchError: unknown = null;
 
   try {
     // Phase A: Fetch accounts
@@ -83,9 +88,30 @@ export async function POST(req: NextRequest) {
       hasMore = has_more;
     }
 
+    // Race-condition guard: newly linked items have transactions prepared asynchronously.
+    // If the first sync returns nothing, wait 2 s and retry once.
+    if (allTransactions.length === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      let retryCursor: string | undefined = undefined;
+      let retryHasMore = true;
+      while (retryHasMore) {
+        const syncResponse = await plaidClient.transactionsSync({
+          access_token: conn.accessToken,
+          cursor: retryCursor,
+        });
+        const { added, next_cursor, has_more } = syncResponse.data;
+        allTransactions = allTransactions.concat(added);
+        retryCursor = next_cursor;
+        retryHasMore = has_more;
+      }
+    }
+
     fetchSucceeded = true;
   } catch (err) {
-    fetchError = err;
+    console.error(
+      "[sync-and-disconnect] fetch failed:",
+      err instanceof Error ? err.message : String(err),
+    );
   } finally {
     // Privacy guarantee: revoke always runs, even if fetch threw
     await revokeConnection(conn.accessToken, connectionId, userId);
@@ -93,11 +119,7 @@ export async function POST(req: NextRequest) {
 
   if (!fetchSucceeded) {
     return NextResponse.json(
-      {
-        error: "Failed to fetch data from Plaid",
-        revoked: true,
-        detail: fetchError instanceof Error ? fetchError.message : "Unknown error",
-      },
+      { error: "Failed to fetch data from Plaid", revoked: true },
       { status: 500 },
     );
   }

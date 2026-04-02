@@ -7,6 +7,8 @@ import { plaidClient } from "@/lib/plaid";
 
 export const runtime = "nodejs";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // GET /api/plaid/connections — list all connections for the current user
 export async function GET() {
   const { userId } = await auth();
@@ -39,6 +41,9 @@ export async function DELETE(req: NextRequest) {
   if (!id) {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
+  if (!UUID_RE.test(id)) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+  }
 
   // Fetch access token to call Plaid item/remove
   const [row] = await db
@@ -52,8 +57,12 @@ export async function DELETE(req: NextRequest) {
 
   try {
     await plaidClient.itemRemove({ access_token: row.accessToken });
-  } catch {
-    // Continue even if Plaid removal fails — delete from DB regardless
+  } catch (err) {
+    console.error(
+      "[connections] itemRemove failed:",
+      err instanceof Error ? err.message : String(err),
+    );
+    // Continue — delete from DB regardless of Plaid removal result
   }
 
   await db

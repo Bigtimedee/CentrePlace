@@ -11,7 +11,10 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  // Only include redirect_uri when explicitly configured — required for OAuth institutions
+  // but must be registered in the Plaid Dashboard; omitting it works for all non-OAuth flows.
+  const oauthRedirectUri = process.env.PLAID_OAUTH_REDIRECT_URI;
+
   try {
     const response = await plaidClient.linkTokenCreate({
       user: { client_user_id: userId },
@@ -19,19 +22,12 @@ export async function POST() {
       products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       language: "en",
-      redirect_uri: `${appUrl}/portfolios`,
+      ...(oauthRedirectUri ? { redirect_uri: oauthRedirectUri } : {}),
     });
 
-    return NextResponse.json({
-      link_token: response.data.link_token,
-      plaid_env: process.env.PLAID_ENV ?? "sandbox",
-    });
+    return NextResponse.json({ link_token: response.data.link_token });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error("[create-link-token] Plaid error:", message);
-    return NextResponse.json(
-      { error: "Failed to create Plaid link token", detail: message },
-      { status: 500 }
-    );
+    console.error("[create-link-token] Plaid error:", err instanceof Error ? err.message : String(err));
+    return NextResponse.json({ error: "Failed to create Plaid link token" }, { status: 500 });
   }
 }

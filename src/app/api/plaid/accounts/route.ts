@@ -34,7 +34,7 @@ export async function GET() {
 
   const accounts: PlaidAccount[] = [];
 
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     connections.map(async (conn) => {
       const response = await plaidClient.accountsGet({ access_token: conn.accessToken });
       for (const acct of response.data.accounts) {
@@ -51,8 +51,17 @@ export async function GET() {
           iso_currency_code: acct.balances.iso_currency_code ?? null,
         });
       }
-    })
+    }),
   );
+
+  for (const result of results) {
+    if (result.status === "rejected") {
+      console.error(
+        "[plaid/accounts] accountsGet failed:",
+        result.reason instanceof Error ? result.reason.message : String(result.reason),
+      );
+    }
+  }
 
   return NextResponse.json({ accounts });
 }

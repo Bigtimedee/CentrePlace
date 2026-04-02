@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { public_token, institution_name } = await req.json() as {
+  const { public_token, institution_name } = (await req.json()) as {
     public_token: string;
     institution_name?: string;
   };
@@ -23,8 +23,19 @@ export async function POST(req: NextRequest) {
   }
 
   // Exchange public token for access token
-  const exchangeResponse = await plaidClient.itemPublicTokenExchange({ public_token });
-  const { access_token, item_id } = exchangeResponse.data;
+  let access_token: string;
+  let item_id: string;
+  try {
+    const exchangeResponse = await plaidClient.itemPublicTokenExchange({ public_token });
+    access_token = exchangeResponse.data.access_token;
+    item_id = exchangeResponse.data.item_id;
+  } catch (err) {
+    console.error(
+      "[exchange-token] itemPublicTokenExchange failed:",
+      err instanceof Error ? err.message : String(err),
+    );
+    return NextResponse.json({ error: "Failed to exchange token with Plaid" }, { status: 500 });
+  }
 
   // Resolve institution name if not supplied by client metadata
   let resolvedName = institution_name ?? null;
@@ -44,16 +55,33 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const [connection] = await db
-    .insert(plaidConnections)
-    .values({
-      userId,
-      accessToken: access_token,
-      itemId: item_id,
-      institutionName: resolvedName,
-      syncMode: "oneshot",
-    })
-    .returning();
+  try {
+    const [connection] = await db
+      .insert(plaidConnections)
+      .values({
+        userId,
+        accessToken: access_token,
+        itemId: item_id,
+        institutionName: resolvedName,
+        syncMode: "oneshot",
+      })
+      .returning();
 
-  return NextResponse.json({ connection_id: connection.id, institution_name: resolvedName });
+    return NextResponse.json({ connection_id: connection.id, institution_name: resolvedName });
+  } catch (err) {
+    console.error(
+      "[exchange-token] DB insert failed:",
+      err instanceof Error ? err.message : String(err),
+    );
+    // Revoke the Plaid item since we cannot store the connection
+    try {
+      await plaidClient.itemRemove({ access_token });
+    } catch (revokeErr) {
+      console.error(
+        "[exchange-token] itemRemove after DB failure:",
+        revokeErr instanceof Error ? revokeErr.message : String(revokeErr),
+      );
+    }
+    return NextResponse.json({ error: "Failed to store connection" }, { status: 500 });
+  }
 }

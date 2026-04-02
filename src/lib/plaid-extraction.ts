@@ -105,7 +105,9 @@ export async function extractExpendituresFromTransactions(
   for (const tx of transactions) {
     // Only process debits (positive amount = money leaving account in Plaid convention)
     if (tx.amount <= 0) continue;
-    const primary = (tx.personal_finance_category as { primary?: string } | null)?.primary;
+    const primary = tx.personal_finance_category?.primary;
+    // Skip inter-account transfers — they are not real expenditures
+    if (primary === "TRANSFER_IN" || primary === "TRANSFER_OUT") continue;
     const category = mapPlaidCategoryToApp(primary);
     // Skip income-like categories
     if (category === "other" && primary === "INCOME") continue;
@@ -116,24 +118,18 @@ export async function extractExpendituresFromTransactions(
   let skipped = 0;
   const safeWindow = windowMonths > 0 ? windowMonths : 12;
 
+  // Pre-load all Plaid-synced categories for this user in one query (avoids N+1)
+  const existingRows = await db
+    .select({ category: expenditures.category })
+    .from(expenditures)
+    .where(and(eq(expenditures.userId, userId), eq(expenditures.isPlaidSynced, true)));
+  const existingCategories = new Set(existingRows.map((r) => r.category));
+
   for (const [category, total] of Object.entries(totals)) {
     const annualAmount = Math.round((total / safeWindow) * 12 * 100) / 100;
     const label = CATEGORY_LABELS[category] ?? "Other";
 
-    // De-duplicate: check if a Plaid-synced row exists for this category
-    const existing = await db
-      .select({ id: expenditures.id })
-      .from(expenditures)
-      .where(
-        and(
-          eq(expenditures.userId, userId),
-          eq(expenditures.category, category),
-          eq(expenditures.isPlaidSynced, true),
-        ),
-      )
-      .limit(1);
-
-    if (existing.length > 0) {
+    if (existingCategories.has(category)) {
       skipped++;
       continue;
     }

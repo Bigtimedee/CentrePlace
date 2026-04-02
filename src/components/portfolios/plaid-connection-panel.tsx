@@ -39,7 +39,7 @@ const IDLE_SYNC_STATE: SyncState = {
 
 const PLAID_TOKEN_KEY = "plaid_link_token";
 
-function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; onEnvDetected: (env: string) => void }) {
+function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
   // Detect OAuth return: Plaid appends oauth_state_id to the redirect URI
   const isOAuthReturn =
     typeof window !== "undefined" && new URLSearchParams(window.location.search).has("oauth_state_id");
@@ -56,21 +56,24 @@ function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; 
     setFetching(true);
     try {
       const res = await fetch("/api/plaid/create-link-token", { method: "POST" });
-      const data = (await res.json()) as { link_token: string; plaid_env: string };
+      if (!res.ok) {
+        console.error("[PlaidLinkButton] create-link-token failed:", res.status);
+        return;
+      }
+      const data = (await res.json()) as { link_token: string };
       sessionStorage.setItem(PLAID_TOKEN_KEY, data.link_token);
       setLinkToken(data.link_token);
-      onEnvDetected(data.plaid_env);
     } finally {
       setFetching(false);
     }
-  }, [onEnvDetected]);
+  }, []);
 
   const { open, ready } = usePlaidLink({
     token: linkToken,
     receivedRedirectUri: isOAuthReturn ? window.location.href : undefined,
     onSuccess: async (public_token, metadata) => {
       sessionStorage.removeItem(PLAID_TOKEN_KEY);
-      await fetch("/api/plaid/exchange-token", {
+      const res = await fetch("/api/plaid/exchange-token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -78,7 +81,15 @@ function PlaidLinkButton({ onSuccess, onEnvDetected }: { onSuccess: () => void; 
           institution_name: metadata.institution?.name,
         }),
       });
+      if (!res.ok) {
+        console.error("[PlaidLinkButton] exchange-token failed:", res.status);
+        return;
+      }
       onSuccess();
+    },
+    onExit: () => {
+      sessionStorage.removeItem(PLAID_TOKEN_KEY);
+      setLinkToken(null);
     },
   });
 
@@ -108,7 +119,6 @@ export function PlaidConnectionPanel() {
   const [connections, setConnections] = useState<PlaidConnection[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [syncState, setSyncState] = useState<SyncState>(IDLE_SYNC_STATE);
-  const [plaidEnv, setPlaidEnv] = useState<string | null>(null);
 
   const loadConnections = useCallback(async () => {
     const res = await fetch("/api/plaid/connections");
@@ -195,10 +205,6 @@ export function PlaidConnectionPanel() {
   const handleSuccess = async () => {
     await loadConnections();
   };
-
-  const handleEnvDetected = useCallback((env: string) => {
-    setPlaidEnv(env);
-  }, []);
 
   const oneshotConnections = connections.filter((c) => c.syncMode === "oneshot");
   const persistentConnections = connections.filter((c) => c.syncMode === "persistent");
@@ -334,7 +340,7 @@ export function PlaidConnectionPanel() {
     <Card>
       <CardHeader
         title="One-Time Bank Import"
-        action={<PlaidLinkButton onSuccess={handleSuccess} onEnvDetected={handleEnvDetected} />}
+        action={<PlaidLinkButton onSuccess={handleSuccess} />}
       />
 
       {connections.length === 0 ? (
@@ -356,7 +362,7 @@ export function PlaidConnectionPanel() {
               You can review your accounts before any data is saved.
             </p>
 
-            {plaidEnv === "sandbox" && (
+            {process.env.NEXT_PUBLIC_PLAID_ENV === "sandbox" && (
               <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <FlaskConical className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
                 <div>
