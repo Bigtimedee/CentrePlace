@@ -205,7 +205,7 @@ export function TwelveMonthProjection() {
       {/* Header */}
       <div className="mb-5">
         <div className="flex items-center gap-2.5 mb-1">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#C8A45A]">
             <svg
               className="h-4 w-4 text-white"
               fill="none"
@@ -333,7 +333,7 @@ export function TwelveMonthProjection() {
             dataKey="lpCarry"
             name="LP / Carry"
             stackId="income"
-            fill="#6366f1"
+            fill="#C8A45A"
             maxBarSize={32}
             radius={[2, 2, 0, 0]}
           />

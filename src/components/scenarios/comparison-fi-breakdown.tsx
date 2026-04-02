@@ -72,7 +72,7 @@ function ScenarioBreakdown({ run }: { run: ScenarioRun }) {
         <p className="text-xs text-slate-500 leading-relaxed">
           Required Capital = (Annual Spending − Permanent Income) ÷ Return Rate
         </p>
-        <p className="text-xs font-mono text-indigo-600 leading-relaxed">
+        <p className="text-xs font-mono text-[#C8A45A] leading-relaxed">
           {formatCurrency(summary.requiredCapitalToday, true)} = (
           {formatCurrency(summary.projectedAnnualSpending, true)} −{" "}
           {formatCurrency(summary.permanentAnnualIncome, true)}) ÷{" "}
@@ -177,7 +177,7 @@ export function ComparisonFIBreakdown({ runs }: Props) {
               <span className="text-slate-700 font-medium">How the FI target is set: </span>
               Financial Independence is achieved when your invested capital can generate enough
               annual return to cover your spending — indefinitely, without drawing down principal.
-              This is the <span className="text-indigo-600">perpetuity formula</span>.
+              This is the <span className="text-[#C8A45A]">perpetuity formula</span>.
             </p>
             <p>
               <span className="text-slate-700 font-medium">Key levers: </span>

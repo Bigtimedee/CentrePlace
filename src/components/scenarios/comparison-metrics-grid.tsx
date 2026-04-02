@@ -165,7 +165,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
                 {metric.info && (
                   <button
                     onClick={() => setShowPermanentIncomeInfo(true)}
-                    className="flex-shrink-0 rounded-full text-slate-600 hover:text-indigo-600 transition-colors"
+                    className="flex-shrink-0 rounded-full text-slate-600 hover:text-[#C8A45A] transition-colors"
                     aria-label="What is Permanent Income?"
                   >
                     <Info className="h-3.5 w-3.5" />
@@ -213,7 +213,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
 
           <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 space-y-1">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">How it&apos;s calculated</p>
-            <p className="font-mono text-xs text-indigo-600">
+            <p className="font-mono text-xs text-[#C8A45A]">
               Permanent Income = Σ (Gross Rental Income − Operating Expenses) × Ownership %
             </p>
             <p className="text-xs text-slate-600 mt-1">
@@ -229,7 +229,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
               Permanent Income directly reduces how much investment capital you need to
               accumulate. The FI target is set by a perpetuity formula:
             </p>
-            <p className="font-mono text-xs text-indigo-600 mt-1">
+            <p className="font-mono text-xs text-[#C8A45A] mt-1">
               Required Capital = (Annual Spending − Permanent Income) ÷ Return Rate
             </p>
             <p className="text-xs text-slate-500 mt-2">
@@ -242,7 +242,7 @@ export function ComparisonMetricsGrid({ runs }: Props) {
           <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Where to set this up</p>
             <p>
-              Go to <span className="text-indigo-600 font-medium">Real Estate</span> in the
+              Go to <span className="text-[#C8A45A] font-medium">Real Estate</span> in the
               left navigation. For each rental or commercial property, enter:
             </p>
             <ul className="mt-2 space-y-1 text-xs text-slate-500 list-disc list-inside">

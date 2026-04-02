@@ -44,7 +44,7 @@ export function LPDistributionTable({ funds }: Props) {
               <td className="py-1.5 pr-3 text-right text-slate-600">{f.vintageYear}</td>
               <td className="py-1.5 pr-3 text-right text-slate-500 font-mono">{formatCurrency(f.commitmentAmount, true)}</td>
               <td className="py-1.5 pr-3 text-right text-slate-700 font-mono">{formatCurrency(f.currentNav, true)}</td>
-              <td className="py-1.5 pr-3 text-right text-indigo-600 font-semibold font-mono">
+              <td className="py-1.5 pr-3 text-right text-[#C8A45A] font-semibold font-mono">
                 {formatCurrency(f.totalExpectedDistributions, true)}
               </td>
               <td className="py-1.5 pr-3 text-right text-slate-500">
@@ -62,7 +62,7 @@ export function LPDistributionTable({ funds }: Props) {
         <tfoot>
           <tr className="border-t border-slate-200">
             <td colSpan={4} className="pt-2 text-xs text-slate-600 font-medium">Total</td>
-            <td className="pt-2 text-right text-indigo-600 font-semibold font-mono text-xs pr-3">
+            <td className="pt-2 text-right text-[#C8A45A] font-semibold font-mono text-xs pr-3">
               {formatCurrency(funds.reduce((s, f) => s + f.totalExpectedDistributions, 0), true)}
             </td>
             <td colSpan={3} />

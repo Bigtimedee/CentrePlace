@@ -4,7 +4,7 @@ import type { CashEventSource } from "@/server/simulation/cashflow/types";
 
 export const SOURCE_CONFIG: Record<CashEventSource, { label: string; color: string; activeClass: string }> = {
   carry:           { label: "GP Carry",    color: "#f59e0b", activeClass: "bg-amber-50 border-amber-400 text-amber-700" },
-  lp_distribution: { label: "LP Dist.",    color: "#6366f1", activeClass: "bg-indigo-50 border-indigo-400 text-indigo-700" },
+  lp_distribution: { label: "LP Dist.",    color: "#C8A45A", activeClass: "bg-[#FFF3D8] border-[#C8A45A] text-[#8B6B2A]" },
   real_estate_sale:{ label: "RE Sale",     color: "#10b981", activeClass: "bg-emerald-50 border-emerald-400 text-emerald-700" },
   w2:              { label: "W-2 Income",  color: "#64748b", activeClass: "bg-slate-100 border-slate-400 text-slate-700" },
   rental:          { label: "Rental",      color: "#a78bfa", activeClass: "bg-violet-50 border-violet-400 text-violet-700" },

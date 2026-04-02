@@ -53,7 +53,7 @@ function PctField({
             const n = parseFloat(raw);
             if (!isNaN(n)) onChange(n / 100);
           }}
-          className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs text-slate-700 placeholder-slate-600 focus:outline-none focus:border-indigo-500 pr-7"
+          className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs text-slate-700 placeholder-slate-600 focus:outline-none focus:border-[#C8A45A] pr-7"
         />
         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-600">%</span>
       </div>
@@ -78,7 +78,7 @@ function SelectField({
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
+        className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-[#C8A45A]"
       >
         {options.map(o => (
           <option key={o.value} value={o.value}>{o.label}</option>
@@ -226,7 +226,7 @@ export function ScenarioCard(props: Props | AddButtonProps) {
                 const raw = e.target.value;
                 updateOverride({ targetAge: raw === "" ? undefined : parseInt(raw, 10) });
               }}
-              className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs text-slate-700 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 text-xs text-slate-700 placeholder-slate-600 focus:outline-none focus:border-[#C8A45A]"
             />
           </div>
 

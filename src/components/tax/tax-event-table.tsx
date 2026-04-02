@@ -64,7 +64,7 @@ function flattenEvents(projections: AnnualTaxProjection[]): TaxEvent[] {
 
 const TYPE_BADGE: Record<TaxEvent["type"], string> = {
   "Carry":          "bg-amber-50 text-amber-600 border-amber-200",
-  "LP Distribution":"bg-indigo-50 text-indigo-600 border-indigo-200",
+  "LP Distribution":"bg-[#FFF3D8] text-[#C8A45A] border-[#D4B896]",
   "RE Sale":        "bg-emerald-50 text-emerald-600 border-emerald-200",
 };
 
@@ -137,7 +137,7 @@ export function TaxEventTable({ projections }: Props) {
           {allEvents.length > 10 && (
             <button
               onClick={() => setShowAll(v => !v)}
-              className="mt-3 text-xs text-indigo-600 hover:text-indigo-500 transition-colors cursor-pointer"
+              className="mt-3 text-xs text-[#C8A45A] hover:text-amber-400 transition-colors cursor-pointer"
             >
               {showAll ? "Show fewer" : `Show all ${allEvents.length} events`}
             </button>

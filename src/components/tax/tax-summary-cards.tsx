@@ -18,7 +18,7 @@ function MetricTile({
     green: "text-emerald-600",
     amber: "text-amber-600",
     red: "text-rose-600",
-    indigo: "text-indigo-600",
+    indigo: "text-[#C8A45A]",
   };
   return (
     <div className="bg-slate-50 rounded-lg px-4 py-3">

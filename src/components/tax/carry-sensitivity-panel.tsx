@@ -20,7 +20,7 @@ const REALIZATION_COLORS: Record<number, string> = {
   0:    "bg-rose-50 border-rose-200 text-rose-600",
   0.25: "bg-amber-50 border-amber-200 text-amber-600",
   0.5:  "bg-slate-50 border-slate-200 text-slate-500",
-  0.75: "bg-indigo-50 border-indigo-200 text-indigo-600",
+  0.75: "bg-[#FFF3D8] border-[#D4B896] text-[#C8A45A]",
   1:    "bg-emerald-50 border-emerald-200 text-emerald-600",
 };
 

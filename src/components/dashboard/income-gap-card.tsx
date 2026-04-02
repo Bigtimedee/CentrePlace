@@ -271,7 +271,7 @@ export function IncomeGapCard() {
               )}
             </div>
             <IncomeRow label="Rental Net Income" amount={annualRental} color="bg-teal-500" />
-            <IncomeRow label="LP Income" amount={annualLP} color="bg-indigo-500" />
+            <IncomeRow label="LP Income" amount={annualLP} color="bg-[#C8A45A]" />
             <IncomeRow label="Carry Income" amount={annualCarry} color="bg-amber-500" />
           </div>
 
