@@ -5,6 +5,7 @@ import { EstateSummaryCard } from "@/components/forms/estate-summary-card";
 import { EstateOptimizationsCard } from "@/components/forms/estate-optimizations-card";
 import { EstateBreakdownCard } from "@/components/forms/estate-breakdown-card";
 import { EstatePlanningCard } from "@/components/forms/estate-planning-card";
+import { PendingLegislationPanel } from "@/components/legislation/pending-legislation-panel";
 import Link from "next/link";
 
 export function EstateDashboard() {
@@ -51,6 +52,9 @@ export function EstateDashboard() {
       <EstateOptimizationsCard recommendations={data.recommendations} />
       <EstateBreakdownCard data={data} />
       <EstatePlanningCard data={data} />
+      <div id="legislation-panel" className="mt-6">
+        <PendingLegislationPanel topics={['qoz', 'estate-tax', 'capital-gains', 'tcja', 'carried-interest', 'section-1031']} />
+      </div>
     </div>
   );
 }

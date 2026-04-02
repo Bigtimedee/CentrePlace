@@ -20,6 +20,7 @@ import type {
   RecommendationCategory,
   RecommendationPriority,
 } from "@/server/simulation/estate/recommendations";
+import { LegislationAlertBadge } from "@/components/legislation/legislation-alert-badge";
 
 interface Props {
   recommendations: EstateRecommendation[];
@@ -79,6 +80,7 @@ function RecommendationRow({ rec }: { rec: EstateRecommendation }) {
                 Save ~{formatCurrency(rec.estimatedTaxSavings, true)}
               </span>
             )}
+            {rec.category === "opportunity_zone" && <LegislationAlertBadge />}
           </div>
           {!expanded && (
             <p className="text-xs text-slate-600 mt-1 line-clamp-2">{rec.description}</p>

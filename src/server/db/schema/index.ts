@@ -13,3 +13,4 @@ export * from "./crypto-holdings";
 export * from "./equity-compensation";
 export * from "./agent-analysis";
 export * from "./relations";
+export * from "./legislation-cache";
