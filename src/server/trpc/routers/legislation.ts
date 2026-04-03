@@ -39,6 +39,34 @@ const TOPIC_QUERIES: Record<string, string> = {
 const CURRENT_CONGRESS = 119;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+// Non-substantive resolution types — they never amend tax law
+const EXCLUDED_BILL_TYPES = new Set(["hconres", "sconres", "hres", "sres"]);
+
+// Title must contain at least one of these terms to be considered tax/estate/investment relevant
+const RELEVANT_TITLE_TERMS = [
+  "tax", "taxes", "taxation", "taxable",
+  "estate", "inheritance", "trust",
+  "invest", "investment", "capital gain", "capital gains",
+  "depreciation", "deduction", "deductions",
+  "income", "revenue", "fiscal",
+  "retirement", "pension", "ira", "roth", "401",
+  "opportunity zone", "like-kind", "exchange",
+  "exemption", "credit", "dividend",
+  "bond", "basis", "amortization", "expensing",
+  "tariff", "customs", "import duty",
+  "securities", "financ",
+  "inflation reduction", "jobs act", "cuts and jobs",
+  "pass-through", "passthrough",
+  "net investment", "carried interest",
+  "alternative minimum",
+];
+
+function isRelevantBill(billType: string, title: string): boolean {
+  if (EXCLUDED_BILL_TYPES.has(billType.toLowerCase())) return false;
+  const titleLower = title.toLowerCase();
+  return RELEVANT_TITLE_TERMS.some((term) => titleLower.includes(term));
+}
+
 async function fetchBillsForTopic(
   topic: string,
   apiKey: string
@@ -62,7 +90,12 @@ async function fetchBillsForTopic(
   };
 
   const bills = data.bills ?? [];
-  return bills.map((b) => {
+
+  const filtered = bills.filter((b) =>
+    isRelevantBill(b.type ?? "hr", b.title ?? "")
+  );
+
+  return filtered.map((b) => {
     const billType = (b.type ?? "hr").toLowerCase();
     const billNumber = b.number ?? "";
     const billId = `${CURRENT_CONGRESS}-${billType}-${billNumber}`;
@@ -105,10 +138,11 @@ async function getOrFetchBills(
     .from(legislationCache)
     .where(gt(legislationCache.fetchedAt, cutoff));
 
-  // Filter cached rows that match at least one requested topic
+  // Filter cached rows that match at least one requested topic and pass the relevance filter
   const cachedForTopics = cached.filter((row) => {
     const tags = (row.topicTags as string[]) ?? [];
-    return topics.some((t) => tags.includes(t));
+    if (!topics.some((t) => tags.includes(t))) return false;
+    return isRelevantBill(row.billType, row.title);
   });
 
   if (cachedForTopics.length > 0) {
