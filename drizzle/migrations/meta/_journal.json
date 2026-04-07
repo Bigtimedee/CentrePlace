@@ -78,6 +78,13 @@
       "when": 1775168005393,
       "tag": "0010_lethal_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1744060800000,
+      "tag": "0011_enable_rls_new_tables",
+      "breakpoints": true
     }
   ]
 }
