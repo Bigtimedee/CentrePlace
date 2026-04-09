@@ -78,19 +78,24 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
     receivedRedirectUri: isOAuthReturn ? window.location.href : undefined,
     onSuccess: async (public_token, metadata) => {
       sessionStorage.removeItem(PLAID_TOKEN_KEY);
-      const res = await fetch("/api/plaid/exchange-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          public_token,
-          institution_name: metadata.institution?.name,
-        }),
-      });
-      if (!res.ok) {
-        console.error("[PlaidLinkButton] exchange-token failed:", res.status);
-        return;
+      try {
+        const res = await fetch("/api/plaid/exchange-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            public_token,
+            institution_name: metadata.institution?.name,
+          }),
+        });
+        if (!res.ok) {
+          console.error("[PlaidLinkButton] exchange-token failed:", res.status);
+          setTokenError("Failed to save bank connection. Please try again.");
+          return;
+        }
+        onSuccess();
+      } catch {
+        setTokenError("Network error while saving connection. Please try again.");
       }
-      onSuccess();
     },
     onExit: () => {
       sessionStorage.removeItem(PLAID_TOKEN_KEY);
