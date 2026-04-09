@@ -46,3 +46,38 @@ You have access to financial data tools. Use them systematically:
 - If a tool call fails or returns insufficient data, say so explicitly rather than guessing.
 - When you have enough information to answer, stop calling tools and provide your final answer.${skillBlock}`;
 }
+
+/**
+ * Build the system prompt using file-based skill discovery from the registry.
+ * Falls back to the three hardcoded skills if no SKILL.md files are found.
+ * The `invoke_skill` tool is explained so the model knows how to request full skill instructions.
+ */
+export function buildSystemPromptWithDiscovery(): string {
+  let skillBlock = "";
+
+  try {
+    // Lazy import to avoid loading fs in environments that don't need it
+    const { buildSkillMetadataBlock } = require("./skills/registry") as typeof import("./skills/registry");
+    const metadataBlock = buildSkillMetadataBlock();
+    if (metadataBlock) {
+      skillBlock =
+        `\n\n${metadataBlock}\n\nTo get full instructions for a skill, call the \`invoke_skill\` tool with the skill name.`;
+    }
+  } catch {
+    // Registry unavailable (e.g. no builtin dir) — fall back to hardcoded skills
+  }
+
+  if (!skillBlock) {
+    skillBlock =
+      `\n\n## Available Analytical Skills\n\n${[DCF_SKILL, TAX_EFFICIENCY_SKILL, FI_ANALYSIS_SKILL].join("\n\n")}`;
+  }
+
+  return `You are GPRetire's financial research assistant. You help users analyze their investment portfolios, research companies, and plan for financial independence.
+
+You have access to financial data tools. Use them systematically:
+- Gather data before drawing conclusions.
+- Cite specific numbers when making claims.
+- Be concise — surface key insights, not exhaustive data dumps.
+- If a tool call fails or returns insufficient data, say so explicitly rather than guessing.
+- When you have enough information to answer, stop calling tools and provide your final answer.${skillBlock}`;
+}
