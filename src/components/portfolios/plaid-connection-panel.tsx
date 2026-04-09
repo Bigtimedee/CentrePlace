@@ -51,18 +51,23 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
     return null;
   });
   const [fetching, setFetching] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(null);
 
   const fetchToken = useCallback(async () => {
     setFetching(true);
+    setTokenError(null);
     try {
       const res = await fetch("/api/plaid/create-link-token", { method: "POST" });
       if (!res.ok) {
         console.error("[PlaidLinkButton] create-link-token failed:", res.status);
+        setTokenError("Unable to start bank connection. Please try again.");
         return;
       }
       const data = (await res.json()) as { link_token: string };
       sessionStorage.setItem(PLAID_TOKEN_KEY, data.link_token);
       setLinkToken(data.link_token);
+    } catch {
+      setTokenError("Network error. Please check your connection and try again.");
     } finally {
       setFetching(false);
     }
@@ -106,10 +111,15 @@ function PlaidLinkButton({ onSuccess }: { onSuccess: () => void }) {
   }, [linkToken, ready, open]);
 
   return (
-    <Button onClick={handleClick} disabled={fetching} size="sm" className="gap-2">
-      <Link2 className="h-4 w-4" />
-      {fetching ? "Loading…" : "Connect Account"}
-    </Button>
+    <div className="flex flex-col items-end gap-1">
+      <Button onClick={handleClick} disabled={fetching} size="sm" className="gap-2">
+        <Link2 className="h-4 w-4" />
+        {fetching ? "Loading…" : "Connect Account"}
+      </Button>
+      {tokenError && (
+        <p className="text-xs text-destructive">{tokenError}</p>
+      )}
+    </div>
   );
 }
 
